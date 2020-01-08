@@ -4,10 +4,10 @@
   "navigationBarTitleText": "",
   "navigationBarTextStyle": "black",
   "usingComponents": {
-   "i-button": "../../../static/dist/button/index",
-   "i-action-sheet": "../../../static/dist/action-sheet/index",
-   "i-tabs": "../../../static/dist/tabs/index",
-   "i-tab": "../../../static/dist/tab/index",
-   "i-switch": "../../../static/dist/switch/index"
+   "i-button": "../../../static/iviewUI/button/index",
+   "i-action-sheet": "../../../static/iviewUI/action-sheet/index",
+   "i-tabs": "../../../static/iviewUI/tabs/index",
+   "i-tab": "../../../static/iviewUI/tab/index",
+   "i-switch": "../../../static/iviewUI/switch/index"
   }
 }
