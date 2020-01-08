@@ -1,0 +1,13 @@
+{
+  "backgroundTextStyle": "light",
+  "navigationBarBackgroundColor": "#fff",
+  "navigationBarTitleText": "",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {
+   "i-button": "../../../static/dist/button/index",
+   "i-action-sheet": "../../../static/dist/action-sheet/index",
+   "i-tabs": "../../../static/dist/tabs/index",
+   "i-tab": "../../../static/dist/tab/index",
+   "i-switch": "../../../static/dist/switch/index"
+  }
+}
