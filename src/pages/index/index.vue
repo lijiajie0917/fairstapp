@@ -59,9 +59,30 @@ export default {
     //     console.log(res.model)
     //   }
     // })
+    // 检查浏览器缓存中是否有账户信息，若有则请求校验
+    // console.log("缓存",wx.getStorageSync('JSESSIONID'))
+    if(wx.getStorageSync('JSESSIONID')){
+      this.checkName(wx.getStorageSync('JSESSIONID'))
+    }
   },
-
   methods: {
+    async checkName(token){
+      this.$httpWX.post({
+        url: '/logined',
+        header: {
+          'content-Type': 'application/json',
+          'Authorization': token
+        },
+      }).then(res => {
+        var data = res.data;
+        // console.log("请求成功==>",res);
+        if (res.status === '200') {
+          wx.navigateTo({
+            url: '/pages/test1/main',
+          })
+        }
+      })
+    },
     // 用户名密码输入时触发
     show:function(){
       if (this.form.username != '' && this.form.password != '') {
@@ -103,7 +124,7 @@ export default {
           },
         }).then(res => {
           var data = res.data;
-          // console.log(data);
+          // console.log("请求成功====>",res);
           // console.log(res.data.pros[3].id);
           // wx.setStorageSync("projectId", res.data.pros[3].id);
           if (res.status === '200') {
