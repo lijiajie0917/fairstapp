@@ -33,8 +33,15 @@
     </div>
     <div class="information" :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment">
       <div class="tabBox">
-        <div class="tabs" @click="cur=0" :class="{active:cur==0}">实时数据</div>
-        <div class="tabs" @click="cur=1" :class="{active:cur==1}">设备控制</div>
+        <div class="tabs" @click="cur=0" :class="{active:cur==0}">实时数据
+          <img class="tabs-border" src="../../../static/images/border.png" alt="">
+        </div>
+        <div class="tabs" @click="cur=2" :class="{active:cur==2}">数据分析
+          <img class="tabs-border" src="../../../static/images/border.png" alt="">
+        </div>
+        <div class="tabs" @click="cur=1" :class="{active:cur==1}">设备控制
+          <img class="tabs-border" src="../../../static/images/border.png" alt="">
+        </div>
       </div>
       <div class="tabCountent">
         <div v-show="cur==0" class='tab1'>
@@ -45,6 +52,11 @@
               <p class="tabNumber">{{item.attachments.current}}{{item.unit}}</p>
             </li>
           </ul>
+        </div>
+        <div v-show="cur==2" class='tab1'>
+          <div class="dataEcharts">
+
+          </div>
         </div>
         <div v-show="cur==1" class='tab1'>
           <ul class="tabUl2">
@@ -281,11 +293,11 @@ export default {
   height: 645px!important;
 }
 .information .tabBox{
-  width: 164px;
+  width: 246px;
   height: 28.5px;
-  background: #fff;
+  background:transparent;
   border-radius: 20px;
-  margin: 17.5px 0 18px 108px;
+  margin: 17.5px 0 18px 66px;
 }
 .information .tabBox .tabs{
   width: 82px;
@@ -294,14 +306,25 @@ export default {
   font-size: 14px;
   text-align: center;
   float: left;
-  color: #555555;
+  color: #777777;
   border-radius: 20px;
+  position: relative;
+}
+.information .tabBox .tabs .tabs-border{
+  width: 32.5px;
+  height: 2.5px;
+  position: absolute;
+  top: 30px;
+  left: 27px;
+  display: none;
 }
 .information .tabBox .active{
-    background-color: #175CFF;
-    color: #fff;
+  color: #222222;
 }
-.information .tabCountent .tabUl,.information .tabCountent .tabUl2{
+.information .tabBox .active .tabs-border{
+  display: block;
+}
+.information .tabCountent .tabUl,.information .tabCountent .tabUl2,.information .tabCountent .dataEcharts{
   padding-left: 15px;
 }
 .information .tabCountent .tabUl .tabList{

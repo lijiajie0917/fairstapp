@@ -32,9 +32,14 @@
   <div class="insetWrap">
     <img class="insetLogo" src="../../../static/images/inset.jpg" alt="">
     <p class="insetTitle">智慧农业信息化<br/>管理平台</p>
+    <div class="project-down" @click="iconDown = !iconDown">
+      <img class="projectIcon" src="../../../static/images/project.png" alt="">
+      选择项目
+      <img class="downIcon" :src="iconDown ? prodown : protop" alt="">
+    </div>
     <a href="/pages/greenhouse/main">
       <div class="insetBtn">
-        智慧农业大棚
+        智慧大棚
       </div>
     </a>
     <a href="#">
@@ -63,8 +68,9 @@ export default {
       isActive: false,
       showPass:false,
       errorBlock:false,
-      closeeyesImg:require("../../../static/images/closeeyes.png"),
-      openeyesImg:require("../../../static/images/openeyes.png"),
+      iconDown:true,
+      prodown:require("../../../static/images/prodown.png"),
+      protop:require("../../../static/images/protop.png"),
     }
   },
 
@@ -109,35 +115,57 @@ export default {
 .insetWrap .insetLogo{
   width: 211px;
   height: 170.5px;
-  margin: 67px 0 43.5px 81.5px;
+  margin: 40px 0 43.5px 81.5px;
 }
 .insetWrap .insetTitle{
   color: #333333;
-  font-size: 19px;
+  font-size: 24px;
   width: 196.5px;
   height: 53px;
   text-align: center;
   line-height: 35px;
   letter-spacing:2px;
   margin-left: 88.5px;
+  margin-bottom:70px;
 }
 .insetWrap .insetBtn{
-  width: 294.5px;
-  height: 46.5px;
-  line-height: 46.5px;
+  width: 275px;
+  height: 44px;
+  line-height: 44px;
   font-size: 17px;
   background: #FFFFFF;
   border-radius: 50px;
   color: #0057FF;
-  margin-top: 50px;
+  margin-top: 25px;
   box-shadow: 0px 0px 20px #e6f0fe;
   text-align:center;
-  margin-left:40px;
+  margin-left:50px;
 }
 .insetWrap .insetBtnGray{
   color: #8da7ff;
 }
 navigator{
   background:#fff;
+}
+.project-down{
+  width: 275px;
+  height: 44px;
+  line-height: 44px;
+  background: #0057FF;
+  border-radius: 50px;
+  margin-left: 50px;
+  color: #fff;
+  font-size: 17px;
+}
+.project-down .projectIcon{
+  width: 13.5px;
+  height: 12px;
+  margin: 16.5px 15px 0 22px;
+}
+.project-down .downIcon{
+  width: 14.5px;
+  height: 8px;
+  float: right;
+  margin: 18.5px 22px 0 0;
 }
 </style>

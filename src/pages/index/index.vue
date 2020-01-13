@@ -13,6 +13,9 @@
         <input v-else type="password" class="user" @input="show($event)" v-model="form.password" placeholder="密码">
         <img class="eyes" :src="showPass ? closeeyesImg : openeyesImg" @click="showPass = !showPass" alt="">
       </div>
+      <div class="rememberDiv">
+
+      </div>
       <button class="butLogin" @click="btnLogin" :class="{'active':isActive}" type="button" name="button">登录</button>
     </form>
     <p class="errorAlert" v-show="errorBlock">
@@ -157,14 +160,14 @@ export default {
   text-decoration: underline;
 }
 .logoImange{
-  width: 65px;
-  height: 64px;
-  margin: 48px 0px 40px 155px;
+  width: 70px;
+  height: 69px;
+  margin: 45.5px 0px 34px 152.5px;
 }
 .bannerName{
   color: #0057FF;
-  font-size: 18px;
-  margin-left: 98px;
+  font-size: 22px;
+  margin-left: 78px;
   margin-bottom: 62px;
 }
 .formBox .boxShadow{
@@ -204,7 +207,7 @@ footer{
   color: #999999;
   font-size: 12px;
   position: absolute;
-  bottom: 9.5px;
+  bottom: 29.5px;
   left: 110.5px;
 }
 .boxShadow .eyes{
