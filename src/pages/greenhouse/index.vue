@@ -183,9 +183,6 @@ export default {
       isIphoneX11:this.globalData.isIphoneX11, //适配iphonex11
       downImage:true,
       downImage2:true,
-      navH: 0, //导航栏高度
-      width: 0, //进度条宽度
-      timeDate:{},
       form: {
         item: '',
         time: ''
@@ -212,61 +209,22 @@ export default {
       columnName:'空气温度',
       unitName:'℃',
       screenWidth:'',
+      navH: 0, //导航栏高度
+      width: 0, //进度条宽度
+      timeDate:{},
     }
   },
   created:function(){
     this.getHeight();
+    this.homePage();
+    wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
   },
   mounted(){
     this.projectId = this.$root.$mp.query.projectId;
-    this.homePage();
-    wx.hideShareMenu();//禁止出现转发按钮
   },
   methods: {
-    // 进度条数值传入当前值，量程上限和量程下限
-    solitNumber(num,max,min){
-      let total = parseInt(max - min);//量程范围
-      let nim = num-min;//当前值相对于量程所占总数
-      let x = nim/total;//当前值随后赞量程百分比
-      if(num == min){//当前值等于量程下限
-        return 0;
-      }else{
-        if(x<1&&x>0){//当前值处于量程范围内属于正常值
-        // console.log(x)
-          let w = this.width * 0.3
-          return x*w;
-        }else{
-          // console.log("x=>",x)
-          if(x<0){
-            // console.log("小于下限",num,min)
-            return "Min";
-          }
-          if(x>1){
-            // console.log("大于上限",num,max)
-            return "Max";
-          }
-        }
-      }
-    },
-    /**标题栏返回按钮 */
-    navBack(){
-      wx.navigateBack({
-        delta: 1
-      })
-    },
-    /**测量屏幕高度,计算标题栏高度 */
-    getHeight(){
-      let that = this;
-      wx.getSystemInfo({
-        success: function(res) {
-          // console.log(res)
-          that.navH = res.statusBarHeight + 46;
-          that.width = res.screenWidth;
-        }
-      })
-    },
     // 初始化echarts
     dataEcharts (canvas, width, height) {
       // 初始化宽高
@@ -432,6 +390,48 @@ export default {
       this.date = e.target.value;
       this.time = this.date;
       this.echartsAjax();
+    },
+    // 进度条数值传入当前值，量程上限和量程下限
+    solitNumber(num,max,min){
+      let total = parseInt(max - min);//量程范围
+      let nim = num-min;//当前值相对于量程所占总数
+      let x = nim/total;//当前值随后赞量程百分比
+      if(num == min){//当前值等于量程下限
+        return 0;
+      }else{
+        if(x<1&&x>0){//当前值处于量程范围内属于正常值
+        // console.log(x)
+          let w = this.width * 0.3
+          return x*w;
+        }else{
+          // console.log("x=>",x)
+          if(x<0){
+            // console.log("小于下限",num,min)
+            return "Min";
+          }
+          if(x>1){
+            // console.log("大于上限",num,max)
+            return "Max";
+          }
+        }
+      }
+    },
+    /**标题栏返回按钮 */
+    navBack(){
+      wx.navigateBack({
+        delta: 1
+      })
+    },
+    /**测量屏幕高度,计算标题栏高度 */
+    getHeight(){
+      let that = this;
+      wx.getSystemInfo({
+        success: function(res) {
+          // console.log(res)
+          that.navH = res.statusBarHeight + 46;
+          that.width = res.screenWidth;
+        }
+      })
     },
     homePage () {
       // this.projectId = wx.getStorageSync("projectId");
