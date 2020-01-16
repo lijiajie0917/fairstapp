@@ -4,10 +4,9 @@
     <div class='nav' :style="{height:(navH)+'px'}">
       <div class='title_icon'>
         <img class="back" src="../../../static/images/backIcon.png" @click='navBack' alt="" mode='aspectFit'>
-        <!-- <image src='../../icon/right.png' mode='aspectFit' class='back' bindtap='navBack' /> -->
       </div>
+      <div class="title_text">智慧农业大棚</div>
     </div>
-    <!-- <div :style="{'padding-top':(navH)+'px'}"></div> -->
     <div class="areaGreenhouseBox" :style="{'top':(navH+20)+'px'}">
       <div class="A_hook">
         <div class="hook"></div>
@@ -49,7 +48,9 @@
       <div class="timeTxt">上次采集时间：{{timeDate.timeHH}}:{{timeDate.timeMM}}:{{timeDate.timeSS}}</div>
       <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5.png" alt="">
     </div>
-    <div class="information" :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment">
+    <div class="information"
+      :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
+    >
       <div class="tabBox">
         <div class="tabs" @click="cur=0" :class="{active:cur==0}">实时数据
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
@@ -70,19 +71,21 @@
               <p class="tabNumber">{{item.attachments.current}}{{item.unit}}</p>
               <div class="tabRange">
                 <div class="range_bottomSolid" :style="{background:(item.color)}"></div>
-                <div class="range_topSolid" :style="{background:(item.color)}"></div>
+                <div class="range_topSolid"
+                  :style="{background:(item.total != 'Min' && item.total != 'Max'?item.color:item.alertColor)}"
+                ></div>
                 <img class="range_alert leftMin"
                   alt=""
                   src="../../../static/images/alert.gif"
-                  v-if="item.attachments.current < item.min"
+                  v-if="item.total == 'Min'"
                 >
                 <img class="range_alert rightMax"
                   alt=""
                   src="../../../static/images/alert.gif"
-                  v-if="item.attachments.current > item.max"
+                  v-if="item.total == 'Max'"
                 >
                 <div class="range_centerSolid"
-                  v-if="item.attachments.current >= item.min && item.attachments.current <= item.max"
+                  v-if="item.total != 'Min' && item.total != 'Max'"
                   :style="{background:(item.color), left:(item.total+28)+'px'}"
                 >
                   <div class="range_circular"
@@ -90,7 +93,7 @@
                   ></div>
                 </div>
                 <div class="range_txt"
-                  :style="{top:(item.attachments.current > item.min && item.attachments.current < item.max?'0':'16px')}"
+                  :style="{top:(item.total != 'Min' && item.total != 'Max'?'0':'16px')}"
                 >
                   <div>{{item.min}}{{item.unit}}</div>
                   <div>{{item.max}}{{item.unit}}</div>
@@ -174,15 +177,18 @@ export default {
       if(num == min){
         return 0;
       }else{
-        if(1>x>0){
+        if(x<1&&x>0){
         // console.log(x)
           let w = this.width * 0.3
           return x*w;
         }else{
-          if(num<min){
+          console.log("x=>",x)
+          if(x<0){
+            console.log("小于下限",num,min)
             return "Min";
           }
-          if(num>max){
+          if(x>1){
+            console.log("大于上限",num,max)
             return "Max";
           }
         }
@@ -287,20 +293,22 @@ export default {
         var data = res.data;
         // console.log("7要素最新数据",data);
         let list = data;
-        let colorlist = [
-          "#50E2CD","#FDC061","#4950B2","#FB724D","#FDC061","#50E2CD","#41A1F2"
-        ]
+        // let colorlist = [
+        //   "#50E2CD","#FDC061","#4950B2","#FB724D","#FDC061","#50E2CD","#41A1F2"
+        // ]
         for(let i in list){
           list[i].total = this.solitNumber(list[i].attachments.current,list[i].max,list[i].min)
-          for(let j in colorlist){
-            list[i].color = colorlist[i];
-          }
+          list[i].color = "#6A97FF"
+          list[i].alertColor = "#FA0830"
+          // for(let j in colorlist){
+          //   list[i].color = colorlist[i];
+          // }
         }
         list[0].unit = "%RH";
         list[list.length-2].unit = "%RH";
         list[list.length-1].unit = "W/cm²";
         this.equipment = nodeId;
-        // console.log("secai",list);
+        console.log("secai",list);
         this.realTimeItems = list;
       })
     },
@@ -395,18 +403,23 @@ export default {
   left: 0;
   z-index: 10;
   border-bottom: 0.5px solid rgba(255,255,255,.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .title_text {
   width: 100%;
-  height: 45px;
-  line-height: 45px;
+  line-height: 23px;
   text-align: center;
   position: absolute;
-  bottom: 0;
+  bottom: 10px;
   left: 0;
   z-index: 10;
-  font-size: 34rpx;
+  font-size:17px;
+  font-family:PingFang SC;
+  font-weight:bold;
+  color:rgba(255,255,255,1);
 }
 
 .title_icon {
@@ -591,6 +604,7 @@ export default {
   display: flex;
   justify-content: space-between;
   flex-wrap:wrap;
+  padding-bottom: 15px;
 }
 
 .information .tabCountent .tabUl .tabList{
