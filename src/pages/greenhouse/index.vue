@@ -82,7 +82,7 @@
                   v-if="item.attachments.current > item.max"
                 >
                 <div class="range_centerSolid"
-                  v-if="item.attachments.current == item.min || item.attachments.current == item.max||item.max>item.attachments.current > item.min"
+                  v-if="item.attachments.current >= item.min && item.attachments.current <= item.max"
                   :style="{background:(item.color), left:(item.total+28)+'px'}"
                 >
                   <div class="range_circular"
