@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="Update_time">
-      <div class="timeTxt">上次采集时间：{{timeDate.timeHH}}:{{timeDate.timeMM}}:{{timeDate.timeSS}}</div>
+      <div class="timeTxt">上次采集时间：{{timeDate.timeHH}}：{{timeDate.timeMM}}：{{timeDate.timeSS}}</div>
       <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5.png" alt="">
     </div>
     <div class="information"
@@ -172,23 +172,23 @@ export default {
     // 进度条数值传入当前值，量程上限和量程下限
     solitNumber(num,max,min){
       let total = parseInt(max - min);//量程范围
-      let nim = num-min;
-      let x = nim/total;
-      if(num == min){
+      let nim = num-min;//当前值相对于量程所占总数
+      let x = nim/total;//当前值随后赞量程百分比
+      if(num == min){//当前值等于量程下限
         return 0;
       }else{
-        if(x<1&&x>0){
+        if(x<1&&x>0){//当前值处于量程范围内属于正常值
         // console.log(x)
           let w = this.width * 0.3
           return x*w;
         }else{
-          console.log("x=>",x)
+          // console.log("x=>",x)
           if(x<0){
-            console.log("小于下限",num,min)
+            // console.log("小于下限",num,min)
             return "Min";
           }
           if(x>1){
-            console.log("大于上限",num,max)
+            // console.log("大于上限",num,max)
             return "Max";
           }
         }
@@ -297,18 +297,22 @@ export default {
         //   "#50E2CD","#FDC061","#4950B2","#FB724D","#FDC061","#50E2CD","#41A1F2"
         // ]
         for(let i in list){
+          //进度条百分比
           list[i].total = this.solitNumber(list[i].attachments.current,list[i].max,list[i].min)
+          //进度条正常颜色
           list[i].color = "#6A97FF"
+          //进度条报警颜色
           list[i].alertColor = "#FA0830"
           // for(let j in colorlist){
           //   list[i].color = colorlist[i];
           // }
         }
+        //单位完善
         list[0].unit = "%RH";
         list[list.length-2].unit = "%RH";
         list[list.length-1].unit = "W/cm²";
         this.equipment = nodeId;
-        console.log("secai",list);
+        // console.log("secai",list);
         this.realTimeItems = list;
       })
     },
