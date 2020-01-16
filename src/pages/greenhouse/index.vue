@@ -175,7 +175,7 @@ export default {
         return 0;
       }else{
         if(1>x>0){
-        console.log(x)
+        // console.log(x)
           let w = this.width * 0.3
           return x*w;
         }else{
@@ -312,7 +312,7 @@ export default {
           'nodeId' : '',
         }
       }).then(res => {
-        console.log("设备状态",res)
+        // console.log("设备状态",res)
         var data = res.data;
         this.deciveItems = data;
       })
