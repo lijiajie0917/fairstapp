@@ -167,7 +167,7 @@ export default {
       greenhouse:'',
       equipment:'选择设备',
       cur:0, //默认选中第一个tab
-      projectId:'',
+      projectId:7,
       switch1:false,
       visible1:false,
       visible2:false,
