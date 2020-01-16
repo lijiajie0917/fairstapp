@@ -2,12 +2,8 @@
   "backgroundTextStyle": "light",
   "navigationBarBackgroundColor": "#4562fc",
   "navigationBarTitleText": "智慧农业大棚",
-  "navigationBarTextStyle": "#fff",
+  "navigationBarTextStyle": "white",
   "usingComponents": {
-   "i-button": "../../../static/iviewUI/button/index",
-   "i-action-sheet": "../../../static/iviewUI/action-sheet/index",
-   "i-tabs": "../../../static/iviewUI/tabs/index",
-   "i-tab": "../../../static/iviewUI/tab/index",
    "i-switch": "../../../static/iviewUI/switch/index"
   }
 }

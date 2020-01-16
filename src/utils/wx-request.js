@@ -61,9 +61,24 @@ function post (obj) {
   return request(obj.url, 'POST', obj.data)
 }
 
+// 获取时间
+function formatTime (){
+  var timestamp = Date.parse(new Date());
+  var date = new Date(timestamp);
+  //获取年份  
+  var Y =date.getFullYear();
+  //获取月份  
+  var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1);
+  //获取当日日期 
+  var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+  var timeDate = Y + '-' + M + '-' + D
+  return timeDate;
+}
+
 export default {
   request,
   get,
   post,
-  host
+  host,
+  formatTime
 }
