@@ -216,13 +216,13 @@ export default {
   },
   created:function(){
     this.getHeight();
-    this.homePage();
     wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
   },
   mounted(){
     this.projectId = this.$root.$mp.query.projectId;
+    this.homePage();
   },
   methods: {
     // 初始化echarts
@@ -237,6 +237,10 @@ export default {
         width: this.screenWidth - 50,
         height: 350
       });
+
+      // 请求图表数据
+      this.echartsAjax();
+
       canvas.setChart(chart);
 
       // 返回动态触摸效果
@@ -486,8 +490,6 @@ export default {
             this.realTimeData(this.equipment,this.gatewayId);
             // 获取设备控制列表
             this.controlNode(greenhouseId,this.equipment);
-            // 请求图表数据
-            this.echartsAjax();
           }
         }
       })
