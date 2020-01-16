@@ -104,7 +104,23 @@
         </div>
         <div v-if="cur==2" class='tab1'>
           <div class="dataEcharts">
-
+            <form :model="form" autocomplete="off" class="formBox">
+              <picker class="user" @change="handlePickerChange" :value="selectedIndex" :range-key="'name'" :range="myAnnual">
+                <view class="picker">{{myAnnual[selectedIndex].name}}
+                  <img class="userDown" src="../../../static/images/down.png" alt="">
+                </view>
+              </picker>
+              <picker class="user" mode="date" :value="date" start="2015-01-01" end="2020-09-01" @change="bindDateChange">
+                <view class="picker">
+                  {{time}}
+                  <img class="userDown" src="../../../static/images/down.png" alt="">
+                </view>
+              </picker>
+              <!-- <button class="exportBtn" type="button" name="button">导出</button> -->
+            </form>
+            <div class="echarts-wrap">
+              <mpvue-echarts :echarts="echarts" :onInit="dataEcharts" canvasId="demo-canvas" />
+            </div>
           </div>
         </div>
         <div v-if="cur==1" class='tab1'>
@@ -133,16 +149,25 @@
 
 <script>
 
-// const { $Toast } = require('../../../static/dist/base/index');
+import echarts from 'echarts'
+import mpvueEcharts from 'mpvue-echarts'
+
+let chart
+
+
 
 export default {
+  components: {
+    mpvueEcharts
+  },
   data () {
     return {
+      echarts,
       areaText:'',
       greenhouse:'',
       equipment:'选择设备',
       cur:0, //默认选中第一个tab
-      projectId:7,
+      projectId:'',
       switch1:false,
       visible1:false,
       visible2:false,
@@ -160,11 +185,42 @@ export default {
       downImage2:true,
       navH: 0, //导航栏高度
       width: 0, //进度条宽度
-      timeDate:{}
+      timeDate:{},
+      form: {
+        item: '',
+        time: ''
+      },
+      selectedIndex: 0,
+      myAnnual: [
+        {name : "空气温度" , key : "air_temperature",unit : "℃"},
+        {name : "空气湿度" , key : "air_humidity"},
+        {name : "光照度" , key : "lux",unit : "lux"},
+        {name : "co2浓度" , key : "CO2",unit : "ppm"},
+        {name : "土壤温度" , key : "soil_temperature",unit : "℃"},
+        {name : "土壤湿度" , key : "soil_humidity"},
+        {name : "酸碱度" , key : "ph"},
+      ],
+      date: '',
+      sysType:1,
+      pId:'72845e87-eabb-41dc-8157-5f62a7d2721e',
+      nodeId:6,
+      time:'',
+      timeAge:[],
+      dataAge:[],
+      startLength:'',
+      columnKey:'air_temperature',
+      columnName:'空气温度',
+      unitName:'℃',
+      screenWidth:'',
     }
   },
-  created() {
+  created:function(){
     this.getHeight();
+    this.date = this.$httpWX.formatTime();
+    this.time = this.$httpWX.formatTime();
+  },
+  mounted(){
+    this.projectId = this.$root.$mp.query.projectId;
     this.homePage();
     wx.hideShareMenu();//禁止出现转发按钮
   },
@@ -211,18 +267,184 @@ export default {
         }
       })
     },
+    // 初始化echarts
+    dataEcharts (canvas, width, height) {
+      // 初始化宽高
+      wx.getSystemInfo({
+        success: res => {
+          this.screenWidth = res.screenWidth;
+        }
+      })
+      chart = echarts.init(canvas, null, {
+        width: this.screenWidth - 50,
+        height: 350
+      });
+      canvas.setChart(chart);
+
+      // 返回动态触摸效果
+      return chart
+
+    },
+    echartsAjax(){
+      this.$httpWX.post({
+        // this.gatewayId 改为 this.pId 查看已有数据
+        url: '/miniProgram/history',
+        data: {
+          gatewayId:this.gatewayId,
+          nodeId:this.equipment,
+          time:this.time,
+          field:this.columnKey,
+        }
+      }).then(res => {
+        var data = res.data;
+        this.timeAge = [];
+        this.dataAge = [];
+        for (var i = 0; i < data.length; i++) {
+          this.timeAge.push(data[i].gatherTime);
+          this.dataAge.push(data[i].field);
+        }
+        // 设置图表样式及数据
+        chart.setOption(this.getBarOption(this.timeAge,this.dataAge))
+      })
+    },
+    getBarOption(timeAge,dataAge){
+      if (dataAge.length > 40) {
+        this.startLength = 100 - (4000/dataAge.length)
+      } else {
+        this.startLength = 0;
+      }
+      return {
+        title: {
+                text: this.unitName,
+                textStyle:{
+                  fonnSize :'11'
+                }
+            },
+            // tooltip: {
+            //     trigger: 'axis'
+            // },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross'
+                }
+            },
+            legend: {
+                data:[this.columnName]
+            },
+            dataZoom : [
+              {
+                   type: 'slider',//图表下方的伸缩条
+                   show : true,  //是否显示
+                   realtime : true,  //
+                   start : this.startLength,  //伸缩条开始位置（1-100），可以随时更改
+                   end : 100,  //伸缩条结束位置（1-100），可以随时更改
+              },
+           ],
+            grid: {
+                left: '4%',
+                right: '4%',
+                bottom: '13%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                  restore: {show: true},
+                }
+            },
+            xAxis: {
+                type: 'category',
+                axisLabel:{
+                  interval:5,
+                  margin: 20,
+                  textStyle: {
+                     color: '#444444'
+                 },
+                },
+                axisLine: {  //设置x轴坐标线的样式
+                    lineStyle: {
+                        color: '#D1D1D1',//x轴坐标线的颜色
+                    }
+                },
+                boundaryGap: false,
+                data:timeAge,
+            },
+            yAxis: {
+                // 背景线
+                splitLine:{
+                  lineStyle:{
+                    type:'dashed',
+                    color:'#D1D1D1'
+                  }
+                },
+                axisLabel:{
+                  margin: 20,
+                  textStyle: {
+                     color: '#444444'
+                 },
+                },
+                axisTick:{ //y轴刻度线
+        		       show:false
+                },
+                axisLine:{ //y轴
+            	    show:false
+                },
+            },
+            series: [
+                {
+                    name:this.columnName,
+                    type:'line',
+                    stack: '总量',
+                    smooth: true,
+                    data:dataAge,
+                    lineStyle:{
+                     color:'#175CFF'
+                    },
+                    itemStyle : {
+                              normal : {
+                                color:'#175CFF'
+                              }
+                    },
+                    areaStyle: {
+                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: '#175CFF'
+                      }, {
+                        offset: 1,
+                        color: '#fff'
+                      }])
+                    },
+                },
+            ]
+      }
+    },
+    // 选择七要素
+    handlePickerChange (e) {
+      this.selectedIndex = e.target.value
+      this.columnKey = this.myAnnual[e.target.value].key
+      this.columnName = this.myAnnual[e.target.value].name;
+      this.unitName = this.myAnnual[e.target.value].unit;
+      this.echartsAjax();
+    },
+    // 选择时间
+    bindDateChange: function(e) {
+      // console.log(e.target.value)
+      this.date = e.target.value;
+      this.time = this.date;
+      this.echartsAjax();
+    },
     homePage () {
       // this.projectId = wx.getStorageSync("projectId");
-      let jsid = wx.getStorageSync("JSESSIONID");
+      // let jsid = wx.getStorageSync("JSESSIONID");
       this.$httpWX.post({
         url: '/miniProgram/groupInfo/' + this.projectId,
         data: {
           'county': '修文县',
         },
-        header: {
-          'content-type':'application/x-www-form-urlencoded',
-          'cookie': jsid // 设置cookie
-        },
+        // header: {
+        //   'content-type':'application/x-www-form-urlencoded',
+        //   'cookie': jsid // 设置cookie
+        // },
       }).then(res => {
         var data = res.data;
         if (data.level == 'area') {
@@ -264,6 +486,8 @@ export default {
             this.realTimeData(this.equipment,this.gatewayId);
             // 获取设备控制列表
             this.controlNode(greenhouseId,this.equipment);
+            // 请求图表数据
+            this.echartsAjax();
           }
         }
       })
@@ -331,6 +555,9 @@ export default {
     },
     equipmentClick(nodeId,gatewayId){
       this.realTimeData(nodeId,gatewayId);
+      this.equipment = nodeId;
+      this.gatewayId = gatewayId;
+      this.echartsAjax();
       this.visible2 = false;
       this.downImage2 = true;
     },
@@ -339,7 +566,7 @@ export default {
       this.visible1 = false;
     },
     onChange(gatewayId,nodeId,switch1){
-      console.log(switch1);
+      // console.log(switch1);
       var switchflg = !switch1;
       var cmd = switch1;
       if (cmd == false) {
@@ -351,7 +578,7 @@ export default {
         url: '/sensor/' + gatewayId + '/' + nodeId + '/' + cmd,
         data: {}
       }).then(res => {
-        console.log(res)
+        // console.log(res)
         if (res.status == "200") {
           this.switch1 = switchflg;
         }
@@ -490,6 +717,7 @@ export default {
   background:rgba(243,245,250,1);
   border-radius:10px;
   margin-bottom: 10px;
+  font-size: 15px;
 }
 .areaGreenhouse .areaDown{
   width: 14.5px;
@@ -584,6 +812,7 @@ export default {
 }
 .tabCountent {
   width: 100vw;
+  padding-left: 15px;
   /* max-height: 100%; */
   overflow-x: hidden;
   overflow-y: auto;
@@ -603,14 +832,12 @@ export default {
   padding-bottom: 100px;
 }
 .information .tabCountent .tabUl,.information .tabCountent .tabUl2,.information .tabCountent .dataEcharts{
-  padding-left: 15px;
   width: 360px;
   display: flex;
   justify-content: space-between;
   flex-wrap:wrap;
   padding-bottom: 15px;
 }
-
 .information .tabCountent .tabUl .tabList{
   width: 165px;
   height: 117px;
@@ -714,6 +941,45 @@ export default {
   margin-bottom: 15px;
   padding-top: 21px;
   position: relative;
+}
+.information .tabCountent .dataEcharts{
+  width: 335px;
+  height: 415px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px 0 0 15px;
+}
+.information .tabCountent .dataEcharts .formBox .user{
+  width: 109px;
+  height: 27.5px;
+  line-height: 27.5px;
+  padding-left: 5.5px;
+  background: #F3F5FA;
+  border: 1px solid #D8D8D8;
+  border-radius: 5px;
+  float: left;
+  margin-right: 15px;
+  font-size: 14px;
+  color: #666666;
+}
+.information .tabCountent .dataEcharts .formBox .user .userDown{
+  width: 12px;
+  height: 6.5px;
+  float: right;
+  margin: 10.5px 5px;
+}
+.information .tabCountent .dataEcharts .formBox .exportBtn{
+  width: 56px;
+  height: 27.5px;
+  line-height: 25px;
+  text-align: center;
+  color: #175CFF;
+  font-size: 13px;
+  border-radius: 50px;
+  float: right;
+  background: transparent;
+  border: 1px solid #175CFF;
+  margin-right: 15px;
 }
 .equipmentList .equipmentImg{
   width: 50px;
@@ -851,5 +1117,10 @@ export default {
   line-height: 37px;
   text-align: center;
   border-bottom: 1px solid #5E5E5E;
+}
+.echarts-wrap {
+  width: 100%;
+  height: 350px;
+  margin-top: 50px;
 }
 </style>

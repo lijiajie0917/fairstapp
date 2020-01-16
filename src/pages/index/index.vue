@@ -27,7 +27,6 @@
 
 <script>
 
-// const { $Toast } = require('../../../static/dist/base/index');
 import {saveUserInfo} from '../../assets/js/auth'
 // 导入 click-counter 组件
 // import ClickCounter from "@/components/click-counter";
@@ -103,22 +102,6 @@ export default {
             mask:true
         })
       } else {
-        // wx.login({
-        //   success:function(res){
-        //     console.log(res.code)
-        //     //发送请求
-        //     wx.request({
-        //       url: 'test.php', //接口地址
-        //       data: {code:res.code},
-        //       header: {
-        //         'content-type': 'application/json' //默认值
-        //       },
-        //       success: function (res) {
-        //         console.log(res.data)
-        //       }
-        //     })
-        //   }
-        // })
         this.$httpWX.post({
           url: '/mini/signIn',
           data: {
@@ -129,7 +112,7 @@ export default {
           var data = res.data;
           // console.log("请求成功====>",res);
           // console.log(res.data.pros[3].id);
-          // wx.setStorageSync("projectId", res.data.pros[3].id);
+          wx.setStorageSync("prosItem", res.data.pros);
           if (res.status === '200') {
             saveUserInfo(res.msg)
             wx.navigateTo({
