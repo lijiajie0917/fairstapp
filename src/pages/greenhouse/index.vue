@@ -946,10 +946,10 @@ export default {
 }
 .information .tabCountent .dataEcharts{
   width: 335px;
-  height: 415px;
   background: #fff;
   border-radius: 10px;
-  padding: 15px 0 0 15px;
+  padding: 15px 0 15px 15px;
+  margin-bottom: 80px;
 }
 .information .tabCountent .dataEcharts .formBox .user{
   width: 109px;
@@ -1123,6 +1123,6 @@ export default {
 .echarts-wrap {
   width: 100%;
   height: 350px;
-  margin-top: 50px;
+  margin-top: 15px;
 }
 </style>
