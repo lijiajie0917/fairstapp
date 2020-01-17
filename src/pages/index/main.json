@@ -3,6 +3,7 @@
   "navigationBarBackgroundColor": "#fff",
   "navigationBarTitleText": "",
   "navigationBarTextStyle": "black",
+  "disableSwipeBack": true,
   "usingComponents": {
    "i-button": "../../../static/iviewUI/button/index",
    "i-action-sheet": "../../../static/iviewUI/action-sheet/index",

@@ -40,7 +40,7 @@
         <img v-if="downImage2" class="down" src="../../../static/images/down.png" alt="">
         <img v-else class="down" src="../../../static/images/top.png" alt="">
       </div>
-      <img v-if="visible2" class="eqImg" src="../../../static/images/up1.png" alt="">
+      <img v-if="visible2" class="sjImg" src="../../../static/images/sj.png" alt="">
       <div v-if="visible2" class="equipmentAlertList">
         <p v-for="(item,index2) in equipmentItems" :key="index2" @click=equipmentClick(item.nodeId,item.gatewayId)>{{item.nodeId}}号设备</p>
       </div>
@@ -119,7 +119,7 @@
               </picker>
               <!-- <button class="exportBtn" type="button" name="button">导出</button> -->
             </form>
-            <div class="echarts-wrap">
+            <div class="echarts-wrap" :style="{height: (screenHeight/2.7 + 'px')}">
               <mpvue-echarts :echarts="echarts" :onInit="dataEcharts" canvasId="demo-canvas" />
             </div>
           </div>
@@ -220,6 +220,13 @@ export default {
     wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
+
+    wx.getSystemInfo({
+      success: res => {
+        this.screenWidth = res.screenWidth;
+        this.screenHeight = res.screenHeight;
+      }
+    })
   },
   mounted(){
     this.projectId = this.$root.$mp.query.projectId;
@@ -240,18 +247,11 @@ export default {
     // 初始化echarts
     dataEcharts (canvas, width, height) {
       // 初始化宽高
-      wx.getSystemInfo({
-        success: res => {
-          this.screenWidth = res.screenWidth;
-          this.screenHeight = res.screenHeight;
-          console.log(res);
-        }
-      })
       chart = echarts.init(canvas, null, {
         width: this.screenWidth - 50,
-        height: this.screenHeight/3.3,
+        height: this.screenHeight/2.8,
         // width:width,
-        // height:height,
+        // height:300,
       });
 
       canvas.setChart(chart);
@@ -320,9 +320,10 @@ export default {
               },
            ],
             grid: {
-                left: '4%',
-                right: '4%',
-                bottom: '20%',
+                left: '0',
+                right: '15px',
+                top: '50px',
+                bottom: '45px',
                 containLabel: true
             },
             toolbox: {
@@ -356,7 +357,7 @@ export default {
                   }
                 },
                 axisLabel:{
-                  margin: 20,
+                  margin: 10,
                   textStyle: {
                      color: '#444444'
                  },
@@ -1140,11 +1141,11 @@ export default {
 }
 .equipmentAlertList{
   width: 93px;
-  /* height: 173px; */
-  background:rgba(85,85,85,1);
-  border-radius:4px;
+  height: 92px;
   /* background-image: url("../../../static/images/back.png");
   background-size: 100% 100%; */
+  background: #555555;
+  border-radius: 5px;
   position: fixed;
   right:15px;
   top: 190px;
@@ -1165,7 +1166,14 @@ export default {
 }
 .echarts-wrap {
   width: 100%;
-  height: 265px;
+  /* height: 315px; */
   margin-top: 45px;
+}
+.sjImg{
+  width: 12.5px;
+  height: 7.5px;
+  position: absolute;
+  top: 73px;
+  right: 44px;
 }
 </style>

@@ -8,6 +8,7 @@
         {{projectName}}
         <img class="downIcon" :src="iconDown ? prodown : protop" alt="">
       </div>
+      <img v-if="visible2" class="eqImg" src="../../../static/images/up1.png" alt="">
       <div v-if="visible2" class="equipmentAlertList">
         <p v-for="(item,index2) in prosItem" :key="index2" @click=equipmentClick(item.name,item.id)>{{item.name}}</p>
       </div>
@@ -35,6 +36,7 @@ export default {
     }
   },
   mounted(){
+    wx.hideShareMenu();//禁止出现转发按钮
     this.prosItem = wx.getStorageSync('prosItem');
     this.projectId = this.prosItem[0].id;
     this.projectName = this.prosItem[0].name;
@@ -71,6 +73,9 @@ export default {
       this.iconDown = true;
     },
     navigateTo(num){
+      if(this.visible2 != false){
+        this.visible2 = false;
+      }
       if (num == 1) {
         wx.navigateTo({
           url: `/pages/greenhouse/main?projectId=${this.projectId}`,
@@ -173,16 +178,26 @@ navigator{
   float: right;
   margin: 18.5px 22px 0 0;
 }
+.eqImg{
+  width: 12.5px;
+  height: 7.5px;
+  position: absolute;
+  right:81px;
+  top: 45px;
+  z-index: 1000;
+}
 .equipmentAlertList{
   width: 93px;
-  height: 117.5px;
-  background-image: url("../../../static/images/back.png");
-  background-size: 100% 100%;
+  /* height: 117.5px; */
+  background:rgba(85,85,85,1);
+  border-radius:4px;
+  /* background-image: url("../../../static/images/back.png");
+  background-size: 100% 100%; */
   position: absolute;
   right:55px;
-  top: 45px;
+  top: 52.5px;
   z-index:1000;
-  padding: 6px 17.5px 0 20.5px;
+  padding: 6px 17.5px 6px 20.5px;
   overflow: auto;
 }
 .equipmentAlertList p{
@@ -192,5 +207,8 @@ navigator{
   line-height: 37px;
   text-align: center;
   border-bottom: 1px solid #5E5E5E;
+}
+.equipmentAlertList :last-child{
+  border:none;
 }
 </style>
