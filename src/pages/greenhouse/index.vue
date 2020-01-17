@@ -845,7 +845,7 @@ export default {
   display: flex;
   justify-content: space-between;
   flex-wrap:wrap;
-  padding-bottom: 15px;
+  padding-bottom: 100px;
 }
 .information .tabCountent .tabUl .tabList{
   width: 165px;
