@@ -44,14 +44,14 @@
         <p v-for="(item,index2) in equipmentItems" :key="index2" @click=equipmentClick(item.nodeId,item.gatewayId)>{{item.nodeId}}号设备</p>
       </div>
     </div>
-    <div class="Update_time">
+    <div class="Update_time" v-if="cur==0">
       <div class="timeTxt">上次采集时间：{{timeDate.timeHH}}：{{timeDate.timeMM}}：{{timeDate.timeSS}}</div>
       <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5.png" alt="">
     </div>
-    <div class="information"
+    <div class="information" :style="{'top':cur==0?'calc(100vh – 280px)':'224px'}"
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
     >
-      <div class="tabBox">
+      <div class="tabBox" :style="{'top':cur==0?'calc(100vh – 280px)':'224px'}">
         <div class="tabs" @click="cur=0" :class="{active:cur==0}">实时数据
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
@@ -782,8 +782,8 @@ export default {
   padding: 7.5px 0 5px 66px;
   position: fixed;
   left: 0;
-  /* top: calc(100vh – 280px); */
-  top: 280px;
+  top: calc(100vh – 280px);
+  /* top: 280px; */
   z-index: 1;
   background: #F3F5F8;
 }
@@ -845,7 +845,7 @@ export default {
   display: flex;
   justify-content: space-between;
   flex-wrap:wrap;
-  padding-bottom: 100px;
+  padding-bottom: 50px;
 }
 .information .tabCountent .tabUl .tabList{
   width: 165px;
