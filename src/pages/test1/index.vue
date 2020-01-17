@@ -8,7 +8,7 @@
         {{projectName}}
         <img class="downIcon" :src="iconDown ? prodown : protop" alt="">
       </div>
-      <img v-if="visible2" class="eqImg" src="../../../static/images/up1.png" alt="">
+      <img v-if="visible2" class="eqImg" src="../../../static/images/sj.png" alt="">
       <div v-if="visible2" class="equipmentAlertList">
         <p v-for="(item,index2) in prosItem" :key="index2" @click=equipmentClick(item.name,item.id)>{{item.name}}</p>
       </div>
@@ -202,5 +202,13 @@ navigator{
 }
 .equipmentAlertList :last-child{
   border:none;
+}
+.eqImg{
+  width: 12.5px;
+  height: 7.5px;
+  position: absolute;
+  right:81px;
+  top: 45px;
+  z-index: 1000;
 }
 </style>

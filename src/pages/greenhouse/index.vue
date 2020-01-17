@@ -856,7 +856,7 @@ export default {
   overflow-y: auto;
   position: relative;
   height: 100%;
-  padding-bottom: 0px;
+  padding-bottom: 50px;
 }
 .tabCountent .tab2{
   /* padding-bottom: 10px; */
