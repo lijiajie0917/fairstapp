@@ -1131,14 +1131,6 @@ export default {
   border-radius: 20px;
   margin-bottom: 10px;
 }
-.eqImg{
-  width: 12.5px;
-  height: 7.5px;
-  position: fixed;
-  right:45px;
-  top: 182.5px;
-  z-index: 1000;
-}
 .equipmentAlertList{
   width: 93px;
   height: 92px;
@@ -1173,7 +1165,7 @@ export default {
   width: 12.5px;
   height: 7.5px;
   position: absolute;
-  top: 73px;
-  right: 44px;
+  right:29px;
+  top: 104.5px;
 }
 </style>

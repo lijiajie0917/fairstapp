@@ -178,14 +178,6 @@ navigator{
   float: right;
   margin: 18.5px 22px 0 0;
 }
-.eqImg{
-  width: 12.5px;
-  height: 7.5px;
-  position: absolute;
-  right:81px;
-  top: 45px;
-  z-index: 1000;
-}
 .equipmentAlertList{
   width: 93px;
   /* height: 117.5px; */
