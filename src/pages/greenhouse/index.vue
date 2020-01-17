@@ -40,18 +40,15 @@
         <img v-if="downImage2" class="down" src="../../../static/images/down.png" alt="">
         <img v-else class="down" src="../../../static/images/top.png" alt="">
       </div>
+      <img v-if="visible2" class="eqImg" src="../../../static/images/up1.png" alt="">
       <div v-if="visible2" class="equipmentAlertList">
         <p v-for="(item,index2) in equipmentItems" :key="index2" @click=equipmentClick(item.nodeId,item.gatewayId)>{{item.nodeId}}号设备</p>
       </div>
     </div>
-    <div class="Update_time" v-if="cur==0">
-      <div class="timeTxt">上次采集时间：{{timeDate.timeHH}}：{{timeDate.timeMM}}：{{timeDate.timeSS}}</div>
-      <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5.png" alt="">
-    </div>
-    <div class="information" :style="{'top':cur==0?'calc(100vh – 280px)':'224px'}"
+    <div class="information"
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
     >
-      <div class="tabBox" :style="{'top':cur==0?'calc(100vh – 280px)':'224px'}">
+      <div class="tabBox">
         <div class="tabs" @click="cur=0" :class="{active:cur==0}">实时数据
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
@@ -64,6 +61,10 @@
       </div>
       <div class="tabCountent">
         <div v-show="cur==0" class='tab1'>
+          <div class="Update_time">
+            <div class="timeTxt">上次采集时间：{{timeDate.timeHH}}:{{timeDate.timeMM}}:{{timeDate.timeSS}}</div>
+            <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5.png" alt="">
+          </div>
           <ul class="tabUl">
             <li class="tabList" v-for="(item,index3) in realTimeItems" :key="index3">
               <img class="tabImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt="">
@@ -215,14 +216,25 @@ export default {
   },
   created:function(){
     this.getHeight();
+    this.homePage();
     wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
-    this.homePage();
   },
   mounted(){
     this.projectId = this.$root.$mp.query.projectId;
-
+    // let pages = getCurrentPages();
+    // let currentPage = pages[pages.length-1]
+    // console.log("currentPage",currentPage)
+    if(this.visible1 != false){
+      this.visible1 = false
+    }
+    if(this.visible2 != false){
+      this.visible2 = false
+    }
+    if(this.cur != 0){
+      this.cur = 0
+    }
   },
   methods: {
     // 初始化echarts
@@ -511,13 +523,22 @@ export default {
         // let m = time.getMonth()+1;
         // let d = time.getDate();
         let h = new Date().getHours();
-        let mm = new Date().getMinutes();
+        let m = new Date().getMinutes();
         let s = new Date().getSeconds();
         // console.log("时间戳",h,mm,s)
+        if(h<10){
+          h = '0'+h;
+        }
+        if(m<10){
+          m = '0'+m;
+        }
+        if(s<10){
+          s = '0'+s;
+        }
         let time = {
-          timeHH: new Date().getHours(),
-          timeMM: new Date().getMinutes(),
-          timeSS: new Date().getSeconds(),
+          timeHH: h,
+          timeMM: m,
+          timeSS: s,
         };
         this.timeDate = time;
         var data = res.data;
@@ -738,34 +759,11 @@ export default {
   margin-top: 17px;
   margin-right: 15px;
 }
-.Update_time{
-  position: absolute;
-  left: 15px;
-  top: 224px;
-  width:315px;
-  height:40px;
-  padding: 0 15px;
-  background:rgba(255,255,255,1);
-  box-shadow:0px 5px 15px 0px rgba(167,197,242,0.3);
-  border-radius:10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.Update_time .timeTxt{
-  font-size:15px;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(51,51,51,1);
-}
-.Update_time .f5Btn{
-  width: 23px;
-  height: 23px;
-}
+
 .information{
   height: 493px;
   position: absolute;
-  top: 280px;
+  top: 220px;
   left: 0;
   overflow-y: auto;
 }
@@ -816,6 +814,28 @@ export default {
 .information .tabBox .active .tabs-border{
   display: block;
 }
+.Update_time{
+  width:315px;
+  height:40px;
+  padding: 0 15px;
+  background:rgba(255,255,255,1);
+  box-shadow:0px 5px 15px 0px rgba(167,197,242,0.3);
+  border-radius:10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.Update_time .timeTxt{
+  font-size:15px;
+  font-family:PingFang SC;
+  font-weight:500;
+  color:rgba(51,51,51,1);
+}
+.Update_time .f5Btn{
+  width: 23px;
+  height: 23px;
+}
 .tabCountent {
   width: 100vw;
   padding-left: 15px;
@@ -835,7 +855,7 @@ export default {
   overflow-y: auto;
   position: relative;
   height: 100%;
-  padding-bottom: 100px;
+  padding-bottom: 50px;
 }
 .tabCountent .tab2{
   /* padding-bottom: 10px; */
@@ -845,7 +865,6 @@ export default {
   display: flex;
   justify-content: space-between;
   flex-wrap:wrap;
-  padding-bottom: 50px;
 }
 .information .tabCountent .tabUl .tabList{
   width: 165px;
@@ -868,7 +887,7 @@ export default {
 }
 .information .tabCountent .tabUl .tabList .tabTitle{
   font-size: 14px;
-  margin: 17.5px 0 22.5px 50px;
+  margin: 17.5px 0 20px 50px;
   height: 13px;
 }
 .information .tabCountent .tabUl .tabList .tabNumber{
@@ -1111,16 +1130,26 @@ export default {
   border-radius: 20px;
   margin-bottom: 10px;
 }
+.eqImg{
+  width: 12.5px;
+  height: 7.5px;
+  position: fixed;
+  right:45px;
+  top: 182.5px;
+  z-index: 1000;
+}
 .equipmentAlertList{
   width: 93px;
-  height: 173px;
-  background-image: url("../../../static/images/back.png");
-  background-size: 100% 100%;
+  /* height: 173px; */
+  background:rgba(85,85,85,1);
+  border-radius:4px;
+  /* background-image: url("../../../static/images/back.png");
+  background-size: 100% 100%; */
   position: fixed;
   right:15px;
   top: 190px;
   z-index:1000;
-  padding: 6px 17.5px 0 20.5px;
+  padding: 6px 17.5px 6px 20.5px;
   overflow: auto;
 }
 .equipmentAlertList p{
@@ -1130,6 +1159,9 @@ export default {
   line-height: 37px;
   text-align: center;
   border-bottom: 1px solid #5E5E5E;
+}
+.equipmentAlertList :last-child{
+  border:none;
 }
 .echarts-wrap {
   width: 100%;
