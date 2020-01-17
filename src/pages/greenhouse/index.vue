@@ -40,12 +40,12 @@
         <img v-if="downImage2" class="down" src="../../../static/images/down.png" alt="">
         <img v-else class="down" src="../../../static/images/top.png" alt="">
       </div>
-      <img v-if="visible2" class="sjImg" src="../../../static/images/sj.png" alt="">
       <div v-if="visible2" class="equipmentAlertList">
+        <img v-if="visible2" class="sjImg" src="../../../static/images/sj.png" alt="">
         <p v-for="(item,index2) in equipmentItems" :key="index2" @click=equipmentClick(item.nodeId,item.gatewayId)>{{item.nodeId}}号设备</p>
       </div>
     </div>
-    <div class="information"
+    <div class="information" v-show="informShow"
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
     >
       <div class="tabBox">
@@ -212,6 +212,7 @@ export default {
       navH: 0, //导航栏高度
       width: 0, //进度条宽度
       timeDate:{},
+      informShow:true,
     }
   },
   created:function(){
@@ -617,6 +618,7 @@ export default {
       this.visible2 = false;
       this.downImage = false;
       this.downImage2 = true;
+      this.informShow = false;
     },
     handleOpen2 () {
       this.visible2 = !this.visible2;
@@ -629,6 +631,7 @@ export default {
     closeMask () {
       this.visible1 = false;
       this.downImage = true;
+      this.informShow = true;
     },
   }
 }
@@ -1143,7 +1146,7 @@ export default {
   top: 190px;
   z-index:1000;
   padding: 6px 17.5px 6px 20.5px;
-  overflow: auto;
+  /* overflow: auto; */
 }
 .equipmentAlertList p{
   color: #fff;
@@ -1165,7 +1168,7 @@ export default {
   width: 12.5px;
   height: 7.5px;
   position: absolute;
-  right:29px;
-  top: 104.5px;
+  right:42.5px;
+  top: -7px;
 }
 </style>
