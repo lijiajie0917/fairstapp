@@ -63,7 +63,7 @@
         </div>
       </div>
       <div class="tabCountent">
-        <div v-if="cur==0" class='tab1'>
+        <div v-show="cur==0" class='tab1'>
           <ul class="tabUl">
             <li class="tabList" v-for="(item,index3) in realTimeItems" :key="index3">
               <img class="tabImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt="">
@@ -102,7 +102,7 @@
             </li>
           </ul>
         </div>
-        <div v-if="cur==2" class='tab1'>
+        <div v-show="cur==2" class='tab2'>
           <div class="dataEcharts">
             <form :model="form" autocomplete="off" class="formBox">
               <picker class="user" @change="handlePickerChange" :value="selectedIndex" :range-key="'name'" :range="myAnnual">
@@ -123,7 +123,7 @@
             </div>
           </div>
         </div>
-        <div v-if="cur==1" class='tab1'>
+        <div v-show="cur==1" class='tab1'>
           <ul class="tabUl2">
             <li class="equipmentList" v-for="(item,index4) in deciveItems" :key="index4">
               <img class="equipmentImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt="">
@@ -153,8 +153,6 @@ import echarts from 'echarts'
 import mpvueEcharts from 'mpvue-echarts'
 
 let chart
-
-
 
 export default {
   components: {
@@ -209,6 +207,7 @@ export default {
       columnName:'空气温度',
       unitName:'℃',
       screenWidth:'',
+      screenHeight:'',
       navH: 0, //导航栏高度
       width: 0, //进度条宽度
       timeDate:{},
@@ -219,10 +218,11 @@ export default {
     wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
+    this.homePage();
   },
   mounted(){
     this.projectId = this.$root.$mp.query.projectId;
-    this.homePage();
+
   },
   methods: {
     // 初始化echarts
@@ -231,17 +231,21 @@ export default {
       wx.getSystemInfo({
         success: res => {
           this.screenWidth = res.screenWidth;
+          this.screenHeight = res.screenHeight;
+          console.log(res);
         }
       })
       chart = echarts.init(canvas, null, {
         width: this.screenWidth - 50,
-        height: 350
+        height: this.screenHeight/3.3,
+        // width:width,
+        // height:height,
       });
+
+      canvas.setChart(chart);
 
       // 请求图表数据
       this.echartsAjax();
-
-      canvas.setChart(chart);
 
       // 返回动态触摸效果
       return chart
@@ -306,7 +310,7 @@ export default {
             grid: {
                 left: '4%',
                 right: '4%',
-                bottom: '13%',
+                bottom: '20%',
                 containLabel: true
             },
             toolbox: {
@@ -318,7 +322,7 @@ export default {
                 type: 'category',
                 axisLabel:{
                   interval:5,
-                  margin: 20,
+                  margin: 15,
                   textStyle: {
                      color: '#444444'
                  },
@@ -817,7 +821,7 @@ export default {
   padding-left: 15px;
   /* max-height: 100%; */
   overflow-x: hidden;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   position: relative;
   height: calc(100vh – 310px);
   top: 50px;
@@ -833,7 +837,10 @@ export default {
   height: 100%;
   padding-bottom: 100px;
 }
-.information .tabCountent .tabUl,.information .tabCountent .tabUl2,.information .tabCountent .dataEcharts{
+.tabCountent .tab2{
+  /* padding-bottom: 10px; */
+}
+.information .tabCountent .tabUl,.information .tabCountent .tabUl2{
   width: 360px;
   display: flex;
   justify-content: space-between;
@@ -948,8 +955,12 @@ export default {
   width: 335px;
   background: #fff;
   border-radius: 10px;
-  padding: 15px 0 15px 15px;
-  margin-bottom: 80px;
+  padding: 15px 0 0 15px;
+  /* height: 350px; */
+  /* overflow:scroll; */
+}
+.information .tabCountent .dataEcharts .formBox{
+  position: absolute;
 }
 .information .tabCountent .dataEcharts .formBox .user{
   width: 109px;
@@ -1122,7 +1133,7 @@ export default {
 }
 .echarts-wrap {
   width: 100%;
-  height: 350px;
-  margin-top: 15px;
+  height: 265px;
+  margin-top: 45px;
 }
 </style>
