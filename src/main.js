@@ -19,8 +19,8 @@ app.$mount()
 Vue.prototype.globalData = getApp().globalData
 wx.getSystemInfo({
   success: res => {
-    // console.log('手机信息res'+res.model)
-    // console.log(res);
+    console.log('手机信息res'+res.model)
+    console.log(res);
     let modelmes = res.model;
     let height = res.screenHeight;
     if (modelmes.search("iPhone X") != -1) {
@@ -28,6 +28,9 @@ wx.getSystemInfo({
     } else if (height >= 896) {
       // console.log('xr');
       app.globalData.isIphoneX11 = true;
+    } else if (height >= 568) {
+      // console.log('xr');
+      app.globalData.isIphone5 = true;
     }
   }
 })

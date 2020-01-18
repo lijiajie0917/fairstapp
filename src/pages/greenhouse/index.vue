@@ -51,7 +51,7 @@
       </div>
     </div>
     <div class="information" v-show="informShow"
-      :style="{'top':'isIphoneX-class'||'isIphoneX11-class'?'260px':'220px'}"
+      :style="{'top':isIphoneX||isIphoneX11?'260px':''}"
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
     >
       <div class="tabBox">
@@ -767,7 +767,7 @@ export default {
 .information{
   height: 493px;
   position: absolute;
-  top: 220px;
+  top: 222.5px;
   left: 0;
   overflow-y: auto;
 }
