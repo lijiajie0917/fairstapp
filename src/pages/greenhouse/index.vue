@@ -27,7 +27,9 @@
               <p class="maskArea">{{item.area}}片区</p>
               <img class="gray" src="../../../static/images/gray.png" alt="">
               <div class="maskList">
-                <span v-for="(itemwrap,index1) in item.greenhouse" :key="index1" @click=areaClick(item.area,itemwrap.greenhouseId,itemwrap.greenhouse)>{{itemwrap.greenhouse}}</span>
+                <span v-for="(itemwrap,index1) in item.greenhouse"
+                  :key="index1" @click=areaClick(item.area,itemwrap.greenhouseId,itemwrap.greenhouse)
+                >{{itemwrap.greenhouse}}</span>
               </div>
             </li>
           </ul>
@@ -42,10 +44,14 @@
       </div>
       <img v-if="visible2" class="sjImg" src="../../../static/images/sj.png" alt="">
       <div v-if="visible2" class="equipmentAlertList">
-        <p v-for="(item,index2) in equipmentItems" :key="index2" @click=equipmentClick(item.nodeId,item.gatewayId)>{{item.nodeId}}号设备</p>
+        <p v-for="(item,index2) in equipmentItems"
+          :key="index2"
+          @click=equipmentClick(item.nodeId,item.gatewayId)
+        >{{item.nodeId}}号设备</p>
       </div>
     </div>
     <div class="information"
+      :style="{'top':'isIphoneX-class'||'isIphoneX11-class'?'260px':'220px'}"
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
     >
       <div class="tabBox">
@@ -62,7 +68,7 @@
       <div class="tabCountent">
         <div v-show="cur==0" class='tab1'>
           <div class="Update_time">
-            <div class="timeTxt">上次采集时间：{{timeDate.timeHH}}:{{timeDate.timeMM}}:{{timeDate.timeSS}}</div>
+            <div class="timeTxt">上次采集时间：{{timeDate}}</div>
             <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5.png" alt="">
           </div>
           <ul class="tabUl">
@@ -106,12 +112,23 @@
         <div v-show="cur==2" class='tab2'>
           <div class="dataEcharts">
             <form :model="form" autocomplete="off" class="formBox">
-              <picker class="user" @change="handlePickerChange" :value="selectedIndex" :range-key="'name'" :range="myAnnual">
+              <picker class="user"
+                @change="handlePickerChange"
+                :value="selectedIndex"
+                :range-key="'name'"
+                :range="myAnnual"
+              >
                 <view class="picker">{{myAnnual[selectedIndex].name}}
                   <img class="userDown" src="../../../static/images/down.png" alt="">
                 </view>
               </picker>
-              <picker class="user" mode="date" :value="date" start="2015-01-01" end="2020-09-01" @change="bindDateChange">
+              <picker class="user"
+                mode="date"
+                :value="date"
+                start="2015-01-01"
+                end="2020-09-01"
+                @change="bindDateChange"
+              >
                 <view class="picker">
                   {{time}}
                   <img class="userDown" src="../../../static/images/down.png" alt="">
@@ -133,8 +150,13 @@
                 <p class="statusTitle">
                   状态：
                   <img :src="item.STATUS == '0' ? tingzhi : kaiqi" alt="">
-                  <span :class="item.STATUS == '0' ? 'spantz' : 'spankq'">{{item.isDamage == '0'? '停止' :(item.STATUS == '1'? '开启' : '待机')}}</span>
-                  <i-switch class="switchBtn" :value="switch1" @change="onChange(item.gatewayId,item.nodeId,switch1)" slot="footer">
+                  <span :class="item.STATUS == '0' ? 'spantz' : 'spankq'"
+                  >{{item.isDamage == '0'? '停止' :(item.STATUS == '1'? '开启' : '待机')}}</span>
+                  <i-switch class="switchBtn"
+                    :value="switch1"
+                    @change="onChange(item.gatewayId,item.nodeId,switch1)"
+                    slot="footer"
+                  >
                       <view slot="open">开</view>
                       <view slot="close">关</view>
                   </i-switch>
@@ -220,7 +242,6 @@ export default {
     wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
-
     wx.getSystemInfo({
       success: res => {
         this.screenWidth = res.screenWidth;
@@ -520,31 +541,10 @@ export default {
           'gatewayId' : gatewayId,
         }
       }).then(res => {
-        // let y = time.getFullYear();
-        // let m = time.getMonth()+1;
-        // let d = time.getDate();
-        let h = new Date().getHours();
-        let m = new Date().getMinutes();
-        let s = new Date().getSeconds();
-        // console.log("时间戳",h,mm,s)
-        if(h<10){
-          h = '0'+h;
-        }
-        if(m<10){
-          m = '0'+m;
-        }
-        if(s<10){
-          s = '0'+s;
-        }
-        let time = {
-          timeHH: h,
-          timeMM: m,
-          timeSS: s,
-        };
-        this.timeDate = time;
         var data = res.data;
         // console.log("7要素最新数据",data);
-        let list = data;
+        this.timeDate = data.gatherTime;
+        let list = data.lastStatus;
         // let colorlist = [
         //   "#50E2CD","#FDC061","#4950B2","#FB724D","#FDC061","#50E2CD","#41A1F2"
         // ]

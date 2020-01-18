@@ -8,7 +8,7 @@ const httpPlugin = {}
 // 该函数接收两个参数：vue和options
 const http = axios.create({
   // 云服务器（生产环境）
-  baseURL: 'http://192.168.3.29/krjrobot/'
+  baseURL: 'http://krj/krjrobot/'
 })
 // const http = axios.create({
 //   // 云服务器（生产环境）
