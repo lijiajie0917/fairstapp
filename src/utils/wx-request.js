@@ -1,7 +1,7 @@
 // 线上环境
 // const host = 'https://www.krjrobot.cn/krjrobot'
 // 本地环境
-const host = 'http://krj/krjrobot/'
+const host = 'http://krj/krjrobot'
 
 function request (url, method, data, header = {}) {
   wx.showLoading({
