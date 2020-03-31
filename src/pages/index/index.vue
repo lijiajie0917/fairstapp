@@ -159,6 +159,8 @@ export default {
           // console.log("请求成功====>",res);
           // console.log(res.data.pros[3].id);
           wx.setStorageSync("prosItem", res.data.pros);
+          this.$store.commit('setprojectId',res.data.pros[0].id);
+
           if (res.status === '200') {
             saveUserInfo(res.msg)
             wx.navigateTo({

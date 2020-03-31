@@ -27,18 +27,18 @@
 </template>
 
 <script>
-import globalStore from "../../stores/global-store";
 
 export default {
-  computed: {
-    count() {
-      return globalStore.state.count;
-    }
-  },
+  // computed: {
+  //   count() {
+  //     return globalStore.state.count;
+  //   }
+  // },
   mounted(){
     wx.hideShareMenu();//禁止出现转发按钮
     this.prosItem = wx.getStorageSync('prosItem');
     this.projectId = this.prosItem[0].id;
+    // this.$store.commit('setprojectId',this.projectId);
     this.projectName = this.prosItem[0].name;
   },
   data () {
@@ -69,6 +69,8 @@ export default {
     equipmentClick(name,projectId){
       this.projectName = name;
       this.projectId = projectId;
+      // console.log(this.projectId);
+      this.$store.commit('setprojectId',this.projectId);
       this.visible2 = false;
       this.iconDown = true;
     },
@@ -82,13 +84,13 @@ export default {
         })
       }
     },
-    hanleIncrement() {
-      globalStore.commit("increment");
-    },
-
-    hanleDecrement() {
-      globalStore.commit("decrement");
-    },
+    // hanleIncrement() {
+    //   globalStore.commit("increment");
+    // },
+    //
+    // hanleDecrement() {
+    //   globalStore.commit("decrement");
+    // },
     formSubmit (e) {
       // console.log('...');
       console.log(e.mp.detail.value);

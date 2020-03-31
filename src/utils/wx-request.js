@@ -1,7 +1,10 @@
 // 线上环境
 // const host = 'https://www.krjrobot.cn/krjrobot'
 // 本地环境
-const host = 'http://krj/krjrobot'
+// const host = 'http://krj/krjrobot'
+// 测试环境
+import store from '../store'//引入store
+const host = 'https://dev.krjrobot.cn/krjrobot'
 
 function request (url, method, data, header = {}) {
   wx.showLoading({
@@ -15,7 +18,8 @@ function request (url, method, data, header = {}) {
         data: data,
         header: {
           'content-type': 'application/json', // 默认值
-          'Authorization': wx.getStorageSync('JSESSIONID')
+          'Authorization': wx.getStorageSync('JSESSIONID'),
+          'projectId':store.state.projectId
         },
         success: function (res) {
           wx.hideLoading()
@@ -38,6 +42,7 @@ function request (url, method, data, header = {}) {
         data: data,
         header: {
           'content-type': 'application/json', // 默认值
+          'projectId':store.state.projectId
         },
         success: function (res) {
           wx.hideLoading()

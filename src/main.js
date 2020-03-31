@@ -4,11 +4,14 @@ import App from './App'
 import WXrequest from './utils/wx-request'
 Vue.prototype.$httpWX = WXrequest
 
+import store from './store'//引入store
+
 // import ElementUI from 'element-ui'
 // import 'element-ui/lib/theme-chalk/index.css'
 // import "../static/weui/weui.css";
 
 // Vue.use(ElementUI)
+Vue.prototype.$store = store
 
 Vue.config.productionTip = false
 App.mpType = 'app'

@@ -36,19 +36,26 @@
         </div>
       </div>
       <i-toast id="toast" />
-      <div class="areaGreenhouse" @click="handleOpen2">
-        <img class="areaDown" src="../../../static/images/shebei.png" alt="">
-        {{equipment}}号设备
-        <img v-if="downImage2" class="down" src="../../../static/images/down.png" alt="">
-        <img v-else class="down" src="../../../static/images/top.png" alt="">
-      </div>
-      <div v-if="visible2" class="equipmentAlertList">
-        <img v-if="visible2" class="sjImg" src="../../../static/images/sj.png" alt="">
+      <form :model="form" autocomplete="off">
+        <picker class="areaGreenhouse"
+          @change="handleOpen2"
+          :value="equipmentIndex"
+          :range-key="'nodeId'"
+          :range="equipmentItems2"
+        >
+          <view class="picker">
+            <img class="areaDown" src="../../../static/images/shebei.png" alt="">
+            {{equipment+'号设备'}}
+            <img class="down" src="../../../static/images/down.png" alt="">
+          </view>
+        </picker>
+      </form>
+      <!-- <div v-if="visible2" class="equipmentAlertList">
         <p v-for="(item,index2) in equipmentItems"
           :key="index2"
           @click=equipmentClick(item.nodeId,item.gatewayId)
         >{{item.nodeId}}号设备</p>
-      </div>
+      </div> -->
     </div>
     <div class="information" v-show="informShow"
       :style="{'top':isIphoneX||isIphoneX11?'260px':''}"
@@ -69,11 +76,12 @@
         <div v-show="cur==0" class='tab1'>
           <div class="Update_time">
             <div class="timeTxt">上次采集时间：{{timeDate}}</div>
-            <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5.png" alt="">
+            <img class="f5Btn" @click="realTimeData(equipment,gatewayId)" src="../../../static/images/f5 (2).png" alt="">
           </div>
           <ul class="tabUl">
             <li class="tabList" v-for="(item,index3) in realTimeItems" :key="index3">
-              <img class="tabImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt="">
+              <!-- <img class="tabImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt=""> -->
+              <img class="tabImg" :src="'https://dev.krjrobot.cn/krjrobot/img/mini/' + item.url" alt="">
               <p class="tabTitle">{{item.name}}</p>
               <p class="tabNumber">{{item.attachments.current}}{{item.unit}}</p>
               <div class="tabRange">
@@ -118,7 +126,8 @@
                 :range-key="'name'"
                 :range="myAnnual"
               >
-                <view class="picker">{{myAnnual[selectedIndex].name}}
+                <view class="picker">
+                  {{myAnnual[selectedIndex].name}}
                   <img class="userDown" src="../../../static/images/down.png" alt="">
                 </view>
               </picker>
@@ -190,7 +199,7 @@ export default {
       echarts,
       areaText:'',
       greenhouse:'',
-      equipment:'选择设备',
+      equipment:'-',
       cur:0, //默认选中第一个tab
       projectId:7,
       switch1:false,
@@ -200,6 +209,7 @@ export default {
       greenhouseId:'',
       gatewayId:'',
       equipmentItems:[],
+      equipmentItems2:[],
       realTimeItems:[],
       deciveItems:[],
       tingzhi:require('../../../static/images/icon3.png'),
@@ -213,6 +223,7 @@ export default {
         time: ''
       },
       selectedIndex: 0,
+      equipmentIndex:0,
       myAnnual: [
         {name : "空气温度" , key : "air_temperature",unit : "℃"},
         {name : "空气湿度" , key : "air_humidity"},
@@ -256,6 +267,7 @@ export default {
     })
   },
   mounted(){
+    // this.homePage();
     this.projectId = this.$root.$mp.query.projectId;
     // let pages = getCurrentPages();
     // let currentPage = pages[pages.length-1]
@@ -263,9 +275,9 @@ export default {
     if(this.visible1 != false){
       this.visible1 = false
     }
-    if(this.visible2 != false){
-      this.visible2 = false
-    }
+    // if(this.visible2 != false){
+    //   this.visible2 = false
+    // }
     if(this.cur != 0){
       this.cur = 0
     }
@@ -283,20 +295,19 @@ export default {
 
       canvas.setChart(chart);
 
-      // 请求图表数据
-      this.echartsAjax();
+      this.echartsAjax(this.equipment,this.gatewayId);
 
       // 返回动态触摸效果
       return chart
 
     },
-    echartsAjax(){
+    echartsAjax(nodeId,gatewayId){
       this.$httpWX.post({
         // this.gatewayId 改为 this.pId 查看已有数据
         url: '/miniProgram/history',
         data: {
-          gatewayId:this.gatewayId,
-          nodeId:this.equipment,
+          gatewayId:gatewayId,
+          nodeId:nodeId,
           time:this.time,
           field:this.columnKey,
         }
@@ -430,14 +441,14 @@ export default {
       this.columnKey = this.myAnnual[e.target.value].key
       this.columnName = this.myAnnual[e.target.value].name;
       this.unitName = this.myAnnual[e.target.value].unit;
-      this.echartsAjax();
+      this.echartsAjax(this.equipment,this.gatewayId);
     },
     // 选择时间
     bindDateChange: function(e) {
       // console.log(e.target.value)
       this.date = e.target.value;
       this.time = this.date;
-      this.echartsAjax();
+      this.echartsAjax(this.equipment,this.gatewayId);
     },
     // 进度条数值传入当前值，量程上限和量程下限
     solitNumber(num,max,min){
@@ -501,7 +512,8 @@ export default {
           this.greenhouseId = data.value[0].greenhouse[0].greenhouseId; //默认大棚id
           this.maskItems = data.value; //片区和大棚下拉框
           // 获取默认设备列表
-          this.equipmentList(this.areaText,this.greenhouseId,this.greenhouse);
+          this.equipmentList(this.areaText,this.greenhouseId,this.greenhouse)
+          // setTimeout(, 2000);
         }
       })
     },
@@ -530,6 +542,16 @@ export default {
             this.equipment = data.value[0].nodeId; //默认设备名字
             this.gatewayId = data.value[0].gatewayId; //默认设备id
             this.equipmentItems = data.value; //设备下拉框
+            this.equipmentItems2 = [];
+            for (var i = 0; i < data.value.length; i++) {
+              this.equipmentItems2.push({
+                "nodeId" : data.value[i].nodeId + '号设备'
+              });
+            }
+            // 请求图表数据
+            // console.log('nodeId' + this.equipment);
+            // console.log('gatewayId' + this.gatewayId);
+            // this.echartsAjax(this.equipment,this.gatewayId)
             // 获取7要素最新数据
             this.realTimeData(this.equipment,this.gatewayId);
             // 获取设备控制列表
@@ -591,13 +613,14 @@ export default {
       this.realTimeData(nodeId,gatewayId);
       this.equipment = nodeId;
       this.gatewayId = gatewayId;
-      this.echartsAjax();
-      this.visible2 = false;
+      this.echartsAjax(this.equipment,this.gatewayId);
+      // this.visible2 = false;
       this.downImage2 = true;
     },
     areaClick(area,greenhouseId,greenhouse) {
       this.equipmentList(area,greenhouseId,greenhouse);
       this.visible1 = false;
+      this.informShow = true;
     },
     onChange(gatewayId,nodeId,switch1){
       // console.log(switch1);
@@ -620,17 +643,21 @@ export default {
     },
     handleOpen1 () {
       this.visible1 = true;
-      this.visible2 = false;
+      // this.visible2 = false;
       this.downImage = false;
       this.downImage2 = true;
       this.informShow = false;
     },
-    handleOpen2 () {
-      this.visible2 = !this.visible2;
-      this.downImage2 = !this.downImage2;
+    handleOpen2 (e) {
+      this.equipmentIndex = e.target.value
+      console.log(e);
+      this.equipment = this.equipmentItems[e.target.value].nodeId;
+      this.equipmentClick(this.equipment,this.equipmentItems[e.target.value].gatewayId)
+      // this.visible2 = !this.visible2;
+      // this.downImage2 = !this.downImage2;
     },
     closeEquipment () {
-      this.visible2 = false;
+      // this.visible2 = false;
       this.downImage2 = true;
     },
     closeMask () {
@@ -1158,11 +1185,11 @@ export default {
   border-radius: 20px;
   margin-bottom: 10px;
 }
-.equipmentAlertList{
+/* .equipmentAlertList{
   width: 93px;
   height: 92px;
-  /* background-image: url("../../../static/images/back.png");
-  background-size: 100% 100%; */
+  background-image: url("../../../static/images/back.png");
+  background-size: 100% 100%;
   background: #555555;
   border-radius: 5px;
   position: fixed;
@@ -1170,19 +1197,25 @@ export default {
   top: 190px;
   z-index:1000;
   padding: 6px 17.5px 6px 20.5px;
-  /* overflow: auto; */
-}
-.equipmentAlertList p{
+  overflow: auto;
+} */
+/* .equipmentAlertList::before{
+  width: 13px;
+  height: 8px;
+  background-image: url("../../../static/images/sj.png");
+  background-size: 100% 100%;
+} */
+/* .equipmentAlertList p{
   color: #fff;
   font-size: 14px;
   height: 37px;
   line-height: 37px;
   text-align: center;
   border-bottom: 1px solid #5E5E5E;
-}
-.equipmentAlertList :last-child{
+} */
+/* .equipmentAlertList :last-child{
   border:none;
-}
+} */
 .echarts-wrap {
   width: 100%;
   /* height: 315px; */
