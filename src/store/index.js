@@ -21,7 +21,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 Vue.use(Vuex);
 const state={
-     projectId:'7',
+     projectId:'',
    };
 const mutations = {
   setprojectId(state, pId) {

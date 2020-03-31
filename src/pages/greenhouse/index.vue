@@ -255,7 +255,7 @@ export default {
   },
   created:function(){
     this.getHeight();
-    this.homePage();
+    // this.homePage();
     wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
@@ -267,7 +267,7 @@ export default {
     })
   },
   mounted(){
-    // this.homePage();
+    this.homePage();
     this.projectId = this.$root.$mp.query.projectId;
     // let pages = getCurrentPages();
     // let currentPage = pages[pages.length-1]
@@ -302,7 +302,7 @@ export default {
 
       canvas.setChart(chart);
 
-      this.echartsAjax(this.equipment,this.gatewayId);
+      // this.echartsAjax(this.equipment,this.gatewayId);
 
       // 返回动态触摸效果
       return chart
