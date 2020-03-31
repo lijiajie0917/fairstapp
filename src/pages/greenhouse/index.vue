@@ -343,15 +343,15 @@ export default {
                   fonnSize :'11'
                 }
             },
-            // tooltip: {
-            //     trigger: 'axis'
-            // },
             tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross'
-                }
+                trigger: 'axis'
             },
+            // tooltip: {
+            //     trigger: 'axis',
+            //     axisPointer: {
+            //         type: 'cross'
+            //     }
+            // },
             legend: {
                 data:[this.columnName]
             },
