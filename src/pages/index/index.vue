@@ -228,7 +228,7 @@ export default {
   border: none;
   background: #0057FF;
   border-radius: 50px;
-  color: #A3B8FF;
+  color: #fff;
   margin-bottom: 28px;
 }
 .formBox .active{
