@@ -142,7 +142,7 @@
           </div>
         </div>
         <div v-show="cur==1" class='tab1'>
-          <ul class="tabUl2">
+          <ul class="tabUl2" v-if="Tourist == 0">
             <li class="equipmentList" v-for="(item,index4) in deciveItems" :key="index4">
               <img class="equipmentImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt="">
               <p class="equipmentTitle">{{item.typeName}}</p>
@@ -164,6 +164,10 @@
               </div>
             </li>
           </ul>
+          <div class="Tourist" v-if="Tourist == 1">
+            <img src="../../../static/images/Tourist.png" alt="">
+            <span>体验账号无设备控制权限</span>
+          </div>
         </div>
       </div>
     </div>
@@ -235,6 +239,7 @@ export default {
       width: 0, //进度条宽度
       timeDate:{},
       informShow:true,
+      Tourist:wx.getStorageSync('Tourist'),//游客模式
     }
   },
   created:function(){
@@ -973,6 +978,25 @@ export default {
   margin-bottom: 15px;
   padding-top: 21px;
   position: relative;
+}
+.Tourist{
+  margin: 160px auto 0;
+  width:520px;
+  height:106px;
+  background:rgba(119,119,119,1);
+  border-radius:8px;
+  text-align: center;
+}
+.Tourist img{
+  width: 34px;
+  height: 34px;
+  margin-right: 30px;
+}
+.Tourist span{
+  font-size:34px;
+  font-family:PingFang SC;
+  font-weight:500;
+  color:rgba(255,255,255,1);
 }
 .information .tabCountent .dataEcharts{
   width: 335px;

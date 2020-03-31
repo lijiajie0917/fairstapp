@@ -5,18 +5,44 @@
     <form :model="form" autocomplete="off" class="formBox">
       <div class="boxShadow userName">
         <img class="titleImg" src="../../../static/images/username.png" alt="">
-        <input class="user" @input="show()" type="text" v-model="form.username" placeholder="用户名">
+        <input class="user"
+          @input="show()"
+          type="text"
+          v-model="form.username"
+          placeholder="用户名"
+        >
       </div>
       <div class="boxShadow password">
         <img class="titleImg" src="../../../static/images/password.png" alt="">
-        <input v-if="showPass" type="text" class="user" @input="show()" v-model="form.password" placeholder="密码">
-        <input v-else type="password" class="user" @input="show($event)" v-model="form.password" placeholder="密码">
-        <img class="eyes" :src="showPass ? closeeyesImg : openeyesImg" @click="showPass = !showPass" alt="">
+        <input v-if="showPass"
+          type="text"
+          class="user"
+          @input="show()"
+          v-model="form.password"
+          placeholder="密码"
+        >
+        <input v-else
+          type="password"
+          class="user"
+          @input="show($event)"
+          v-model="form.password"
+          placeholder="密码"
+        >
+        <img class="eyes"
+          :src="showPass ? closeeyesImg : openeyesImg"
+          @click="showPass = !showPass"
+          alt=""
+        >
       </div>
-      <div class="rememberDiv">
-
-      </div>
-      <button class="butLogin" @click="btnLogin" :class="{'active':isActive}" type="button" name="button">登录</button>
+      <button class="butLogin"
+        @click="btnLogin"
+        :class="{'active':isActive}"
+        type="button"
+        name="button"
+      >登录</button>
+      <view class="Tourist"
+        @click="btnTourist"
+      >体验模式登陆</view>
     </form>
     <p class="errorAlert" v-show="errorBlock">
       密码输入错误！
@@ -55,6 +81,7 @@ export default {
     // }
   },
   created:function(){
+    wx.setStorageSync("Tourist", "0");
     // wx.getSystemInfo({
     //    success: function(res) {
     //   //model中包含着设备信息
@@ -68,6 +95,25 @@ export default {
     }
   },
   methods: {
+    //游客模式按钮
+    btnTourist(){
+      this.$httpWX.post({
+          url: '/mini/signIn',
+          data: {
+            'username': "guest",
+            'password' : "guest",
+          },
+        }).then(res => {
+          // console.log("请求成功====>",res);
+          // console.log(res.data.pros[3].id);
+          if (res.status === '200') {
+            wx.setStorageSync("Tourist", "1");
+            wx.navigateTo({
+              url: '/pages/test1/main',
+            })
+          }
+        })
+    },
     async checkName(token){
       this.$httpWX.post({
         url: '/logined',
@@ -181,7 +227,7 @@ export default {
   background: #0057FF;
   border-radius: 50px;
   color: #A3B8FF;
-  margin-top: 60px;
+  margin-bottom: 28px;
 }
 .formBox .active{
   color: #fff;
@@ -199,6 +245,13 @@ footer{
   position: absolute;
   top: 17.5px;
   right: 23px;
+}
+.Tourist{
+  text-align: center;
+  font-size: 18px;
+  color: #444;
+  background: url("../../../static/images/Tourist.png") no-repeat center center;
+  background-size:200px 1px;
 }
 .errorAlert{
   color: #FFFFFF;
