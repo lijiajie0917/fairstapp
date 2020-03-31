@@ -267,6 +267,10 @@ export default {
     })
   },
   mounted(){
+    setTimeout(()=>{
+　　　　　// 进入运用一秒后会对页面刷新
+        this.publicFn("1","0","1");
+    },1000);
     this.homePage();
     this.projectId = this.$root.$mp.query.projectId;
     // let pages = getCurrentPages();
@@ -291,6 +295,7 @@ export default {
       }
     },
     // 初始化echarts
+
     dataEcharts (canvas, width, height) {
       // 初始化宽高
       chart = echarts.init(canvas, null, {
