@@ -61,13 +61,13 @@
       :style="{'top':isIphoneX||isIphoneX11?'260px':''}"
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}">
       <div class="tabBox">
-        <div class="tabs" @click="cur=0" :class="{active:cur==0}">实时数据
+        <div class="tabs" @click="changeCur(0)" :class="{active:cur==0}">实时数据
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
-        <div class="tabs" @click="cur=2" :class="{active:cur==2}">数据分析
+        <div class="tabs" @click="changeCur(2)" :class="{active:cur==2}">数据分析
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
-        <div class="tabs" @click="cur=1" :class="{active:cur==1}">设备控制
+        <div class="tabs" @click="changeCur(1)" :class="{active:cur==1}">设备控制
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
       </div>
@@ -150,7 +150,7 @@
           </div>
         </div>
         <div v-show="cur==1" class='tab1'>
-          <ul class="tabUl2">
+          <ul class="tabUl2" v-if="Tourist == '0'">
             <li class="equipmentList" v-for="(item,index4) in deciveItems" :key="index4">
               <img class="equipmentImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt="">
               <p class="equipmentTitle">{{item.typeName}}</p>
@@ -172,6 +172,10 @@
               </div>
             </li>
           </ul>
+          <div class="Tourist" v-if="Tourist == '1'">
+            <img src="../../../static/images/tips.png" alt="">
+            <span>体验账号无设备控制权限</span>
+          </div>
         </div>
       </div>
     </div>
@@ -246,6 +250,7 @@ export default {
       timeDate:{},
       informShow:true,
       greenhouseDevise:'',
+      Tourist:"0",//默认非游客模式
     }
   },
   created:function(){
@@ -278,6 +283,13 @@ export default {
     }
   },
   methods: {
+    //切换cur
+    changeCur(num){
+      this.cur = num;
+      if(num == 1){
+        this.Tourist = wx.getStorageSync('Tourist')
+      }
+    },
     // 初始化echarts
     dataEcharts (canvas, width, height) {
       // 初始化宽高
@@ -1002,6 +1014,28 @@ export default {
   margin-bottom: 15px;
   padding-top: 21px;
   position: relative;
+}
+.Tourist{
+  margin: 70px 0 0 42.5px;
+  width:260px;
+  height:53px;
+  background:rgba(119,119,119,1);
+  border-radius:4px;
+  text-align: center;
+  padding-top: 18px;
+}
+.Tourist img{
+  width: 17px;
+  height: 17px;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+.Tourist span{
+  font-size:17px;
+  font-family:PingFang SC;
+  font-weight:500;
+  color:rgba(255,255,255,1);
+  vertical-align: middle;
 }
 .information .tabCountent .dataEcharts{
   width: 335px;
