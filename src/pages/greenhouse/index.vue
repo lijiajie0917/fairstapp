@@ -247,7 +247,7 @@ export default {
       screenHeight:'',
       navH: 0, //导航栏高度
       width: 0, //进度条宽度
-      timeDate:{},
+      timeDate:'',
       informShow:true,
       greenhouseDevise:'',
       Tourist:"0",//默认非游客模式
