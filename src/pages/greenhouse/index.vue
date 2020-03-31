@@ -268,10 +268,8 @@ export default {
   },
   mounted(){
     setTimeout(()=>{
-　　　　　// 进入运用一秒后会对页面刷新
-        this.publicFn("1","0","1");
-    },1000);
-    this.homePage();
+      this.homePage();
+    },200);
     this.projectId = this.$root.$mp.query.projectId;
     // let pages = getCurrentPages();
     // let currentPage = pages[pages.length-1]
