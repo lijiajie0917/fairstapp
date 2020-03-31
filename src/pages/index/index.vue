@@ -107,6 +107,10 @@ export default {
           // console.log("请求成功====>",res);
           // console.log(res.data.pros[3].id);
           if (res.status === '200') {
+
+            wx.setStorageSync("prosItem", res.data.pros);
+            this.$store.commit('setprojectId',res.data.pros[0].id);
+            (wx.setStorageSync('JSESSIONID'),null)
             wx.setStorageSync("Tourist", "1");
             wx.navigateTo({
               url: '/pages/test1/main',

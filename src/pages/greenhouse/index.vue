@@ -62,13 +62,13 @@
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
     >
       <div class="tabBox">
-        <div class="tabs" @click="cur=0" :class="{active:cur==0}">实时数据
+        <div class="tabs" @click="changeCur(0)" :class="{active:cur==0}">实时数据
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
-        <div class="tabs" @click="cur=2" :class="{active:cur==2}">数据分析
+        <div class="tabs" @click="changeCur(2)" :class="{active:cur==2}">数据分析
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
-        <div class="tabs" @click="cur=1" :class="{active:cur==1}">设备控制
+        <div class="tabs" @click="changeCur(1)" :class="{active:cur==1}">设备控制
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
         </div>
       </div>
@@ -250,7 +250,7 @@ export default {
       width: 0, //进度条宽度
       timeDate:{},
       informShow:true,
-      Tourist:wx.getStorageSync('Tourist'),//游客模式
+      Tourist:"0",//默认非游客模式
     }
   },
   created:function(){
@@ -283,6 +283,13 @@ export default {
     }
   },
   methods: {
+    //切换cur
+    changeCur(num){
+      this.cur = num;
+      if(num == 1){
+        this.Tourist = wx.getStorageSync('Tourist')
+      }
+    },
     // 初始化echarts
     dataEcharts (canvas, width, height) {
       // 初始化宽高
