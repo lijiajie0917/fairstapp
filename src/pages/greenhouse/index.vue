@@ -59,8 +59,7 @@
     </div>
     <div class="information" v-show="informShow"
       :style="{'top':isIphoneX||isIphoneX11?'260px':''}"
-      :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}" @click="closeEquipment"
-    >
+      :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}">
       <div class="tabBox">
         <div class="tabs" @click="changeCur(0)" :class="{active:cur==0}">实时数据
           <img class="tabs-border" src="../../../static/images/border.png" alt="">
@@ -217,7 +216,7 @@ export default {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11:this.globalData.isIphoneX11, //适配iphonex11
       downImage:true,
-      downImage2:true,
+      // downImage2:true,
       form: {
         item: '',
         time: ''
@@ -248,14 +247,15 @@ export default {
       screenHeight:'',
       navH: 0, //导航栏高度
       width: 0, //进度条宽度
-      timeDate:{},
+      timeDate:'',
       informShow:true,
+      greenhouseDevise:'',
       Tourist:"0",//默认非游客模式
     }
   },
   created:function(){
     this.getHeight();
-    this.homePage();
+    // this.homePage();
     wx.hideShareMenu();//禁止出现转发按钮
     this.date = this.$httpWX.formatTime();
     this.time = this.$httpWX.formatTime();
@@ -267,7 +267,9 @@ export default {
     })
   },
   mounted(){
-    // this.homePage();
+    setTimeout(()=>{
+      this.homePage();
+    },200);
     this.projectId = this.$root.$mp.query.projectId;
     // let pages = getCurrentPages();
     // let currentPage = pages[pages.length-1]
@@ -291,6 +293,7 @@ export default {
       }
     },
     // 初始化echarts
+
     dataEcharts (canvas, width, height) {
       // 初始化宽高
       chart = echarts.init(canvas, null, {
@@ -302,7 +305,7 @@ export default {
 
       canvas.setChart(chart);
 
-      this.echartsAjax(this.equipment,this.gatewayId);
+      // this.echartsAjax(this.equipment,this.gatewayId);
 
       // 返回动态触摸效果
       return chart
@@ -343,15 +346,15 @@ export default {
                   fonnSize :'11'
                 }
             },
-            // tooltip: {
-            //     trigger: 'axis'
-            // },
             tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross'
-                }
+                trigger: 'axis'
             },
+            // tooltip: {
+            //     trigger: 'axis',
+            //     axisPointer: {
+            //         type: 'cross'
+            //     }
+            // },
             legend: {
                 data:[this.columnName]
             },
@@ -558,7 +561,7 @@ export default {
             // 请求图表数据
             // console.log('nodeId' + this.equipment);
             // console.log('gatewayId' + this.gatewayId);
-            // this.echartsAjax(this.equipment,this.gatewayId)
+            this.echartsAjax(this.equipment,this.gatewayId)
             // 获取7要素最新数据
             this.realTimeData(this.equipment,this.gatewayId);
             // 获取设备控制列表
@@ -617,15 +620,17 @@ export default {
       })
     },
     equipmentClick(nodeId,gatewayId){
-      this.realTimeData(nodeId,gatewayId);
       this.equipment = nodeId;
       this.gatewayId = gatewayId;
-      this.echartsAjax(this.equipment,this.gatewayId);
-      // this.visible2 = false;
-      this.downImage2 = true;
+      this.realTimeData(nodeId,gatewayId);
+      this.echartsAjax(nodeId,gatewayId);
+      this.controlNode(this.greenhouseDevise,this.equipment);
+      // this.downImage2 = true;
     },
     areaClick(area,greenhouseId,greenhouse) {
+      this.greenhouseDevise = greenhouseId;
       this.equipmentList(area,greenhouseId,greenhouse);
+      this.controlNode(greenhouseId,this.equipment);
       this.visible1 = false;
       this.informShow = true;
     },
@@ -652,21 +657,21 @@ export default {
       this.visible1 = true;
       // this.visible2 = false;
       this.downImage = false;
-      this.downImage2 = true;
+      // this.downImage2 = true;
       this.informShow = false;
     },
     handleOpen2 (e) {
       this.equipmentIndex = e.target.value
-      console.log(e);
+      // console.log(e);
       this.equipment = this.equipmentItems[e.target.value].nodeId;
       this.equipmentClick(this.equipment,this.equipmentItems[e.target.value].gatewayId)
       // this.visible2 = !this.visible2;
       // this.downImage2 = !this.downImage2;
     },
-    closeEquipment () {
-      // this.visible2 = false;
-      this.downImage2 = true;
-    },
+    // closeEquipment () {
+    //   // this.visible2 = false;
+    //   this.downImage2 = true;
+    // },
     closeMask () {
       this.visible1 = false;
       this.downImage = true;
