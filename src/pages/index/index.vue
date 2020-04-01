@@ -107,10 +107,9 @@ export default {
           // console.log("请求成功====>",res);
           // console.log(res.data.pros[3].id);
           if (res.status === '200') {
-
             wx.setStorageSync("prosItem", res.data.pros);
             this.$store.commit('setprojectId',res.data.pros[0].id);
-            (wx.setStorageSync('JSESSIONID'),null)
+            wx.setStorageSync('JSESSIONID',res.msg)
             wx.setStorageSync("Tourist", "1");
             wx.navigateTo({
               url: '/pages/test1/main',
@@ -162,8 +161,13 @@ export default {
           var data = res.data;
           // console.log("请求成功====>",res);
           // console.log(res.data.pros[3].id);
+          if(this.form.username == 'guest'){
+            wx.setStorageSync("Tourist", "1");
+          }else{
+            wx.setStorageSync("Tourist", "0");
+          }
           wx.setStorageSync("prosItem", res.data.pros);
-          wx.setStorageSync("Tourist", "0");
+          wx.setStorageSync('JSESSIONID',res.msg)
           this.$store.commit('setprojectId',res.data.pros[0].id);
 
           if (res.status === '200') {
