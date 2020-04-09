@@ -81,6 +81,7 @@ export default {
     // }
   },
   created:function(){
+    wx.hideShareMenu();//禁止出现转发按钮
     wx.setStorageSync("Tourist", "0");
     // wx.getSystemInfo({
     //    success: function(res) {
@@ -142,6 +143,7 @@ export default {
         this.isActive = false;
       }
     },
+    //登录按钮
     btnLogin() {
       if (this.form.username == '' || this.form.password == '') {
         wx.showToast({
@@ -161,7 +163,7 @@ export default {
           var data = res.data;
           // console.log("请求成功====>",res);
           // console.log(res.data.pros[3].id);
-          if(this.form.username == 'guest'){
+          if(this.form.username == 'guest'){//guest账号登录处理
             wx.setStorageSync("Tourist", "1");
           }else{
             wx.setStorageSync("Tourist", "0");
