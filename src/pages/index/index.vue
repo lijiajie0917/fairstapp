@@ -68,6 +68,7 @@ export default {
     }
   },
   created:function(){
+    wx.hideShareMenu();//禁止出现转发按钮
     this.$httpWX.setStorage("Tourist", "0")
     // 检查浏览器缓存中是否有账户信息，若有则请求校验
     if(wx.getStorageSync('JSESSIONID')){
