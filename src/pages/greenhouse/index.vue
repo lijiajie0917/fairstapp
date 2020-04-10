@@ -322,20 +322,33 @@ export default {
           field:this.columnKey,
         }
       }).then(res => {
-        var data = res.data;
+        var data = res.data.data;
+        var frequency = (60/res.data.frequency)-1;
+      //   console.log(frequency);
         this.timeAge = [];
         this.dataAge = [];
         for (var i = 0; i < data.length; i++) {
-          this.timeAge.push(data[i].gatherTime);
-          this.dataAge.push(data[i].field);
+          if (data[i].gatherTime == "") {
+            this.timeAge.push("");
+            this.dataAge.push(data[i].field);
+            // this.dataAge.push("0");
+          } else {
+            this.dataAge.push(data[i].field);
+            this.timeAge.push(data[i].gatherTime);
+          }
         }
         // 设置图表样式及数据
-        chart.setOption(this.getBarOption(this.timeAge,this.dataAge))
+        chart.setOption(this.getBarOption(this.timeAge,this.dataAge,frequency))
       })
     },
-    getBarOption(timeAge,dataAge){
+    getBarOption(timeAge,dataAge,frequency){
+
       if (dataAge.length > 40) {
-        this.startLength = 100 - (4000/dataAge.length)
+        if (frequency <= "5") {
+          this.startLength = 100 - (6000/dataAge.length)
+        } else {
+          this.startLength = 100 - (10000/dataAge.length)
+        }
       } else {
         this.startLength = 0;
       }
@@ -346,14 +359,34 @@ export default {
                   fonnSize :'11'
                 }
             },
-            tooltip: {
-                trigger: 'axis'
+            tooltip:{
+              trigger: 'axis',
+              confine: true,
+              axisPointer: {
+                  type: 'line',
+              },
+              formatter: function (params, ticket, callback) {
+                  //x轴名称
+                  var name = params[0].name
+                  // //图表title名称
+                  var seriesName = params[0].seriesName
+                  // //值
+                  var value = params[0].value
+                  if (name == "") {
+                    return' 此时间点暂无数据 ';
+                  } else {
+                    return '采集时间：' + name + '\n' + seriesName + '：' + value
+                  }
+              },
+              backgroundColor: 'rgba(0,0,0,0.3)', // 背景
             },
             // tooltip: {
-            //     trigger: 'axis',
-            //     axisPointer: {
-            //         type: 'cross'
-            //     }
+            //   trigger: 'axis',
+            //   axisPointer: {
+            //       type: 'line'
+            //   },
+            //   formatter: "采集时间：{b}\n{a0}：{c0}",
+            //   backgroundColor: 'rgba(0,0,0,0.3)', // 背景
             // },
             legend: {
                 data:[this.columnName]
@@ -381,12 +414,22 @@ export default {
             },
             xAxis: {
                 type: 'category',
+                // splitNumber: 24,
+                splitLine: {
+                    show: false
+                },
                 axisLabel:{
-                  interval:5,
+                  interval:frequency,
                   margin: 15,
                   textStyle: {
                      color: '#444444'
-                 },
+                  },
+                  formatter: function (value,index) {
+                    var newstring= value.substring(0,2);
+
+                    return newstring;
+
+                  },
                 },
                 axisLine: {  //设置x轴坐标线的样式
                     lineStyle: {
@@ -420,9 +463,11 @@ export default {
             series: [
                 {
                     name:this.columnName,
+                    // symbol: "none",
                     type:'line',
-                    stack: '总量',
-                    smooth: true,
+                    // stack: '总量',
+                    // smooth: true,
+                    // showAllSymbol: true, //标注所有数据点,
                     data:dataAge,
                     lineStyle:{
                      color:'#175CFF'

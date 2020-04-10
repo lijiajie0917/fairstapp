@@ -53,14 +53,7 @@
 
 <script>
 
-import {saveUserInfo} from '../../assets/js/auth'
-// 导入 click-counter 组件
-// import ClickCounter from "@/components/click-counter";
-// import globalStore from "../../stores/global-store";
-
 export default {
-  // 声明在当前组件下使用 counter-click 组件
-  // components: { ClickCounter },
   data () {
     return {
       form: {
@@ -74,24 +67,11 @@ export default {
       openeyesImg:require("../../../static/images/openeyes.png"),
     }
   },
-
-  computed: {
-    // count() {
-    //   return globalStore.state.count;
-    // }
-  },
   created:function(){
-    wx.setStorageSync("Tourist", "0");
-    // wx.getSystemInfo({
-    //    success: function(res) {
-    //   //model中包含着设备信息
-    //     console.log(res.model)
-    //   }
-    // })
+    this.$httpWX.setStorage("Tourist", "0")
     // 检查浏览器缓存中是否有账户信息，若有则请求校验
-    // console.log("缓存",wx.getStorageSync('JSESSIONID'))
     if(wx.getStorageSync('JSESSIONID')){
-      this.checkName(wx.getStorageSync('JSESSIONID'))
+      this.checkName(this.$httpWX.getStorage('JSESSIONID'))
     }
   },
   methods: {
@@ -104,13 +84,16 @@ export default {
             'password' : "guest",
           },
         }).then(res => {
-          // console.log("请求成功====>",res);
-          // console.log(res.data.pros[3].id);
           if (res.status === '200') {
-            wx.setStorageSync("prosItem", res.data.pros);
+            // 存入项目列表
+            this.$httpWX.setStorage("prosItem",res.data.pros);
+            // 改变默认请求头projectId
             this.$store.commit('setprojectId',res.data.pros[0].id);
-            wx.setStorageSync('JSESSIONID',res.msg)
-            wx.setStorageSync("Tourist", "1");
+            // 存入用户token
+            this.$httpWX.setStorage('JSESSIONID',res.msg);
+            // 存入游客登录标识
+            this.$httpWX.setStorage("Tourist", "1");
+            // 跳转
             wx.navigateTo({
               url: '/pages/test1/main',
             })
@@ -126,7 +109,6 @@ export default {
         },
       }).then(res => {
         var data = res.data;
-        // console.log("请求成功==>",res);
         if (res.status === '200') {
           wx.navigateTo({
             url: '/pages/test1/main',
@@ -142,6 +124,7 @@ export default {
         this.isActive = false;
       }
     },
+    // 登录按钮
     btnLogin() {
       if (this.form.username == '' || this.form.password == '') {
         wx.showToast({
@@ -158,30 +141,23 @@ export default {
             'password' : this.form.password,
           },
         }).then(res => {
-          var data = res.data;
-          // console.log("请求成功====>",res);
-          // console.log(res.data.pros[3].id);
-          if(this.form.username == 'guest'){
-            wx.setStorageSync("Tourist", "1");
-          }else{
-            wx.setStorageSync("Tourist", "0");
-          }
-          wx.setStorageSync("prosItem", res.data.pros);
-          wx.setStorageSync('JSESSIONID',res.msg)
-          this.$store.commit('setprojectId',res.data.pros[0].id);
-
           if (res.status === '200') {
-            saveUserInfo(res.msg)
+            // 判断输入的用户名是否为游客
+            if(this.form.username == 'guest'){
+              this.$httpWX.setStorage("Tourist", "1");
+            }else{
+              this.$httpWX.setStorage("Tourist", "0");
+            }
+            // 存入项目列表
+            this.$httpWX.setStorage("prosItem", res.data.pros);
+            // 存入用户token
+            this.$httpWX.setStorage('JSESSIONID',res.msg);
+            // 改变默认请求头projectId
+            this.$store.commit('setprojectId',res.data.pros[0].id);
+            // 跳转
             wx.navigateTo({
               url: '/pages/test1/main',
             })
-          } else if (res.status === '500') {
-            wx.showToast({
-                title: res.msg,
-                icon: 'none',
-                duration: 1000,
-                mask:true
-            })
           }
         })
       }

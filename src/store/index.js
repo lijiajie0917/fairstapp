@@ -1,36 +1,19 @@
-// import Vue from 'vue'
-// import Vuex from 'vuex';
-//
-// Vue.use(Vuex);
-//
-// export default new Vuex.Store({
-//   state: {
-//     count: 0
-//   },
-//   mutations: {
-//     increment: (state) => {
-//       state.count += 1
-//     },
-//     decrement: (state) => {
-//       state.count -= 1
-//     }
-//   }
-// });
-
-import Vue from 'vue';
+import Vue from 'vue'
 import Vuex from 'vuex';
+
+// 挂载
 Vue.use(Vuex);
-const state={
-     projectId:'',
-   };
-const mutations = {
-  setprojectId(state, pId) {
-    state.projectId= pId;
+
+const store =  new Vuex.Store({
+  state : {
+    projectId:'',
   },
-}
-const store = new Vuex.Store({
-  state,
-  mutations
+  mutations : {
+    // 改变projectId
+    setprojectId(state,value) {
+      state.projectId = value
+    },
+  }
 });
 
 export default store;

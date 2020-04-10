@@ -1,10 +1,36 @@
+
+
+// function version(){
+//   console.log('envVersion', __wxConfig.envVersion);
+//   let version = __wxConfig.envVersion;
+//   switch (version)
+//   {
+//     case 'develop':
+//       return 'https://测试版环境域名';
+//       break;
+//     case 'trial':
+//       return 'https://体验版环境域名';
+//       break;
+//     case 'release':
+//       return 'https://线上环境域名';
+//       break;
+//     default:
+//       return 'https://测试版环境域名';
+//   }
+// }
+
+//调用
+// version();
+
+
 // 线上环境
-// const host = 'https://www.krjrobot.cn/krjrobot'
+const host = 'https://krjrobot.cn/krjrobot'
 // 本地环境
 // const host = 'http://krj/krjrobot'
 // 测试环境
+// const host = 'https://dev.krjrobot.cn/krjrobot'
+
 import store from '../store'//引入store
-const host = 'https://dev.krjrobot.cn/krjrobot'
 
 function request (url, method, data, header = {}) {
   wx.showLoading({
@@ -42,7 +68,7 @@ function request (url, method, data, header = {}) {
         data: data,
         header: {
           'content-type': 'application/json', // 默认值
-          'projectId':store.state.projectId
+          // 'projectId':store.state.projectId
         },
         success: function (res) {
           wx.hideLoading()
@@ -58,15 +84,26 @@ function request (url, method, data, header = {}) {
       })
     })
   }
-
 }
 
+// GET请求
 function get (obj) {
   return request(obj.url, 'GET', obj.data)
 }
 
+// POST请求
 function post (obj) {
   return request(obj.url, 'POST', obj.data)
+}
+
+// 存
+function setStorage (key,value) {
+  wx.setStorageSync(key, value);
+}
+
+// 取
+function getStorage (key) {
+  wx.getStorageSync(key);
 }
 
 // 获取时间
@@ -88,5 +125,7 @@ export default {
   get,
   post,
   host,
-  formatTime
+  formatTime,
+  setStorage,
+  getStorage
 }

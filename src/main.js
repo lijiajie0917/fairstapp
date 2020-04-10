@@ -2,24 +2,21 @@ import Vue from 'vue'
 import App from './App'
 
 import WXrequest from './utils/wx-request'
+
+import store from './store'
+
+// 全局
 Vue.prototype.$httpWX = WXrequest
-
-import store from './store'//引入store
-
-// import ElementUI from 'element-ui'
-// import 'element-ui/lib/theme-chalk/index.css'
-// import "../static/weui/weui.css";
-
-// Vue.use(ElementUI)
 Vue.prototype.$store = store
 
 Vue.config.productionTip = false
-App.mpType = 'app'
 
+App.mpType = 'app'
 const app = new Vue(App)
 app.$mount()
 
 Vue.prototype.globalData = getApp().globalData
+
 wx.getSystemInfo({
   success: res => {
     console.log('手机信息res'+res.model)
@@ -37,7 +34,3 @@ wx.getSystemInfo({
     }
   }
 })
-
-export default {
-  config: {}
-}
