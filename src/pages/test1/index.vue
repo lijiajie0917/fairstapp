@@ -3,10 +3,16 @@
     <img class="insetLogo" src="../../../static/images/inset.jpg" alt="">
     <p class="insetTitle">智慧农业信息化<br/>管理平台</p>
     <div class="projectWrap">
-      <div class="project-down" @click="handleOpen2">
+      <!-- 正式用户 -->
+      <div class="project-down" @click="handleOpen2" v-if="Tourist != '1'">
         <img class="projectIcon" src="../../../static/images/project.png" alt="">
-        {{projectName}}
+        <span>{{projectName}}</span>
         <img class="downIcon" :src="iconDown ? prodown : protop" alt="">
+      </div>
+      <!-- 体验用户 -->
+      <div class="project-down" v-if="Tourist == '1'">
+        <img class="projectIcon" src="../../../static/images/project.png" alt="">
+        科瑞杰—ZNFT
       </div>
       <img v-if="visible2" class="eqImg" src="../../../static/images/sj.png" alt="">
       <div v-if="visible2" class="equipmentAlertList">
@@ -40,6 +46,7 @@ export default {
     this.projectId = this.prosItem[0].id;
     // this.$store.commit('setprojectId',this.projectId);
     this.projectName = this.prosItem[0].name;
+    this.Tourist = wx.getStorageSync('Tourist')
   },
   data () {
     return {
@@ -57,9 +64,9 @@ export default {
       prosItem:[],
       projectName:'',
       projectId:'',
+      Tourist:"0",//默认非游客模式
     }
   },
-
   methods: {
 
     handleOpen2 () {
