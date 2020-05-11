@@ -950,9 +950,9 @@ export default {
   height: 100%;
   padding-bottom: 50px;
 }
-.tabCountent .tab2{
+/* .tabCountent .tab2{ */
   /* padding-bottom: 10px; */
-}
+/* } */
 .information .tabCountent .tabUl,.information .tabCountent .tabUl2{
   width: 360px;
   display: flex;
