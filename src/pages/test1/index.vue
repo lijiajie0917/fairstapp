@@ -213,11 +213,11 @@ navigator{
   border:none;
 }
 .eqImg{
-  width: 12.5px;
-  height: 7.5px;
-  position: absolute;
-  right:81px;
-  top: 45px;
-  z-index: 1000;
+  width: 12.5px;
+  height: 7.5px;
+  position: absolute;
+  right: 81px;
+  top: 45px;
+  z-index: 1000;
 }
 </style>
