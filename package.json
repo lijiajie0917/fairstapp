@@ -33,6 +33,8 @@
     "mpvue": "^2.0.0",
     "mpvue-echarts": "^0.3.2",
     "vant-weapp": "^0.5.27",
+    "video.js": "^7.7.5",
+    "videojs-contrib-hls": "^5.15.0",
     "vuex": "^3.0.1",
     "weui-wxss": "^2.0.1"
   },
