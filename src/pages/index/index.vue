@@ -29,7 +29,7 @@
           placeholder="密码"
         >
         <img class="eyes"
-          :src="showPass ? closeeyesImg : openeyesImg"
+          :src="showPass ? openeyesImg : closeeyesImg"
           @click="showPass = !showPass"
           alt=""
         >
@@ -69,7 +69,7 @@ export default {
   },
   created:function(){
     wx.hideShareMenu();//禁止出现转发按钮
-    this.$httpWX.setStorage("Tourist", "0")
+    // this.$httpWX.setStorage("Tourist", "0")
     // 检查浏览器缓存中是否有账户信息，若有则请求校验
     if(wx.getStorageSync('JSESSIONID')){
       this.checkName(this.$httpWX.getStorage('JSESSIONID'))
@@ -109,8 +109,10 @@ export default {
           'Authorization': token
         },
       }).then(res => {
+        console.log("检验登录状态",res)
         var data = res.data;
         if (res.status === '200') {
+          // if()
           wx.navigateTo({
             url: '/pages/test1/main',
           })
