@@ -13,10 +13,13 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin') // 头部引入UglifyJs压缩
+
 // add hot-reload related code to entry chunks
 // Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 //   baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
 // })
+
 
 module.exports = merge(baseWebpackConfig, {
   module: {
@@ -39,6 +42,8 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': config.dev.env
     }),
+
+    new UglifyJsPlugin({ sourceMap: true }), // 加入这个就能解决
 
     // copy from ./webpack.prod.conf.js
     // extract css into its own file

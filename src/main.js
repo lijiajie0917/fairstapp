@@ -53,8 +53,8 @@ Vue.prototype.globalData = getApp().globalData
 
 wx.getSystemInfo({
   success: res => {
-    console.log('手机信息res'+res.model)
-    console.log(res);
+    // console.log('手机信息res'+res.model)
+    // console.log(res);
     let modelmes = res.model;
     let height = res.screenHeight;
     if (modelmes.search("iPhone X") != -1) {
