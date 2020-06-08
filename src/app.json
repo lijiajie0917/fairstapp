@@ -1,13 +1,21 @@
 {
   "pages": [
-    "pages/index/main",
-    "pages/test1/main",
-    "pages/greenhouse/main"
+    "pages/login/main",
+    "pages/option/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "第一个小程序",
     "navigationBarTextStyle": "black"
-  }
+  },
+  "subPackages": [
+    {
+      "root": "pages/sub",
+      "pages": [
+        "greenhouse/main",
+        "video/main"
+      ]
+    }
+  ]
 }
