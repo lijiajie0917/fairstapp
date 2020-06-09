@@ -1,7 +1,12 @@
 {
   "pages": [
     "pages/login/main",
-    "pages/option/main"
+    "pages/option/main",
+    "pages/menu/main",
+    "pages/realtimedata/main",
+    "pages/control/main",
+    "pages/automatic/main",
+    "pages/timing/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

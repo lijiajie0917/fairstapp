@@ -84,7 +84,7 @@ export default {
       }
       if (num == 1) {
         wx.navigateTo({
-          url: `/pages/sub/greenhouse/main?projectId=${this.projectId}`,
+          url: `/pages/menu/main?projectId=${this.projectId}`,
         })
       }
     },
