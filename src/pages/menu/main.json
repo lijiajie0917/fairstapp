@@ -1,8 +1,6 @@
 {
   "backgroundTextStyle": "light",
-  "navigationBarBackgroundColor": "#4562fc",
-  "navigationBarTitleText": "智慧农业大棚",
-  "disableScroll": true,
-  "navigationStyle": "custom",
-  "navigationBarTextStyle": "white"
+  "navigationBarBackgroundColor": "#F3F5F8",
+  "navigationBarTitleText": "",
+  "navigationBarTextStyle": "black"
 }

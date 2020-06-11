@@ -147,7 +147,7 @@ export default {
 
 <style scoped>
 .menu{
-  padding: 80rpx 50rpx 0;
+  padding: 20rpx 50rpx 0;
   background: #F3F5F8;
 }
 .menuTitle{
