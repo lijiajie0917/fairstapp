@@ -8,7 +8,7 @@
 </template>
 <script>
 export default {
-    name: "titleBar",
+    name: "titleBar",   //导航栏组件
     props: ["navTitle"],
     data() {
     	return {

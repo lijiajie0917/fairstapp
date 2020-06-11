@@ -36,6 +36,7 @@ export default {
 
   },
   methods: {
+    // 获取视频监控地址
     getVideoUrl(){
       // this.$httpWX.post({
       //   url: '/miniProgram/getVideoUrl/'

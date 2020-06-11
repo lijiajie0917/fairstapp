@@ -50,11 +50,13 @@ export default {
     console.log(this.videoList);
   },
   methods:{
+    // 跳转视频监控页面
     video(videoName,num){
       wx.navigateTo({
         url: '/pages/sub/video/main?num='+num+'&videoName='+videoName,
       })
     },
+    // 跳转设备信息详情
     videoDetails(videoName,num){
       wx.navigateTo({
         url: '/pages/sub/videoDetails/main?num='+num+'&videoName='+videoName,

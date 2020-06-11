@@ -10,10 +10,11 @@ const store =  new Vuex.Store({
     navH:''
   },
   mutations : {
-    // 改变projectId
+    // 改变项目ID
     setprojectId(state,value) {
       state.projectId = value
     },
+    // 改变标题栏高度
     setnavH(state,value) {
       state.navH = value
     },

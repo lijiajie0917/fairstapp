@@ -2,7 +2,7 @@
   <div class="container">
     <TitleBar :navTitle="title"></TitleBar>
     <ul class="equipmentInfor" :style="{'margin-top':(navH + 15)+'px'}">
-      <li @click='showModal2'>
+      <li @click='showModal'>
         <span class="liTitle">设备名称：</span>
         <span>{{videoName}}</span>
       </li>
@@ -16,7 +16,7 @@
       </li>
     </ul>
     <button class="unbind" @click="unbind()" type="button" name="button">解绑摄像机</button>
-    <modal :hidden="hiddenModal2" title="请输入设备名" confirm-text="确定" cancel-text="取消" @confirm="model2confirm" @cancel="model2cancel">
+    <modal :hidden="deviceModal" title="请输入设备名" confirm-text="确定" cancel-text="取消" @confirm="modelconfirm" @cancel="modelcancel">
         <input placeholder='请输入内容' v-model="input"/>
     </modal>
   </div>
@@ -36,12 +36,14 @@ export default {
       videoName:'',
       title:'设备信息',
       navH:this.$store.state.navH,
-      hiddenModal2:true,
+      deviceModal:true,
       input:''
     }
   },
   mounted(){
+    // 获取视频列表序列号
     this.num = this.$root.$mp.query.num
+    // 获取视频列表设备名称
     this.videoName = this.$root.$mp.query.videoName
   },
   created(){
@@ -55,16 +57,19 @@ export default {
       }
       this.$httpWX.alert('提示','确定解除设备绑定吗？',confirm,true);
     },
-    showModal2(){
-      this.hiddenModal2 = false;
+    // 点击设备名称弹框显示
+    showModal(){
+      this.deviceModal = false;
     },
-    model2confirm(e) {
-      this.hiddenModal2 = true;
+    // 确认修改回调
+    modelconfirm(e) {
+      this.deviceModal = true;
       this.$httpWX.showSuccessToast('修改成功')
       // this.videoName = this.input;
     },
-    model2cancel(e) {
-      this.hiddenModal2 = true;
+    // 取消修改回调
+    modelcancel(e) {
+      this.deviceModal = true;
     }
   }
 };

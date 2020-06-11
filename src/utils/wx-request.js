@@ -1,34 +1,21 @@
 
+let host;
 
-// function version(){
-//   console.log('envVersion', __wxConfig.envVersion);
-//   let version = __wxConfig.envVersion;
-//   switch (version)
-//   {
-//     case 'develop':
-//       return 'https://测试版环境域名';
-//       break;
-//     case 'trial':
-//       return 'https://体验版环境域名';
-//       break;
-//     case 'release':
-//       return 'https://线上环境域名';
-//       break;
-//     default:
-//       return 'https://测试版环境域名';
-//   }
-// }
-
-//调用
-// version();
-
-
-// 线上环境
-// const host = 'https://krjrobot.cn/krjrobot'
-// 本地环境
-// const host = 'http://krj/krjrobot'
-// 测试环境
-const host = 'https://dev.krjrobot.cn/krjrobot'
+let dev = __wxConfig.envVersion; // 运行环境
+switch (dev)
+{
+  case 'develop':
+    host = 'https://dev.krjrobot.cn/krjrobot'; // 测试环境
+    break;
+  case 'trial':
+    host = 'https://dev.krjrobot.cn/krjrobot'; //体验环境
+    break;
+  case 'release':
+    host = 'https://krjrobot.cn/krjrobot'; // 线上环境
+    break;
+  default:
+    host = 'https://dev.krjrobot.cn/krjrobot'; // 测试环境
+}
 
 import store from '../store'//引入store
 
@@ -151,9 +138,7 @@ function alert(title = '',msg = '',confirm,cancel) {//confirm,cancel分别对应
         if(confirm){ //如果confirm函数不为空，则点击确定执行该函数
           confirm()
         }
-      } else {
-
-      }
+      } else {}
     }
   })
 }
