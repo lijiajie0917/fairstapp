@@ -1,7 +1,8 @@
 {
   "backgroundTextStyle": "light",
-  "navigationBarBackgroundColor": "#fff",
-  "navigationBarTitleText": "",
-  "navigationBarTextStyle": "black",
-  "disableSwipeBack": true
+  "navigationBarBackgroundColor": "#4562fc",
+  "navigationBarTitleText": "实时数据",
+  "disableScroll": true,
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "white"
 }
