@@ -28,12 +28,12 @@ export default {
         {
           videoName:"1号摄像头",
           number:"C12345",
-          imgUrl:require('../../../../static/images/video.png')
+          imgUrl:require('../../../../static/images/monitoring.png')
         },
         {
           videoName:"2号摄像头",
           number:"N78952",
-          imgUrl:require('../../../../static/images/video.png')
+          imgUrl:require('../../../../static/images/monitoring.png')
         }
       ]
     }
