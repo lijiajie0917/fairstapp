@@ -1,34 +1,21 @@
 
+let host;
 
-// function version(){
-//   console.log('envVersion', __wxConfig.envVersion);
-//   let version = __wxConfig.envVersion;
-//   switch (version)
-//   {
-//     case 'develop':
-//       return 'https://测试版环境域名';
-//       break;
-//     case 'trial':
-//       return 'https://体验版环境域名';
-//       break;
-//     case 'release':
-//       return 'https://线上环境域名';
-//       break;
-//     default:
-//       return 'https://测试版环境域名';
-//   }
-// }
-
-//调用
-// version();
-
-
-// 线上环境
-const host = 'https://krjrobot.cn/krjrobot'
-// 本地环境
-// const host = 'http://krj/krjrobot'
-// 测试环境
-// const host = 'https://dev.krjrobot.cn/krjrobot'
+let dev = __wxConfig.envVersion; // 运行环境
+switch (dev)
+{
+  case 'develop':
+    host = 'https://dev.krjrobot.cn/krjrobot'; // 测试环境
+    break;
+  case 'trial':
+    host = 'https://dev.krjrobot.cn/krjrobot'; //体验环境
+    break;
+  case 'release':
+    host = 'https://krjrobot.cn/krjrobot'; // 线上环境
+    break;
+  default:
+    host = 'https://dev.krjrobot.cn/krjrobot'; // 测试环境
+}
 
 import store from '../store'//引入store
 
@@ -120,6 +107,42 @@ function formatTime (){
   return timeDate;
 }
 
+//成功toast
+function showSuccessToast(msg) {
+  wx.showToast({
+    title: msg,
+    // duration:2000,//显示时长
+    mask:true,//是否显示透明蒙层，防止触摸穿透，默认：false
+    icon:'success' //图标，支持"success"、"loading"
+  })
+}
+
+//失败toast
+function showErrorToast(msg) {
+  wx.showToast({
+    title: msg,
+    mask: true,
+    // image: '/static/images/icon_error.png' //自定义失败图标
+  })
+}
+
+//封装wx.showModel为alert
+function alert(title = '',msg = '',confirm,cancel) {//confirm,cancel分别对应成功后的回调函数和失败后的回调函数
+  wx.showModal({
+    title: title , //标题
+    content: msg, //提示内容
+    showCancel: cancel ? true : false, //是否显示取消按钮（如果cancel函数为空也就是不传，则不显示，否则显示）
+    confirmColor: '#336FFF',//确定文字的颜色
+    success:res=>{
+      if(res.confirm){
+        if(confirm){ //如果confirm函数不为空，则点击确定执行该函数
+          confirm()
+        }
+      } else {}
+    }
+  })
+}
+
 export default {
   request,
   get,
@@ -127,5 +150,8 @@ export default {
   host,
   formatTime,
   setStorage,
-  getStorage
+  getStorage,
+  showSuccessToast,
+  showErrorToast,
+  alert
 }

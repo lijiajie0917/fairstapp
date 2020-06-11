@@ -84,62 +84,70 @@
 export default {
   data () {
     return {
-      prosItem:[],
-      projectId:null
+      // projectId:null
     }
   },
   created:function(){
     wx.hideShareMenu();//禁止出现转发按钮
-
+    this.getHeight();
   },
   mounted() {
-    this.prosItem = wx.getStorageSync('prosItem');
-    this.projectId = this.prosItem[0].id;
+    // this.projectId = this.$store.state.projectId;
   },
   methods: {
     //跳转数据分析页
     goGreenhouse(){
       wx.navigateTo({
-        url: `/pages/sub/greenhouse/main?projectId=${this.projectId}`,
+        url: `/pages/sub/greenhouse/main`,
       })
     },
     //跳转实时数据页
     goRealtimedata(){
       wx.navigateTo({
-        url: `/pages/realtimedata/main?projectId=${this.projectId}`,
+        url: `/pages/realtimedata/main`,
       })
     },
     //跳转设备控制页
     goControl(){
       wx.navigateTo({
-        url: `/pages/control/main?projectId=${this.projectId}`,
+        url: `/pages/control/main`,
       })
     },
     //跳转自动控制页
     goAutomatic(){
       wx.navigateTo({
-        url: `/pages/automatic/main?projectId=${this.projectId}`,
+        url: `/pages/automatic/main`,
       })
     },
     //跳转定时任务页
     goTiming(){
       wx.navigateTo({
-        url: `/pages/timing/main?projectId=${this.projectId}`,
+        url: `/pages/timing/main`,
       })
     },
     //跳转视频监控页
     goVideo(){
       wx.navigateTo({
-        url: `/pages/sub/video/main?projectId=${this.projectId}`,
+        url: `/pages/sub/videoList/main`,
       })
-    }
+    },
+    /**测量屏幕高度,计算标题栏高度 */
+    getHeight(){
+      let that = this;
+      wx.getSystemInfo({
+        success: function(res) {
+          that.navH = res.statusBarHeight + 46;
+          that.$store.commit('setnavH',that.navH);
+        }
+      })
+    },
   }
 }
 </script>
 
 <style scoped>
 .menu{
-  padding: 80rpx 50rpx 0;
+  padding: 20rpx 50rpx 0;
   background: #F3F5F8;
 }
 .menuTitle{
