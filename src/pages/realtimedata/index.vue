@@ -144,8 +144,8 @@ export default {
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
       projectId: 7,
       screenWidth: "",
-      screenHeight: "",
       navH: 0, //导航栏高度
+      screenHeight: null,//屏幕总高
       width: 0, //进度条宽度
       timeDate: "",
       informShow: true,
@@ -161,20 +161,12 @@ export default {
       equipmentItems2: [],
       downImage: true,
       visible1: false,
-      visible2: false,
       realTimeItems: [],
-      screenHeight: null
     };
   },
   created: function() {
     wx.hideShareMenu(); //禁止出现转发按钮
     this.getHeight();
-    wx.getSystemInfo({
-      success: res => {
-        this.screenWidth = res.screenWidth;
-        this.screenHeight = res.screenHeight;
-      }
-    });
   },
   mounted() {
     this.homePage();
@@ -334,9 +326,7 @@ export default {
     },
     handleOpen1() {
       this.visible1 = true;
-      // this.visible2 = false;
       this.downImage = false;
-      // this.downImage2 = true;
       this.informShow = false;
     },
     handleOpen2(e) {
@@ -352,7 +342,12 @@ export default {
       this.visible1 = false;
       this.downImage = true;
       this.informShow = true;
-    }
+    },
+    equipmentClick(nodeId,gatewayId){
+      this.equipment = nodeId;
+      this.gatewayId = gatewayId;
+      this.realTimeData(nodeId,gatewayId);
+    },
   }
 };
 </script>
