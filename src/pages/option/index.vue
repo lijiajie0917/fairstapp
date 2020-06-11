@@ -39,8 +39,7 @@ export default {
   mounted(){
     wx.hideShareMenu();//禁止出现转发按钮
     this.prosItem = wx.getStorageSync('prosItem');
-    this.projectId = this.prosItem[0].id;
-    // this.$store.commit('setprojectId',this.projectId);
+    this.projectId = this.$store.state.projectId;
     this.projectName = this.prosItem[0].name;
     this.Tourist = wx.getStorageSync('Tourist')
   },

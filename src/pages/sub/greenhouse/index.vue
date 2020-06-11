@@ -200,7 +200,7 @@ export default {
       greenhouse:'',
       equipment:'-',
       cur:0, //默认选中第一个tab
-      projectId:7,
+      projectId:'',
       switch1:false,
       visible1:false,
       visible2:false,
@@ -270,7 +270,7 @@ export default {
     setTimeout(()=>{
       this.homePage();
     },200);
-    this.projectId = this.$root.$mp.query.projectId;
+    this.projectId = this.$store.state.projectId;
     // let pages = getCurrentPages();
     // let currentPage = pages[pages.length-1]
     // console.log("currentPage",currentPage)

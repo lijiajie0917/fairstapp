@@ -11,7 +11,6 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "第一个小程序",
     "navigationBarTextStyle": "black"
   },
   "subPackages": [
@@ -19,7 +18,9 @@
       "root": "pages/sub",
       "pages": [
         "greenhouse/main",
-        "video/main"
+        "videoList/main",
+        "video/main",
+        "videoDetails/main"
       ]
     }
   ]

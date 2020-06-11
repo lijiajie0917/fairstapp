@@ -1,11 +1,13 @@
 <template>
   <div class="insetWrap">
+    <TitleBar :navTitle="this.$root.$mp.query.videoName"></TitleBar>
     <video direction="0"
-    src="http://hls01open.ys7.com/openlive/92185fae71934fca881ea590d40134e3.m3u8"
+    :src="videoUrl"
     controls="true"
     objectFit="cover"
     autoplay
     :show-play-btn="false"
+    :style="{'margin-top':(navH)+'px'}"
     >
     </video>
   </div>
@@ -13,20 +15,42 @@
 
 <script>
 
+import TitleBar from "@/components/titleBar/index";
+
 export default {
-  mounted(){
+  components: {
+    TitleBar
   },
   data () {
     return {
-
+      num:'',
+      videoUrl:'',
+      navH:this.$store.state.navH
     }
   },
-  methods: {
+  mounted(){
+    this.num = this.$root.$mp.query.num
+    this.getVideoUrl();
+  },
+  created(){
 
+  },
+  methods: {
+    getVideoUrl(){
+      // this.$httpWX.post({
+      //   url: '/miniProgram/getVideoUrl/'
+      // }).then(res => {
+      //   var data = res.data;
+      // })
+      this.videoUrl = "http://hls01open.ys7.com/openlive/92185fae71934fca881ea590d40134e3.m3u8"
+    }
   }
 };
 </script>
 
 <style scoped>
-
+video{
+  width: 100%;
+  height: 211px;
+}
 </style>
