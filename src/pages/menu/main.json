@@ -1,6 +1,8 @@
 {
   "backgroundTextStyle": "light",
-  "navigationBarBackgroundColor": "#F3F5F8",
-  "navigationBarTitleText": "",
-  "navigationBarTextStyle": "black"
+  "navigationBarBackgroundColor": "#4562fc",
+  "navigationBarTitleText": "设备控制",
+  "disableScroll": true,
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "white"
 }

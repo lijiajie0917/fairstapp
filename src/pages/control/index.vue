@@ -192,10 +192,6 @@ export default {
           data: {
             county: "修文县"
           }
-          // header: {
-          //   'content-type':'application/x-www-form-urlencoded',
-          //   'cookie': jsid // 设置cookie
-          // },
         })
         .then(res => {
           var data = res.data;
