@@ -151,6 +151,7 @@ export default {
   background: #F3F5F8;
 }
 .menuTitle{
+  padding-top: 64rpx;
   font-size:23px;
   font-family:PingFang SC;
   font-weight:bold;
