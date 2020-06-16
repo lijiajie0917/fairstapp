@@ -48,7 +48,7 @@
           </ul>
         </div>
       </div>
-      <i-toast id="toast" />
+      <!-- <i-toast id="toast" /> -->
       <form :model="form" autocomplete="off">
         <picker
           class="areaGreenhouse"
@@ -142,7 +142,7 @@ export default {
     return {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
-      projectId: 7,
+      projectId: '',
       screenWidth: "",
       screenHeight: "",
       navH: 0, //导航栏高度
@@ -161,7 +161,6 @@ export default {
       equipmentItems2: [],
       downImage: true,
       visible1: false,
-      visible2: false,
       realTimeItems: [],
       screenHeight: null
     };
@@ -169,15 +168,18 @@ export default {
   created: function() {
     wx.hideShareMenu(); //禁止出现转发按钮
     this.getHeight();
-    wx.getSystemInfo({
-      success: res => {
-        this.screenWidth = res.screenWidth;
-        this.screenHeight = res.screenHeight;
-      }
-    });
+    // wx.getSystemInfo({
+    //   success: res => {
+    //     this.screenWidth = res.screenWidth;
+    //     this.screenHeight = res.screenHeight;
+    //   }
+    // });
   },
   mounted() {
-    this.homePage();
+    setTimeout(()=>{
+      this.homePage();
+    },200);
+    this.projectId = this.$store.state.projectId;
     if (this.visible1 != false) {
       this.visible1 = false;
     }
@@ -297,13 +299,18 @@ export default {
           }
         });
     },
+    areaClick(area,greenhouseId,greenhouse) {
+      this.equipmentList(area,greenhouseId,greenhouse);
+      this.visible1 = false;
+      this.informShow = true;
+    },
     // 7要素最新数据
-    realTimeData(nodeId, gatewayId) {
+    realTimeData(equipment,gatewayId) {
       this.$httpWX
         .get({
           url: "/miniProgram/lastStatus",
           data: {
-            nodeId: nodeId,
+            nodeId: equipment,
             gatewayId: gatewayId
           }
         })
@@ -328,25 +335,21 @@ export default {
           list[0].unit = "%RH";
           list[list.length - 2].unit = "%RH";
           list[list.length - 1].unit = "W/cm²";
-          this.equipment = nodeId;
+          // this.equipment = nodeId;
           this.realTimeItems = list;
         });
     },
     handleOpen1() {
       this.visible1 = true;
-      // this.visible2 = false;
       this.downImage = false;
-      // this.downImage2 = true;
       this.informShow = false;
     },
     handleOpen2(e) {
       this.equipmentIndex = e.target.value;
       // console.log(e);
       this.equipment = this.equipmentItems[e.target.value].nodeId;
-      this.equipmentClick(
-        this.equipment,
-        this.equipmentItems[e.target.value].gatewayId
-      );
+      this.gatewayId = this.equipmentItems[e.target.value].gatewayId;
+      this.realTimeData(this.equipment,this.gatewayId);
     },
     closeMask() {
       this.visible1 = false;

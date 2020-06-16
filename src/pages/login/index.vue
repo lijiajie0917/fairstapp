@@ -109,10 +109,11 @@ export default {
           'Authorization': token
         },
       }).then(res => {
-        console.log("检验登录状态",res)
+        // console.log("检验登录状态",res)
         var data = res.data;
         if (res.status === '200') {
-          // if()
+          // 改变默认请求头projectId
+          this.$store.commit('setprojectId',wx.getStorageSync('prosItem')[0].id);
           wx.navigateTo({
             url: '/pages/option/main',
           })

@@ -6,7 +6,8 @@
     "pages/realtimedata/main",
     "pages/control/main",
     "pages/automatic/main",
-    "pages/timing/main"
+    "pages/timing/main",
+    "pages/addtiming/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
