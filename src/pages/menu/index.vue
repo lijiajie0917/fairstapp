@@ -84,12 +84,15 @@
 export default {
   data () {
     return {
-      projectId: wx.getStorageSync('projectId')
+      projectId: ''
     }
   },
   created:function(){
     wx.hideShareMenu();//禁止出现转发按钮
     this.getHeight();
+  },
+  mounted() {
+    this.projectId = wx.getStorageSync('projectId')
   },
   methods: {
     //跳转数据分析页

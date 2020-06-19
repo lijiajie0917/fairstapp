@@ -147,6 +147,7 @@ export default {
     this.getHeight();
   },
   mounted() {
+    this.projectId = wx.getStorageSync('projectId')
     this.homePage();
   },
   methods: {

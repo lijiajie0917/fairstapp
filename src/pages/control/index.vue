@@ -145,7 +145,7 @@ export default {
     return {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
-      projectId:  wx.getStorageSync('projectId'),
+      projectId: '',
       equipment: "-", //默认设备名字
       gatewayId: "", //默认设备
       equipmentItems: [], //设备下拉框
@@ -171,6 +171,7 @@ export default {
     this.getHeight();
   },
   mounted() {
+    this.projectId = wx.getStorageSync('projectId')
     this.homePage();
     if (this.visible1 != false) {
       this.visible1 = false;

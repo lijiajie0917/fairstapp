@@ -142,7 +142,7 @@ export default {
     return {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
-      projectId:  wx.getStorageSync('projectId'),
+      projectId: '',
       screenWidth: "",
       navH: 0, //导航栏高度
       screenHeight: null,//屏幕总高
@@ -169,6 +169,7 @@ export default {
     this.getHeight();
   },
   mounted() {
+    this.projectId = wx.getStorageSync('projectId')
     setTimeout(()=>{
       this.homePage();
     },200);

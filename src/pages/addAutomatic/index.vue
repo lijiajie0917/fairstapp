@@ -110,7 +110,7 @@
 export default {
   data() {
     return {
-      projectId:  wx.getStorageSync('projectId'),
+      projectId: '',
       Tourist: "0", //默认非游客模式
       navH: 0, //导航栏高度
       screenHeight: null, //屏幕总高
@@ -170,6 +170,7 @@ export default {
     this.getHeight();
   },
   mounted() {
+    this.projectId = wx.getStorageSync('projectId')
     this.getList();
   },
   onLoad (option) {
