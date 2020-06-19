@@ -29,17 +29,6 @@
         />
         <img v-else class="down" src="../../../static/images/top.png" alt />
       </div>
-      <div class="areaGreenhouse" @click="handleOpen1">
-        <img class="areaDown" src="../../../static/images/area.png" alt />
-        {{areaText}}片区—{{greenhouse}}
-        <img
-          v-if="downImage"
-          class="down"
-          src="../../../static/images/down.png"
-          alt
-        />
-        <img v-else class="down" src="../../../static/images/top.png" alt />
-      </div>
       <div v-if="visible1" class="mask">
         <div class="asShow">
           <img @click="closeMask" src="../../../static/images/close.png" alt />
@@ -64,13 +53,13 @@
         <picker
           class="areaGreenhouse"
           @change="handleOpen2"
-          :value="equipmentIndex"
-          :range-key="'nodeId'"
+          :value="wsbIndex"
+          :range-key="'localId'"
           :range="equipmentItems2"
         >
           <view class="picker">
-            <img class="areaDown" src="../../../static/images/shebei.png" alt />
-            {{equipment+'号设备'}}
+            <img class="areaDown" src="../../../static/images/wsb.png" alt />
+            {{wsbId+'号温室宝'}}
             <img
               class="down"
               src="../../../static/images/down.png"
@@ -83,91 +72,96 @@
     <div class="automaticKong" v-if="0">
       <img src="../../../static/images/automaticjpg.png" alt />
       <p>当前无自动控制任务！</p>
-      <div class="addTaskOne">添加自动控制</div>
+      <div class="addTaskOne" @click="addmatic()">添加自动控制</div>
     </div>
-    <img class="addBtn" src="../../../static/images/add.png" alt/>
+    <img class="addBtn" @click="addmatic()" src="../../../static/images/add.png" alt />
     <ul class="automaticUl">
-      <li class="automaticli">
+      <li class="automaticli" v-for="(item,index) in deciveItems" :key="index">
         <div class="automaticName">
           <i-switch
             class="switchBtn"
-            :value="switch1"
+            :value="item.WisOpen"
             slot="footer"
+            @change="onChange(index,item.WlocalId,item.WisOpen)"
           >
             <view slot="open">开</view>
             <view slot="close">关</view>
           </i-switch>
-          <div>设置水阀上限—002</div>
-          <img src="../../../static/images/off.png" alt>
+          <div>{{item.Wname}}</div>
+          <img @click="delBtn()" src="../../../static/images/off.png" alt />
         </div>
         <div class="automaticTxt">
           <div class="automaticItem">
-            当<div class="spanTxt1">土壤温度</div>
-            大于<div class="spanTxt2">26000RH</div>
+            当
+            <div class="spanTxt1">{{item.Wfield}}</div>大于
+            <div class="spanTxt2">{{item.Wlimit}}</div>
           </div>
           <div class="automaticItem">
-            则<div class="spanTxt2">水阀—001</div>
-            <div class="spanTxt3">开启</div>
-          </div>
-        </div>
-      </li>
-      <li class="automaticli">
-        <div class="automaticName">
-          <i-switch
-            class="switchBtn"
-            :value="switch1"
-            slot="footer"
-          >
-            <view slot="open">开</view>
-            <view slot="close">关</view>
-          </i-switch>
-          <div>设置水阀下限—002</div>
-          <img src="../../../static/images/off.png" alt>
-        </div>
-        <div class="automaticTxt">
-          <div class="automaticItem">
-            当<div class="spanTxt1">土壤温度</div>
-            大于<div class="spanTxt2">26000RH</div>
-          </div>
-          <div class="automaticItem">
-            则<div class="spanTxt2">水阀—001</div>
-            <div class="spanTxt3">关闭</div>
+            则
+            <div class="spanTxt2">水阀—001</div>
+            <div class="spanTxt3">{{item.Waction}}</div>
           </div>
         </div>
       </li>
     </ul>
+    <div class="delTips" v-if="delTips">
+      <div class="deleteTips">
+        <p>确定删除此控制吗？</p>
+        <div class="delTipsBtn">
+          <div class="delTipsBtnL" @click="cencelDel()">取消</div>
+          <div class="delTipsBtnR" @click="trueDel()">确定</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
-      projectId: 7,
-      equipment: "-", //默认设备名字
-      gatewayId: "", //默认设备
-      equipmentItems: [], //设备下拉框
-      equipmentItems2: [],
-      Tourist: "0", //默认非游客模式
+      projectId: wx.getStorageSync('projectId'),
       areaText: "", //默认区域
       greenhouse: "", //默认大鹏名字
+      maskItems:[],//大棚下拉框数据
       greenhouseId: "",
+      wsbId:"",//默认温室宝localId
+      wsbIndex:0,
+      equipmentItems: [], //设备下拉框数据列表
+      wsbList:[],//温室宝下拉框数据列表
+      equipmentItems2: [],//温室宝下拉框名称列表
+      Tourist: "0", //默认非游客模式
       navH: 0, //导航栏高度
       screenHeight: null, //屏幕总高
-
-    }
+      switch1: false,
+      deciveItems: [], //自动控制任务列表
+      downImage: true,
+      visible1: false,
+      delTips:false,//删除弹框是否显示
+    };
   },
-  created:function(){
+  created: function() {
     wx.hideShareMenu(); //禁止出现转发按钮
     this.getHeight();
   },
-  mounted(){
+  mounted() {
     this.homePage();
-
   },
   methods: {
+    //显示删除弹框
+    delBtn(){
+      this.delTips = true;
+    },
+    // 取消删除
+    cencelDel(){
+      this.delTips = false;
+    },
+    //确定删除
+    trueDel(){
+      this.delTips = false;
+    },
     /**标题栏返回按钮 */
     navBack() {
       wx.navigateBack({
@@ -179,16 +173,33 @@ export default {
       let that = this;
       wx.getSystemInfo({
         success: function(res) {
-          console.log("------", res);
           that.screenHeight = res.screenHeight;
           that.navH = res.statusBarHeight + 46;
           that.width = res.screenWidth;
         }
       });
     },
+    onChange(i,WlocalId,WisOpen) {
+      console.log(i,WlocalId,WisOpen);
+      // this.deciveItems[i].WisOpen = !WisOpen;
+      // var cmd = switch1;
+      // if (cmd == false) {
+      //   cmd = 1;
+      // } else {
+      //   cmd = 0;
+      // }
+      // this.$httpWX
+      //   .post({
+      //     url: "/sensor/" + gatewayId + "/" + nodeId + "/" + cmd,
+      //     data: {}
+      //   })
+      //   .then(res => {
+      //     // console.log(res)
+      //     if (res.status == "200") {
+      //     }
+      //   });
+    },
     homePage() {
-      // this.projectId = wx.getStorageSync("projectId");
-      // let jsid = wx.getStorageSync("JSESSIONID");
       this.$httpWX
         .post({
           url: "/miniProgram/groupInfo/" + this.projectId,
@@ -197,66 +208,172 @@ export default {
           }
         })
         .then(res => {
+          console.log("/*/*/*/", res);
           var data = res.data;
           if (data.level == "area") {
             this.areaText = data.value[0].area; //默认区域
             this.greenhouse = data.value[0].greenhouse[0].greenhouse; //默认大鹏名字
             this.greenhouseId = data.value[0].greenhouse[0].greenhouseId; //默认大棚id
             this.maskItems = data.value; //片区和大棚下拉框
-            // 获取默认设备列表
-            this.equipmentList(
-              this.areaText,
-              this.greenhouseId,
-              this.greenhouse
+            //获取温室宝
+            this.realTimeData(
+              this.projectId,
+              data.value[0].area,
+              data.value[0].greenhouse[0].greenhouseId
             );
-            // setTimeout(, 2000);
           }
         });
     },
-    equipmentList(area, greenhouseId, greenhouse) {
+    // 温室宝数据
+    realTimeData(id,txt,gid) {
+      console.log(id)
       this.$httpWX
         .post({
-          url: "/miniProgram/groupInfo/" + this.projectId,
+          url: "/miniProgram/group/sensorInfo",
           data: {
-            county: "修文县",
-            area: area,
-            greenhouseId: greenhouseId
+            greenhouseId:gid,
+            nodeType:"9"
           }
         })
         .then(res => {
-          var data = res.data;
-          if (data.level == "nodeInfo") {
-            if (data.value.length == 0) {
-              wx.showToast({
-                title: "暂无数据",
-                icon: "none",
-                duration: 1000,
-                mask: true
-              });
-            } else {
-              this.areaText = area; //默认区域
-              this.greenhouse = greenhouse; //默认大鹏名字
-              this.equipment = data.value[0].nodeId; //默认设备名字
-              this.gatewayId = data.value[0].gatewayId; //默认设备id
-              this.equipmentItems = data.value; //设备下拉框
-              this.equipmentItems2 = [];
-              for (var i = 0; i < data.value.length; i++) {
-                this.equipmentItems2.push({
-                  nodeId: data.value[i].nodeId + "号设备"
-                });
-              }
-              // 获取设备控制列表
-              // this.controlNode(greenhouseId, this.equipment);
-            }
+          // let data = []
+          // for(let i in res.data.rows){
+          //   if(res.data.rows[i].typeName == "温室宝"){
+          //     data = data.concat(res.data.rows[i])
+          //   }
+          // }
+          let data = res.data.rows;
+          console.log("温室宝数据", data);
+          this.wsbList = data;
+          this.wsbId = data[0].localId;
+          this.equipmentItems2 = [];
+          for (let j = 0; j < data.length; j++) {
+            this.equipmentItems2.push({
+              localId: data[j].localId + '号温室宝'
+            });
           }
+          // 获取自动任务列表
+          this.getList(
+            data[0].localId,
+          );
         });
     },
-  },
-}
+    //获取自动任务列表
+    getList(id) {
+      this.$httpWX
+        .get({
+          url: "/miniProgram/autoControl/" + id
+        })
+        .then(res => {
+          console.log("自动控制任务列表", res.data);
+          let data = res.data;
+          // let list = []
+          let spanTxt1 = [
+            {"localId":"空气湿度",
+              "name":"airHumidity"
+            },
+            {"localId":"空气温度",
+              "name":"airTemperature"
+            },
+            {"localId":"光照强度",
+              "name":"lux"
+            },
+            {"localId":"二氧化碳",
+              "name":"CO2"
+            },
+            {"localId":"土壤温度",
+              "name":"soilTemperature"
+            },
+            {"localId":"土壤湿度",
+              "name":"soilHumidity"
+            },
+            {"localId":"土壤ph值",
+              "name":"ph"
+            }
+          ]
+          for(let i in data){
+            if(data[i].rule.lowWater.action == 'OPEN'){
+              data[i].rule.lowWater.action = '开启'
+            }else{
+              data[i].rule.lowWater.action = '关闭'
+            }
+            for(let j in spanTxt1){
+              if(spanTxt1[j].name == data[i].rule.field){
+                data[i].rule.field = spanTxt1[j].localId
+              }
+            }
+            if(data[i].rule.highWater == null||data[i].rule.highWater == "null"){
+              data[i] = {
+                frequency: data[i].frequency,
+                localId: data[i].localId,
+                modifyTime: data[i].modifyTime,
+                name: data[i].name,
+                Wfield: data[i].rule.field,
+                WgatewayId: data[i].rule.gatewayId,
+                WlocalId: data[i].rule.localId,
+                Waction: data[i].rule.lowWater.action,
+                WisOpen: data[i].rule.lowWater.isOpen,
+                Wlimit: data[i].rule.lowWater.limit,
+                Wname: data[i].rule.lowWater.name,
+                WnodeId: data[i].rule.nodeId,
+                nullRule: data[i].rule.nullRule,
+                ruleJson: data[i].ruleJson,
+                serialId: data[i].serialId,
+                version: data[i].version,
+              }
+            }else{
+              data[i] = {
+                frequency: data[i].frequency,
+                localId: data[i].localId,
+                modifyTime: data[i].modifyTime,
+                name: data[i].name,
+                Wfield: data[i].rule.field,
+                WgatewayId: data[i].rule.gatewayId,
+                WlocalId: data[i].rule.localId,
+                Waction: data[i].rule.highWater.action,
+                WisOpen: data[i].rule.highWater.isOpen,
+                Wlimit: data[i].rule.highWater.limit,
+                Wname: data[i].rule.highWater.name,
+                WnodeId: data[i].rule.nodeId,
+                nullRule: data[i].rule.nullRule,
+                ruleJson: data[i].ruleJson,
+                serialId: data[i].serialId,
+                version: data[i].version,
+              }
+            }
+            this.deciveItems = this.deciveItems.concat(data[i])
+            console.log("数据处理后",this.deciveItems)
+          }
+          // this.deciveItems = list;
+        });
+    },
+    /**跳转添加自动任务页 */
+    addmatic(){
+      wx.navigateTo({
+        url: `/pages/addAutomatic/main`+
+        `?gatewayId=`+this.wsbList[this.wsbIndex].gatewayId+
+        `&nodeId=`+this.wsbList[this.wsbIndex].nodeId+
+        `&localId=`+this.wsbList[this.wsbIndex].localId
+      })
+    },
+    handleOpen1() {//大鹏下拉
+      this.visible1 = true;
+      this.downImage = false;
+    },
+    handleOpen2 (e) {//温室宝下拉
+      this.wsbIndex = e.target.value
+      this.wsbId = this.wsbList[e.target.value].localId;
+    },
+    closeMask() {
+      this.visible1 = false;
+      this.downImage = true;
+    },
+  }
+};
 </script>
 
 <style scoped>
-.automatic{
+.automatic {
   width: 100vw;
   height: 100vh;
   position: relative;
@@ -378,130 +495,264 @@ export default {
   margin-top: 17px;
   margin-right: 15px;
 }
-.automaticKong{
+.mask{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(0,0,0,.7);
+  z-index:900;
+  transition:all .2s ease-in-out;
+  opacity:1;
+}
+.mask .asShow{
+  position:fixed;
+  width:100%;
+  box-sizing:border-box;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#f7f7f7;
+  transform:translate3d(0,0,0);
+  transform-origin:center;
+  transition:all .2s ease-in-out;
+  z-index:900;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  height: 537px;
+  background: #F9FAFC;
+  padding: 30px 15px 0 15px;
+}
+.mask .asShow>img{
+  width: 19px;
+  height: 19px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+.maskLi{
+  margin-bottom: 16px;
+  position: relative;
+}
+.maskLi .homeLogo{
+  width: 32.5px;
+  height: 32.5px;
+  margin-right: 15.5px;
+  float: left;
+}
+.maskLi .gray{
+  width: 1px;
+  height: 56.5px;
+  position: absolute;
+  left:16.5px;
+  top:50px;
+}
+.maskLi .maskArea{
+  font-size: 15px;
+  color: #0F3DA8;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.maskLi .maskList{
+  width: 282px;
+  height: 67.5px;
+  border-radius: 10px;
+  background: #fff;
+  color: #666666;
+  font-size: 14px;
+  box-shadow: 0px 0px 20px #e6f0fe;
+  margin-left: 48px;
+  padding-top: 10px;
+  padding-left: 15px;
+}
+.maskLi .maskList span{
+  float: left;
+  width: 79px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  margin-right: 15px;
+  /* background: #175CFF; */
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.automaticKong {
   position: relative;
   top: 170rpx;
   left: 0;
   text-align: center;
 }
-.automaticKong img{
+.automaticKong img {
   width: 436rpx;
   height: 272rpx;
   margin-bottom: 69rpx;
 }
-.automaticKong p{
-  font-size:30rpx;
-  font-family:PingFang SC;
-  font-weight:400;
-  color:rgba(102,102,102,1);
+.automaticKong p {
+  font-size: 30rpx;
+  font-family: PingFang SC;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
   text-align: center;
   margin-bottom: 106rpx;
 }
-.addTaskOne{
-  width:390rpx;
-  height:78rpx;
-  background:rgba(51,112,255,1);
-  border-radius:12rpx;
+.addTaskOne {
+  width: 390rpx;
+  height: 78rpx;
+  background: rgba(51, 112, 255, 1);
+  border-radius: 12rpx;
   line-height: 78rpx;
-  font-size:34rpx;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(255,255,255,1);
+  font-size: 34rpx;
+  font-family: PingFang SC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
   text-align: center;
   margin: 0 auto;
 }
-.automaticUl{
-  margin-top: 150rpx;
+.automaticUl {
+  margin-top: 50rpx;
   padding: 0 30rpx;
 }
-.automaticli{
-  width:610rpx;
-  background:rgba(255,255,255,1);
-  box-shadow:0px 10rpx 30rpx 0px rgba(167,197,242,0.3);
-  border-radius:20rpx;
+.automaticli {
+  width: 610rpx;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 10rpx 30rpx 0px rgba(167, 197, 242, 0.3);
+  border-radius: 20rpx;
   padding: 30rpx 40rpx 0;
   margin-bottom: 30rpx;
 }
-.automaticName{
+.automaticName {
   position: relative;
   display: flex;
   justify-content: space-between;
   height: 60rpx;
-  border-bottom: 1rpx solid rgba(0,0,0,0.14);
-  font-size:32rpx;
-  font-family:PingFang SC;
-  font-weight:bold;
-  color:rgba(9,42,117,1);
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.14);
+  font-size: 32rpx;
+  font-family: PingFang SC;
+  font-weight: bold;
+  color: rgba(9, 42, 117, 1);
 }
-.automaticName img{
+.automaticName img {
   width: 20rpx;
   height: 20rpx;
 }
-.switchBtn{
+.switchBtn {
   position: absolute;
   right: 47rpx;
   top: 0;
 }
-.addBtn{
+.addBtn {
   position: fixed;
   bottom: 50rpx;
   right: 30rpx;
-  width:102rpx;
-  height:102rpx;
-  background:rgba(51,112,255,1);
-  box-shadow:0px 8rpx 29rpx 0px rgba(36,89,213,0.4);
-  border-radius:50%;
+  width: 102rpx;
+  height: 102rpx;
+  background: rgba(51, 112, 255, 1);
+  box-shadow: 0px 8rpx 29rpx 0px rgba(36, 89, 213, 0.4);
+  border-radius: 50%;
 }
-.automaticTxt{
+.automaticTxt {
   padding-top: 40rpx;
 }
-.automaticItem{
+.automaticItem {
   display: flex;
   align-items: center;
-  font-size:30rpx;
-  font-family:PingFang SC;
-  font-weight:400;
-  color:rgba(153,153,153,1);
+  font-size: 30rpx;
+  font-family: PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
   padding-bottom: 40rpx;
 }
-.spanTxt1{
-  width:233rpx;
-  height:56rpx;
-  background:rgba(243,245,250,1);
-  border-radius:8rpx;
-  font-size:30rpx;
+.spanTxt1 {
+  width: 233rpx;
+  height: 56rpx;
+  background: rgba(243, 245, 250, 1);
+  border-radius: 8rpx;
+  font-size: 30rpx;
   line-height: 56rpx;
-  font-family:PingFang SC;
-  font-weight:400;
-  color:rgba(51,51,51,1);
+  font-family: PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
   margin-left: 14rpx;
-  margin-right: 30rpx;
+  margin-right: 24rpx;
   text-align: center;
 }
-.spanTxt2{
-  width:233rpx;
-  height:56rpx;
-  background:rgba(243,245,250,1);
-  border-radius:8rpx;
-  font-size:30rpx;
+.spanTxt2 {
+  width: 233rpx;
+  height: 56rpx;
+  background: rgba(243, 245, 250, 1);
+  border-radius: 8rpx;
+  font-size: 30rpx;
   line-height: 56rpx;
-  font-family:PingFang SC;
-  font-weight:400;
-  color:rgba(51,51,51,1);
+  font-family: PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
   margin-left: 14rpx;
   text-align: center;
 }
-.spanTxt3{
-  width:233rpx;
-  height:56rpx;
-  background:rgba(243,245,250,1);
-  border-radius:8rpx;
-  font-size:30rpx;
+.spanTxt3 {
+  width: 233rpx;
+  height: 56rpx;
+  background: rgba(243, 245, 250, 1);
+  border-radius: 8rpx;
+  font-size: 30rpx;
   line-height: 56rpx;
-  font-family:PingFang SC;
-  font-weight:400;
-  color:rgba(51,51,51,1);
+  font-family: PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
   margin-left: 100rpx;
   text-align: center;
+}
+.delTips{
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  background:rgba(51,51,61,.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.deleteTips{
+  width:690rpx;
+  height:300rpx;
+  background:rgba(255,255,255,1);
+  box-shadow:0px 10rpx 30rpx 0px rgba(167,197,242,0.3);
+  border-radius:20rpx;
+  font-size:34rpx;
+  font-family:PingFang SC;
+  font-weight:bold;
+  color:rgba(33,33,33,1);
+  text-align: center;
+}
+.deleteTips p{
+  margin: 60rpx 0;
+}
+.delTipsBtn{
+  display: flex;
+  justify-content: space-around;
+  align-self: center;
+  font-size:34rpx;
+  font-family:PingFang SC;
+  font-weight:500;
+  line-height: 86rpx;
+}
+.delTipsBtnL{
+  width:290rpx;
+  height:88rpx;
+  border:1rpx solid rgba(209,209,209,1);
+  border-radius:12rpx;
+  color:rgba(51,51,51,1);
+}
+.delTipsBtnR{
+  width:290rpx;
+  height:88rpx;
+  background:rgba(51,111,255,1);
+  border-radius:12rpx;
+  color:rgba(255,255,255,1);
 }
 </style>

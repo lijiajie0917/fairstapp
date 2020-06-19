@@ -39,7 +39,7 @@ export default {
   mounted(){
     wx.hideShareMenu();//禁止出现转发按钮
     this.prosItem = wx.getStorageSync('prosItem');
-    this.projectId = this.$store.state.projectId;
+    this.projectId = wx.getStorageSync('projectId');
     this.projectName = this.prosItem[0].name;
     this.Tourist = wx.getStorageSync('Tourist')
   },
@@ -70,10 +70,10 @@ export default {
       this.iconDown = !this.iconDown;
     },
     equipmentClick(name,projectId){
+      this.$httpWX.setStorage('projectId',projectId);
       this.projectName = name;
       this.projectId = projectId;
       // console.log(this.projectId);
-      this.$store.commit('setprojectId',this.projectId);
       this.visible2 = false;
       this.iconDown = true;
     },

@@ -17,6 +17,7 @@ switch (dev)
     host = 'https://dev.krjrobot.cn/krjrobot'; // 测试环境
 }
 
+// host = 'https://krjrobot.cn/krjrobot'; // 线上环境
 import store from '../store'//引入store
 
 function request (url, method, data, header = {}) {
@@ -32,7 +33,7 @@ function request (url, method, data, header = {}) {
         header: {
           'content-type': 'application/json', // 默认值
           'Authorization': wx.getStorageSync('JSESSIONID'),
-          'projectId':store.state.projectId
+          'projectId':wx.getStorageSync('prosItem')[0].id
         },
         success: function (res) {
           wx.hideLoading()

@@ -142,7 +142,7 @@ export default {
     return {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
-      projectId: 7,
+      projectId:  wx.getStorageSync('projectId'),
       screenWidth: "",
       navH: 0, //导航栏高度
       screenHeight: null,//屏幕总高
@@ -221,8 +221,6 @@ export default {
       }
     },
     homePage() {
-      // this.projectId = wx.getStorageSync("projectId");
-      // let jsid = wx.getStorageSync("JSESSIONID");
       this.$httpWX
         .post({
           url: "/miniProgram/groupInfo/" + this.projectId,

@@ -81,9 +81,9 @@
       <ul class="tabUl2" v-if="Tourist == '0'">
         <li class="equipmentList" v-for="(item,index) in deciveItems" :key="index">
           <img class="equipmentImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt />
-          <p class="equipmentTitle">{{item.typeName}}</p>
+          <p class="equipmentTitle" @click="changeBtn()">{{item.typeName}}</p>
           <div class="equipmentStatus">
-            <div class="statusTitle" v-if="item.nodeType == '11'">
+            <div class="statusTitle">
               状态：
               <div :class="item.STATUS == '0' ? 'spottz' : (item.STATUS == '1'? 'spotkq' : 'spotdj')"></div>
               <div
@@ -91,7 +91,13 @@
               >{{item.isDamage == '0'? '停止' :(item.STATUS == '1'? '开启' : '待机')}}</div>
             </div>
           </div>
-          <i-switch
+          <div class="switchBtnBox" v-if="item.typeName == '卷膜机'">
+            <img class="switchBtnup" src="../../../static/images/up1.png" alt>
+            <img class="switchBtning" v-if="item.STATUS == '0'" src="../../../static/images/stop.png" alt>
+            <img class="switchBtning" v-if="item.STATUS == '1'" src="../../../static/images/ing.png" alt>
+            <img class="switchBtndown" src="../../../static/images/down1.png" alt>
+          </div>
+          <i-switch  v-if="item.typeName != '卷膜机'"
             class="switchBtn"
             :value="switch1"
             @change="onChange(item.gatewayId,item.nodeId,switch1)"
@@ -101,11 +107,11 @@
             <view slot="close">关</view>
           </i-switch>
         </li>
-        <li class="equipmentList" v-for="(item,index) in deciveItems" :key="index">
+        <!-- <li class="equipmentList" v-for="(item,index) in deciveItems" :key="index">
           <img class="equipmentImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt />
           <p class="equipmentTitle">{{item.typeName}}</p>
           <div class="equipmentStatus">
-            <div class="statusTitle" v-if="item.nodeType == '11'">
+            <div class="statusTitle">
               状态：
               <div :class="item.STATUS == '0' ? 'spottz' : (item.STATUS == '1'? 'spotkq' : 'spotdj')"></div>
               <span
@@ -113,17 +119,21 @@
               >{{item.isDamage == '0'? '停止' :(item.STATUS == '1'? '运行' : '待机')}}</span>
             </div>
           </div>
-          <div class="switchBtnBox">
-            <img class="switchBtnup" src="../../../static/images/up1.png" alt>
-            <img class="switchBtning" v-if="item.STATUS == '0'" src="../../../static/images/stop.png" alt>
-            <img class="switchBtning" v-if="item.STATUS == '1'" src="../../../static/images/ing.png" alt>
-            <img class="switchBtndown" src="../../../static/images/down1.png" alt>
-          </div>
-        </li>
+        </li> -->
       </ul>
       <div class="Tourist" v-if="Tourist == '1'">
         <img src="../../../static/images/tips.png" alt />
         <span>体验账号无设备控制权限</span>
+      </div>
+    </div>
+
+    <div class="delTips" v-if="delTips">
+      <div class="deleteTips">
+        <input type="text" v-model="controlName" placeholder="请输入新的设备名称"/>
+        <div class="delTipsBtn">
+          <div class="delTipsBtnL" @click="cencelDel()">取消</div>
+          <div class="delTipsBtnR" @click="trueDel()">确定</div>
+        </div>
       </div>
     </div>
   </div>
@@ -135,7 +145,7 @@ export default {
     return {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
-      projectId: 7,
+      projectId:  wx.getStorageSync('projectId'),
       equipment: "-", //默认设备名字
       gatewayId: "", //默认设备
       equipmentItems: [], //设备下拉框
@@ -151,7 +161,9 @@ export default {
       switch1: false,
       informShow: true,
       downImage: true,
-      visible1: false
+      visible1: false,
+      delTips:false,//改名字弹框是否显示
+      controlName:'',//设备修改名字
     };
   },
   created: function() {
@@ -165,6 +177,18 @@ export default {
     }
   },
   methods: {
+    //显示改名弹框
+    changeBtn(){
+      this.delTips = true;
+    },
+    // 取消改名
+    cencelDel(){
+      this.delTips = false;
+    },
+    //确定改名
+    trueDel(){
+      this.delTips = false;
+    },
     /**标题栏返回按钮 */
     navBack() {
       wx.navigateBack({
@@ -176,7 +200,6 @@ export default {
       let that = this;
       wx.getSystemInfo({
         success: function(res) {
-          console.log("------", res);
           that.screenHeight = res.screenHeight;
           that.navH = res.statusBarHeight + 46;
           that.width = res.screenWidth;
@@ -184,8 +207,6 @@ export default {
       });
     },
     homePage() {
-      // this.projectId = wx.getStorageSync("projectId");
-      // let jsid = wx.getStorageSync("JSESSIONID");
       this.$httpWX
         .post({
           url: "/miniProgram/groupInfo/" + this.projectId,
@@ -661,5 +682,57 @@ export default {
   /* background: #175CFF; */
   border-radius: 20px;
   margin-bottom: 10px;
+}
+
+.delTips{
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  background:rgba(51,51,61,.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.deleteTips{
+  width:690rpx;
+  height:300rpx;
+  background:rgba(255,255,255,1);
+  box-shadow:0px 10rpx 30rpx 0px rgba(167,197,242,0.3);
+  border-radius:20rpx;
+  font-size:34rpx;
+  font-family:PingFang SC;
+  color:rgba(33,33,33,1);
+  text-align: center;
+}
+.deleteTips input{
+  margin: 60rpx 100rpx;
+  border-bottom: 1rpx solid #ccc;
+}
+.delTipsBtn{
+  display: flex;
+  justify-content: space-around;
+  align-self: center;
+  font-size:34rpx;
+  font-family:PingFang SC;
+  font-weight:500;
+  line-height: 86rpx;
+}
+.delTipsBtnL{
+  width:290rpx;
+  height:88rpx;
+  border:1rpx solid rgba(209,209,209,1);
+  border-radius:12rpx;
+  color:rgba(51,51,51,1);
+}
+.delTipsBtnR{
+  width:290rpx;
+  height:88rpx;
+  background:rgba(51,111,255,1);
+  border-radius:12rpx;
+  color:rgba(255,255,255,1);
 }
 </style>

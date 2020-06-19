@@ -89,7 +89,7 @@ export default {
             // 存入项目列表
             this.$httpWX.setStorage("prosItem",res.data.pros);
             // 改变默认请求头projectId
-            this.$store.commit('setprojectId',res.data.pros[0].id);
+            this.$httpWX.setStorage('projectId',res.data.pros[0].id);
             // 存入用户token
             this.$httpWX.setStorage('JSESSIONID',res.msg);
             // 存入游客登录标识
