@@ -3,8 +3,5 @@
   "navigationBarBackgroundColor": "#4562fc",
   "disableScroll": true,
   "navigationStyle": "custom",
-  "navigationBarTextStyle": "white",
-  "usingComponents":{
-    "i-switch":"../../../../static/iviewUI/switch/index"
-  }
+  "navigationBarTextStyle": "white"
 }

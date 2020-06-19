@@ -39,7 +39,7 @@ export default {
     }
   },
   created(){
-
+    wx.hideShareMenu();//禁止出现转发按钮
   },
   mounted(){
     // this.$httpWX.post({
@@ -47,7 +47,7 @@ export default {
     // }).then(res => {
     //   var data = res.data;
     // })
-    console.log(this.videoList);
+    // console.log(this.videoList);
   },
   methods:{
     // 跳转视频监控页面

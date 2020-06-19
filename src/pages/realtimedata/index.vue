@@ -48,7 +48,7 @@
           </ul>
         </div>
       </div>
-      <i-toast id="toast" />
+      <!-- <i-toast id="toast" /> -->
       <form :model="form" autocomplete="off">
         <picker
           class="areaGreenhouse"
@@ -169,7 +169,10 @@ export default {
     this.getHeight();
   },
   mounted() {
-    this.homePage();
+    setTimeout(()=>{
+      this.homePage();
+    },200);
+    this.projectId = this.$store.state.projectId;
     if (this.visible1 != false) {
       this.visible1 = false;
     }
@@ -287,13 +290,18 @@ export default {
           }
         });
     },
+    areaClick(area,greenhouseId,greenhouse) {
+      this.equipmentList(area,greenhouseId,greenhouse);
+      this.visible1 = false;
+      this.informShow = true;
+    },
     // 7要素最新数据
-    realTimeData(nodeId, gatewayId) {
+    realTimeData(equipment,gatewayId) {
       this.$httpWX
         .get({
           url: "/miniProgram/lastStatus",
           data: {
-            nodeId: nodeId,
+            nodeId: equipment,
             gatewayId: gatewayId
           }
         })
@@ -318,7 +326,7 @@ export default {
           list[0].unit = "%RH";
           list[list.length - 2].unit = "%RH";
           list[list.length - 1].unit = "W/cm²";
-          this.equipment = nodeId;
+          // this.equipment = nodeId;
           this.realTimeItems = list;
         });
     },
@@ -331,10 +339,8 @@ export default {
       this.equipmentIndex = e.target.value;
       // console.log(e);
       this.equipment = this.equipmentItems[e.target.value].nodeId;
-      this.equipmentClick(
-        this.equipment,
-        this.equipmentItems[e.target.value].gatewayId
-      );
+      this.gatewayId = this.equipmentItems[e.target.value].gatewayId;
+      this.realTimeData(this.equipment,this.gatewayId);
     },
     closeMask() {
       this.visible1 = false;

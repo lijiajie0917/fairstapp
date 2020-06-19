@@ -1,5 +1,6 @@
 <template>
   <div class='nav' :style="{height:(navH)+'px',}">
+    <img class="navBackground" src="../../../static/images/titlebg.jpg" alt />
     <div class='title_icon'>
       <img class="back" src="../../../static/images/backIcon.png" @click='navBack' alt="" mode='aspectFit'>
     </div>
@@ -32,10 +33,9 @@ export default {
 /* 自定义导航 */
 
 .nav {
-  width: 100%;
+  width: 100vw;
   overflow: hidden;
   position: fixed;
-  background: #5432FF;
   top: 0;
   left: 0;
   z-index: 10;
@@ -84,5 +84,12 @@ export default {
   height: 18px;
   border-left: 1px solid #eaeaea;
   margin-top: 6px;
+}
+.navBackground {
+  width: 100vw;
+  height: 64px;
+  position: relative;
+  top: 0;
+  left: 0;
 }
 </style>
