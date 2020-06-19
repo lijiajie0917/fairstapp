@@ -2,36 +2,40 @@
   <div class="container">
     <div class="timing" :style="{'margin-top':(navH)+'px'}">
       <TitleBar :navTitle="title"></TitleBar>
-      <SelectOption></SelectOption>
-      <!-- <h1>{{equipment}}</h1>
-      <h1>{{gatewayId}}</h1> -->
+      <SelectOption :navTitle="title"></SelectOption>
+      <!-- <h1>{{localId}}</h1> -->
       <ul class="timedTask" :style="{
         'top':(navH+175)+'px',
         'height':isIphoneX||isIphoneX11?(screenHeight-350)+'px':(screenHeight-240)+'px'}"
         >
-        <li class="timedTaskList" v-for="(item,index) in timedTaskList" :key="index" >
+        <li class="timedTaskList" v-show="timedTaskShow">
           <div class="timedHeader">
-            <p class="timedName">{{item.timedName}}</p>
+            <p class="timedName">{{timedTaskList.name}}</p>
             <i-switch class="switchBtn"
-              :value="item.onOff"
-              @change="onChange(item.onOff)"
+              :value="timedTaskList.isOpen"
+              @change="onChange(
+                timedTaskList.isOpen,
+                timedTaskList.localId,
+                timedTaskList.name,
+                timedTaskList.actions[0].startTime,
+                timedTaskList.isRepeat,
+                timedTaskList.actions[0].action,
+                timedTaskList.actions[1].endTime,
+                timedTaskList.actions[1].endAction,
+                )"
               slot="footer"
             >
                 <view slot="open">开</view>
                 <view slot="close">关</view>
             </i-switch>
-            <img @click="delTask(item.timeID,item.timedName)" class="deleteBtn" src="../../../static/images/delete.png" alt="">
+            <img @click="delTask(timedTaskList.localId,timedTaskList.name)" class="deleteBtn" src="../../../static/images/delete.png" alt="">
           </div>
-          <ul class="taskUi">
-            <li class="taskTilte">任务开启</li>
-            <li>开始时间 <span>{{item.openingTime}}</span> </li>
-            <li>执行类型 <span>{{item.perType}}</span> </li>
-            <li>动作 <span>{{item.openMove}}</span> </li>
-          </ul>
-          <ul class="taskUi">
-            <li class="taskTilte">任务结束</li>
-            <li>结束时间 <span>{{item.endTime}}</span> </li>
-            <li>动作 <span>{{item.endMove}}</span> </li>
+          <ul class="taskUi" v-for="(item2,index2) in timedTaskList.actions" :key="index2">
+            <li class="taskTilte">{{item2.action == "OPEN"? "任务开启":"任务结束"}}</li>
+            <li>{{item2.action == "OPEN"? "开始":"结束"}}时间 <span>{{item2.startTime}}</span> </li>
+            <li v-show="item2.action == 'OPEN'? true:false ">执行类型 <span>{{timedTaskList.period}}</span> </li>
+            <li v-show="item2.action == 'OPEN'? true:false ">是否重复 <span>{{timedTaskList.isRepeat}}</span> </li>
+            <li>动作 <span>{{item2.action == "OPEN"? "开启":"关闭"}}——{{equipmentName}}</span> </li>
           </ul>
         </li>
         <div class="addTiming" @click="goaddTiming()">
@@ -60,32 +64,14 @@ export default {
       equipment:'', //设备名称
       gatewayId:'', //设备ID
       projectId:'', //项目ID
-      timedTaskList:[ //定时任务列表初始化
-        {
-          timedName:"定时任务——1",
-          openingTime:'08:00',
-          perType:"每三天执行",
-          openMove:'开启水阀——001',
-          endTime:'12.00',
-          endMove:'关闭水阀——001',
-          onOff:true,
-          timeID:'timeID1234567'
-        },
-        {
-          timedName:"定时任务——2",
-          openingTime:'08:00',
-          perType:"每三天执行",
-          openMove:'开启水阀——002',
-          endTime:'12.00',
-          endMove:'关闭水阀——002',
-          onOff:false,
-          timeID:'timeID123'
-        },
-      ],
+      timedTaskList:[], //定时任务列表初始化
       screenHeight: "",
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
       switch1:false,
+      localId:'',
+      equipmentName:'',
+      timedTaskShow:false,
     }
   },
   created:function(){
@@ -97,43 +83,87 @@ export default {
     });
   },
   watch: {
-    '$store.state.equipment': function () {
-      this.equipment = this.$store.state.equipment;
+    '$store.state.localId': function (newVal) {
+      this.localId = newVal;
+      this.scheduleControl(this.localId);
     },
-    '$store.state.gatewayId': function () {
-      this.gatewayId = this.$store.state.gatewayId;
+    '$store.state.equipmentName': function (newVal) {
+      this.equipmentName = newVal;
+    },
+    '$store.state.addTimingFlag': function (newVal) {
+      this.scheduleControl(this.localId);
     }
   },
   mounted(){
     this.projectId = this.$store.state.projectId;
+    setTimeout(()=>{
+      this.scheduleControl(this.$store.state.localId);
+    },500);
   },
   methods:{
+    // 获取定时任务列表
+    scheduleControl(localId){
+      this.$httpWX.get({
+        url: '/miniProgram/scheduleControl',
+        data: {
+          localId : localId,
+        }
+      }).then(res => {
+        let data = res.data;
+        console.log(res)
+        if (data.actions.length == 0) {
+          this.timedTaskShow = false;
+        } else {
+          this.timedTaskShow = true;
+          this.timedTaskList = data;
+        }
+      })
+    },
     // 定时任务开关操作
-    onChange(switch1){
-      console.log(switch1);
-      // var switchflg = !switch1;
-      // var cmd = switch1;
-      // if (cmd == false) {
-      //   cmd = 1;
-      // } else {
-      //   cmd = 0;
-      // }
-      // this.$httpWX.post({
-      //   url: '/sensor/' + gatewayId + '/' + nodeId + '/' + cmd,
-      //   data: {}
-      // }).then(res => {
-      //   // console.log(res)
-      //   if (res.status == "200") {
-      //     this.switch1 = switchflg;
-      //   }
-      // })
+    onChange(switch1,localId,name,startTime,isRepeat,action,endTime,endAction){
+      // console.log(switch1);
+      var switchflg = !switch1;
+      var cmd = switch1;
+      if (cmd == false) {
+        cmd = 1;
+      } else {
+        cmd = 0;
+      }
+      this.$httpWX.put({
+        url: '/miniProgram/scheduleControl',
+        data: {
+          localId : localId,
+          name : name,
+          startTime : startTime,
+          isRepeat : isRepeat,
+          action : action,
+          endTime : endTime,
+          endAction : endAction,
+          isOpen : cmd,
+        }
+      }).then(res => {
+        console.log(res)
+        // this.switch1 = switchflg;
+      })
     },
     // 删除定时任务
-    delTask(timeID,timedName){
+    delTask(localId,name){
       let confirm = ()=>{
-      	this.$httpWX.showSuccessToast('删除成功')
+        this.$httpWX.post({
+          url: '/miniProgram/del/scheduleControl',
+          data: {
+            localId : localId,
+          }
+        }).then(res => {
+          let data = res.data;
+          console.log(res)
+          if (res.status == "200") {
+            this.$httpWX.showSuccessToast('删除成功')
+            this.scheduleControl(this.localId);
+          }
+        })
       }
-      this.$httpWX.alert('提示','确定删除"' + timedName + '"吗？',confirm,true);
+      this.$httpWX.alert('提示','确定删除"' + name + '"吗？',confirm,true);
     },
     goaddTiming(){
       wx.navigateTo({
@@ -157,7 +187,7 @@ export default {
 }
 .timedTaskList{
   width: 305px;
-  height: 316px;
+  height: 340px;
   background: #fff;
   border-radius: 10px;
   margin: 0 0 15px 15px;
