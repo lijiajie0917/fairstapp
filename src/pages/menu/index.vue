@@ -84,7 +84,7 @@
 export default {
   data () {
     return {
-      // projectId:null
+      projectId: ''
     }
   },
   created:function(){
@@ -92,7 +92,7 @@ export default {
     this.getHeight();
   },
   mounted() {
-    // this.projectId = this.$store.state.projectId;
+    this.projectId = wx.getStorageSync('projectId')
   },
   methods: {
     //跳转数据分析页

@@ -6,6 +6,7 @@
     "pages/realtimedata/main",
     "pages/control/main",
     "pages/automatic/main",
+    "pages/addAutomatic/main",
     "pages/timing/main",
     "pages/addtiming/main"
   ],

@@ -112,7 +112,22 @@ export default {
     }
   },
   mounted(){
-    this.projectId = this.$store.state.projectId;
+    this.projectId = wx.getStorageSync('projectId')
+    setTimeout(()=>{
+      this.homePage();
+    },200);
+    // let pages = getCurrentPages();
+    // let currentPage = pages[pages.length-1]
+    // console.log("currentPage",currentPage)
+    if(this.visible1 != false){
+      this.visible1 = false
+    }
+    // if(this.visible2 != false){
+    //   this.visible2 = false
+    // }
+    if(this.cur != 0){
+      this.cur = 0
+    }
   },
   methods: {
     dataEchartsOne(canvas){ //空气温度

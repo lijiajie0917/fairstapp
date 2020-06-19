@@ -169,6 +169,7 @@ export default {
     this.getHeight();
   },
   mounted() {
+    this.projectId = wx.getStorageSync('projectId')
     setTimeout(()=>{
       this.homePage();
     },200);
@@ -224,8 +225,6 @@ export default {
       }
     },
     homePage() {
-      // this.projectId = wx.getStorageSync("projectId");
-      // let jsid = wx.getStorageSync("JSESSIONID");
       this.$httpWX
         .post({
           url: "/miniProgram/groupInfo/" + this.projectId,
