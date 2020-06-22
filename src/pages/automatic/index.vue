@@ -69,41 +69,44 @@
         </picker>
       </form>
     </div>
-    <div class="automaticKong" v-if="0">
+    <div class="automaticKong" v-if="kong == true">
       <img src="../../../static/images/automaticjpg.png" alt />
       <p>当前无自动控制任务！</p>
       <div class="addTaskOne" @click="addmatic()">添加自动控制</div>
     </div>
-    <img class="addBtn" @click="addmatic()" src="../../../static/images/add.png" alt />
-    <ul class="automaticUl">
-      <li class="automaticli" v-for="(item,index) in deciveItems" :key="index">
-        <div class="automaticName">
-          <i-switch
-            class="switchBtn"
-            :value="item.WisOpen"
-            slot="footer"
-            @change="onChange(index,item.WlocalId,item.WisOpen)"
-          >
-            <view slot="open">开</view>
-            <view slot="close">关</view>
-          </i-switch>
-          <div>{{item.Wname}}</div>
-          <img @click="delBtn()" src="../../../static/images/off.png" alt />
-        </div>
-        <div class="automaticTxt">
-          <div class="automaticItem">
-            当
-            <div class="spanTxt1">{{item.Wfield}}</div>大于
-            <div class="spanTxt2">{{item.Wlimit}}</div>
+    <img class="addBtn" v-if="kong == false" @click="addmatic()" src="../../../static/images/add.png" alt />
+
+    <div class="automaticBox">
+      <ul class="automaticUl" v-if="kong == false">
+        <li class="automaticli" v-for="(item,index) in deciveItems" :key="index">
+          <div class="automaticName">
+            <i-switch
+              class="switchBtn"
+              :value="item.WisOpen"
+              slot="footer"
+              @change="onChange(index,item.WlocalId,item.WisOpen)"
+            >
+              <view slot="open">开</view>
+              <view slot="close">关</view>
+            </i-switch>
+            <div>{{item.Wname}}</div>
+            <img @click="delBtn(item.isHight,item.WlocalId)" src="../../../static/images/off.png" alt />
           </div>
-          <div class="automaticItem">
-            则
-            <div class="spanTxt2">水阀—001</div>
-            <div class="spanTxt3">{{item.Waction}}</div>
+          <div class="automaticTxt">
+            <div class="automaticItem">
+              当
+              <div class="spanTxt1">{{item.Wfield}}</div>大于
+              <div class="spanTxt2">{{item.Wlimit}}</div>
+            </div>
+            <div class="automaticItem">
+              则
+              <div class="spanTxt2">{{item.name}}</div>
+              <div class="spanTxt3">{{item.Waction}}</div>
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </div>
     <div class="delTips" v-if="delTips">
       <div class="deleteTips">
         <p>确定删除此控制吗？</p>
@@ -137,9 +140,12 @@ export default {
       screenHeight: null, //屏幕总高
       switch1: false,
       deciveItems: [], //自动控制任务列表
+      kong:false,//任务列表为空
       downImage: true,
       visible1: false,
       delTips:false,//删除弹框是否显示
+      delId:'',//删除设备的localId
+      isHight:false,//删除设备是否高水位
     };
   },
   created: function() {
@@ -152,16 +158,44 @@ export default {
   },
   methods: {
     //显示删除弹框
-    delBtn(){
+    delBtn(isHight,id){
+      console.log(isHight,id)
+      this.isHight = isHight;
+      this.delId = id;
       this.delTips = true;
     },
     // 取消删除
     cencelDel(){
+      this.isHight = false;
+      this.delId = '';
       this.delTips = false;
     },
     //确定删除
     trueDel(){
-      this.delTips = false;
+      let acTxt = 'lowerWater';
+      if(this.isHight == true){
+        acTxt = 'highWater';
+      }
+      console.log(acTxt)
+      this.$httpWX
+        .post({
+          url: "/miniProgram/del/autoControl/"+this.wsbId,
+          data: {
+            localId:this.delId,
+            action:acTxt
+          }
+        })
+        .then(res => {
+          console.log("删除", res);
+          for(let i in this.deciveItems){
+            if(this.deciveItems[i].WlocalId = this.delId){
+              this.deciveItems[i].remove()
+            }
+          }
+          this.isHight = false;
+          this.delId = '';
+          this.delTips = false;
+        });
     },
     /**标题栏返回按钮 */
     navBack() {
@@ -268,84 +302,98 @@ export default {
         .then(res => {
           console.log("自动控制任务列表", res.data);
           let data = res.data;
-          // let list = []
-          let spanTxt1 = [
-            {"localId":"空气湿度",
-              "name":"airHumidity"
-            },
-            {"localId":"空气温度",
-              "name":"airTemperature"
-            },
-            {"localId":"光照强度",
-              "name":"lux"
-            },
-            {"localId":"二氧化碳",
-              "name":"CO2"
-            },
-            {"localId":"土壤温度",
-              "name":"soilTemperature"
-            },
-            {"localId":"土壤湿度",
-              "name":"soilHumidity"
-            },
-            {"localId":"土壤ph值",
-              "name":"ph"
-            }
-          ]
-          for(let i in data){
-            if(data[i].rule.lowWater.action == 'OPEN'){
-              data[i].rule.lowWater.action = '开启'
-            }else{
-              data[i].rule.lowWater.action = '关闭'
-            }
-            for(let j in spanTxt1){
-              if(spanTxt1[j].name == data[i].rule.field){
-                data[i].rule.field = spanTxt1[j].localId
+          if(data.length>0){
+            this.kong = false;
+            let spanTxt1 = [
+              {"localId":"空气湿度",
+                "name":"airHumidity",
+                "company":"%RH"
+              },
+              {"localId":"空气温度",
+                "name":"airTemperature",
+                "company":"℃"
+              },
+              {"localId":"光照强度",
+                "name":"lux",
+                "company":"lux"
+              },
+              {"localId":"二氧化碳",
+                "name":"CO2",
+                "company":"ppm"
+              },
+              {"localId":"土壤温度",
+                "name":"soilTemperature",
+                "company":"℃"
+              },
+              {"localId":"土壤湿度",
+                "name":"soilHumidity",
+                "company":"%RH"
+              },
+              {"localId":"土壤ph值",
+                "name":"ph",
+                "company":"W/cm²"
               }
-            }
-            if(data[i].rule.highWater == null||data[i].rule.highWater == "null"){
-              data[i] = {
-                frequency: data[i].frequency,
-                localId: data[i].localId,
-                modifyTime: data[i].modifyTime,
-                name: data[i].name,
-                Wfield: data[i].rule.field,
-                WgatewayId: data[i].rule.gatewayId,
-                WlocalId: data[i].rule.localId,
-                Waction: data[i].rule.lowWater.action,
-                WisOpen: data[i].rule.lowWater.isOpen,
-                Wlimit: data[i].rule.lowWater.limit,
-                Wname: data[i].rule.lowWater.name,
-                WnodeId: data[i].rule.nodeId,
-                nullRule: data[i].rule.nullRule,
-                ruleJson: data[i].ruleJson,
-                serialId: data[i].serialId,
-                version: data[i].version,
+            ]
+            for(let i in data){
+              if(data[i].rule.lowWater.action == 'OPEN'){
+                data[i].rule.lowWater.action = '开启'
+              }else{
+                data[i].rule.lowWater.action = '关闭'
               }
-            }else{
-              data[i] = {
-                frequency: data[i].frequency,
-                localId: data[i].localId,
-                modifyTime: data[i].modifyTime,
-                name: data[i].name,
-                Wfield: data[i].rule.field,
-                WgatewayId: data[i].rule.gatewayId,
-                WlocalId: data[i].rule.localId,
-                Waction: data[i].rule.highWater.action,
-                WisOpen: data[i].rule.highWater.isOpen,
-                Wlimit: data[i].rule.highWater.limit,
-                Wname: data[i].rule.highWater.name,
-                WnodeId: data[i].rule.nodeId,
-                nullRule: data[i].rule.nullRule,
-                ruleJson: data[i].ruleJson,
-                serialId: data[i].serialId,
-                version: data[i].version,
+              for(let j in spanTxt1){
+                if(spanTxt1[j].name == data[i].rule.field){
+                  data[i].rule.field = spanTxt1[j].localId
+                  data[i].rule.lowWater.limit = data[i].rule.lowWater.limit+spanTxt1[j].company
+                }
               }
+              if(data[i].rule.highWater == null||data[i].rule.highWater == "null"){
+                data[i] = {
+                  isHight:false,
+                  frequency: data[i].frequency,
+                  localId: data[i].localId,
+                  modifyTime: data[i].modifyTime,
+                  name: data[i].name,
+                  Wfield: data[i].rule.field,
+                  WgatewayId: data[i].rule.gatewayId,
+                  WlocalId: data[i].rule.localId,
+                  Waction: data[i].rule.lowWater.action,
+                  WisOpen: data[i].rule.lowWater.isOpen,
+                  Wlimit: data[i].rule.lowWater.limit,
+                  Wname: data[i].rule.lowWater.name,
+                  WnodeId: data[i].rule.nodeId,
+                  nullRule: data[i].rule.nullRule,
+                  ruleJson: data[i].ruleJson,
+                  serialId: data[i].serialId,
+                  version: data[i].version,
+                }
+              }else{
+                data[i] = {
+                  isHight:true,
+                  frequency: data[i].frequency,
+                  localId: data[i].localId,
+                  modifyTime: data[i].modifyTime,
+                  name: data[i].name,
+                  Wfield: data[i].rule.field,
+                  WgatewayId: data[i].rule.gatewayId,
+                  WlocalId: data[i].rule.localId,
+                  Waction: data[i].rule.highWater.action,
+                  WisOpen: data[i].rule.highWater.isOpen,
+                  Wlimit: data[i].rule.highWater.limit,
+                  Wname: data[i].rule.highWater.name,
+                  WnodeId: data[i].rule.nodeId,
+                  nullRule: data[i].rule.nullRule,
+                  ruleJson: data[i].ruleJson,
+                  serialId: data[i].serialId,
+                  version: data[i].version,
+                }
+              }
+              this.deciveItems = this.deciveItems.concat(data[i])
+              console.log("数据处理后",this.deciveItems)
             }
-            this.deciveItems = this.deciveItems.concat(data[i])
-            console.log("数据处理后",this.deciveItems)
+          }else{
+            this.kong = true;
+            this.deciveItems = []
           }
-          // this.deciveItems = list;
         });
     },
     /**跳转添加自动任务页 */
@@ -364,6 +412,7 @@ export default {
     handleOpen2 (e) {//温室宝下拉
       this.wsbIndex = e.target.value
       this.wsbId = this.wsbList[e.target.value].localId;
+      this.getList(this.wsbList[e.target.value].localId)
     },
     closeMask() {
       this.visible1 = false;
@@ -611,9 +660,19 @@ export default {
   text-align: center;
   margin: 0 auto;
 }
-.automaticUl {
-  margin-top: 50rpx;
+.automaticBox{
+  width: 690rpx;
   padding: 0 30rpx;
+  position: absolute;
+  left: 0;
+  top: 410rpx;
+  height: 100%;
+  overflow-y: auto;
+}
+.automaticUl {
+  width: 690rpx;
+  overflow-y: auto;
+  margin-top: 30rpx;
 }
 .automaticli {
   width: 610rpx;
@@ -645,6 +704,7 @@ export default {
 }
 .addBtn {
   position: fixed;
+  z-index: 99;
   bottom: 50rpx;
   right: 30rpx;
   width: 102rpx;

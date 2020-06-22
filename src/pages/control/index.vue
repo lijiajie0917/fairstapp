@@ -81,26 +81,37 @@
       <ul class="tabUl2" v-if="Tourist == '0'">
         <li class="equipmentList" v-for="(item,index) in deciveItems" :key="index">
           <img class="equipmentImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt />
-          <p class="equipmentTitle" @click="changeBtn()">{{item.typeName}}</p>
-          <div class="equipmentStatus">
+          <p class="equipmentTitle" @click="changeBtn(item.localId,index)">{{item.name}}</p>
+          <div class="equipmentStatus" v-if="item.typeName != '卷膜机'&&item.typeName != '卷帘机'">
             <div class="statusTitle">
               状态：
               <div :class="item.STATUS == '0' ? 'spottz' : (item.STATUS == '1'? 'spotkq' : 'spotdj')"></div>
               <div
                 :class="item.STATUS == '0' ? 'spantz' : 'spankq'"
-              >{{item.isDamage == '0'? '停止' :(item.STATUS == '1'? '开启' : '待机')}}</div>
+              >{{item.STATUS == '0'? '停止' :(item.STATUS == '1'? '开启' : '待机')}}</div>
             </div>
           </div>
-          <div class="switchBtnBox" v-if="item.typeName == '卷膜机'">
-            <img class="switchBtnup" src="../../../static/images/up1.png" alt>
-            <img class="switchBtning" v-if="item.STATUS == '0'" src="../../../static/images/stop.png" alt>
-            <img class="switchBtning" v-if="item.STATUS == '1'" src="../../../static/images/ing.png" alt>
-            <img class="switchBtndown" src="../../../static/images/down1.png" alt>
+          <div class="equipmentStatus" v-if="item.typeName == '卷膜机'||item.typeName == '卷帘机'">
+            <div class="statusTitle">
+              状态：
+              <div :class="item.STATUS == '3' ? 'spottz' : (item.STATUS == '1'? 'spotkq' : 'spotdj')"></div>
+              <div
+                :class="item.STATUS == '3' ? 'spantz' : 'spankq'"
+              >{{item.STATUS == '3'? '停止' : '开启'}}</div>
+            </div>
           </div>
-          <i-switch  v-if="item.typeName != '卷膜机'"
+          <div class="switchBtnBox" v-if="item.typeName == '卷膜机'||item.typeName == '卷帘机'">
+            <img class="switchBtnup" v-if="item.STATUS != '0'" @click="changeJ(item.gatewayId,item.nodeId,1,item.isOpen,index)" src="../../../static/images/up1.png" alt>
+            <img class="switchBtnup" v-if="item.STATUS == '0'" src="../../../static/images/up2.png" alt>
+            <img class="switchBtning" v-if="item.STATUS == '3'" src="../../../static/images/stop.png" alt>
+            <img class="switchBtning" v-if="item.STATUS != '3'" @click="changeJ(item.gatewayId,item.nodeId,3,item.isOpen,index)" src="../../../static/images/ing.png" alt>
+            <img class="switchBtndown" v-if="item.STATUS != '1'" @click="changeJ(item.gatewayId,item.nodeId,0,item.isOpen,index)" src="../../../static/images/down1.png" alt>
+            <img class="switchBtndown" v-if="item.STATUS == '1'" src="../../../static/images/down2.png" alt>
+          </div>
+          <i-switch v-if="item.typeName != '卷膜机'&&item.typeName != '卷帘机'"
             class="switchBtn"
-            :value="switch1"
-            @change="onChange(item.gatewayId,item.nodeId,switch1)"
+            :value="item.isOpen"
+            @change="onChange(item.gatewayId,item.nodeId,item.STATUS,item.isOpen,index)"
             slot="footer"
           >
             <view slot="open">开</view>
@@ -158,12 +169,13 @@ export default {
       screenHeight: null, //屏幕总高
       deciveItems: [],
       maskItems: [],
-      switch1: false,
-      informShow: true,
       downImage: true,
       visible1: false,
       delTips:false,//改名字弹框是否显示
       controlName:'',//设备修改名字
+      localId:'',//设备修改名字localId
+      controlIndex:'',//设备修改index
+      greenhouseDevise:'',
     };
   },
   created: function() {
@@ -173,22 +185,45 @@ export default {
   mounted() {
     this.projectId = wx.getStorageSync('projectId')
     this.homePage();
+    this.Tourist = wx.getStorageSync('Tourist')
     if (this.visible1 != false) {
       this.visible1 = false;
     }
   },
   methods: {
     //显示改名弹框
-    changeBtn(){
+    changeBtn(localId,index){
+      this.localId = localId;
+      this.controlIndex = index;
       this.delTips = true;
     },
     // 取消改名
     cencelDel(){
+      this.controlName = ''
+      this.localId = '';
+      this.controlIndex = '';
       this.delTips = false;
     },
     //确定改名
     trueDel(){
-      this.delTips = false;
+      this.$httpWX
+        .post({
+          url: '/miniProgram/upd/des',
+          data: {
+            localId:this.localId,
+            name:this.controlName,
+          }
+        })
+        .then(res => {
+          console.log(res)
+          if(res.status == '200'){
+            this.deciveItems[this.controlIndex].name = this.controlName;
+            this.controlName = ''
+            this.localId = '';
+            this.controlIndex = '';
+            this.delTips = false;
+          }
+        });
     },
     /**标题栏返回按钮 */
     navBack() {
@@ -228,7 +263,6 @@ export default {
               this.greenhouseId,
               this.greenhouse
             );
-            // setTimeout(, 2000);
           }
         });
     },
@@ -276,20 +310,37 @@ export default {
           url: "/miniProgram/controlNode",
           data: {
             greenhouseId: greenhouseId,
-            nodeId: ""
+            nodeId: ''
           }
         })
         .then(res => {
           // console.log("设备状态",res)
-          var data = res.data;
-          this.deciveItems = data;
+          if(res.status == '200'){
+            let data = res.data;
+            for( let i in data){
+              if(data[i].typeName != '卷膜机'){
+                if(data[i].STATUS == '0'){
+                  data[i].isOpen = false
+                }else{
+                  data[i].isOpen = true
+                }
+              }
+            }
+            console.log("----data",data)
+            this.deciveItems = data;
+          }else{
+            wx.showToast({
+              title: res.msg,
+              icon: "none",
+              duration: 2000
+            });
+            return;
+          }
         });
     },
-    onChange(gatewayId, nodeId, switch1) {
-      // console.log(switch1);
-      var switchflg = !switch1;
-      var cmd = switch1;
-      if (cmd == false) {
+    onChange(gatewayId, nodeId, status,isOpen,index) {
+      let cmd = status;
+      if (cmd == '0') {
         cmd = 1;
       } else {
         cmd = 0;
@@ -300,36 +351,81 @@ export default {
           data: {}
         })
         .then(res => {
-          // console.log(res)
+          console.log(res)
           if (res.status == "200") {
-            this.switch1 = switchflg;
+            this.deciveItems[index].isOpen = !isOpen;
+            console.log(this.deciveItems[index].isOpen)
+            if(status == '0'){
+              this.deciveItems[index].STATUS = '1';
+            }else{
+              this.deciveItems[index].STATUS = '0';
+            }
+          }else{
+            wx.showToast({
+              title: res.msg,
+              icon: "none",
+              duration: 2000
+            });
+            return;
+          }
+        });
+    },
+    changeJ(gatewayId, nodeId, status,isOpen,index){
+      this.$httpWX
+        .post({
+          // url: '/command/mini/unify',
+          url: "/sensor/" + gatewayId + "/" + nodeId + "/" + status
+          // data: {
+          //   nodeId:nodeId,
+          //   channel:'0',
+          //   deviceId:gatewayId,
+          //   status:status,
+          //   nodeType:10
+          // }
+        })
+        .then(res => {
+          console.log(res)
+          if (res.status == "200") {
+            this.deciveItems[index].STATUS = status;
+          }else{
+            wx.showToast({
+              title: res.msg,
+              icon: "none",
+              duration: 2000
+            });
+            return;
           }
         });
     },
     handleOpen1() {
       this.visible1 = true;
       this.downImage = false;
-      this.informShow = false;
     },
     handleOpen2(e) {
       this.equipmentIndex = e.target.value;
       // console.log(e);
       this.equipment = this.equipmentItems[e.target.value].nodeId;
-      this.equipmentClick(
-        this.equipment,
-        this.equipmentItems[e.target.value].gatewayId
-      );
+      this.controlNode(this.greenhouseId, this.equipment);
+      // this.equipmentClick(
+      //   this.equipment,
+      //   this.equipmentItems[e.target.value].gatewayId
+      // );
     },
     closeMask() {
       this.visible1 = false;
       this.downImage = true;
-      this.informShow = true;
     },
     equipmentClick(nodeId, gatewayId) {
       this.equipment = nodeId;
       this.gatewayId = gatewayId;
       this.controlNode(this.greenhouseDevise, this.equipment);
-    }
+    },
+    areaClick(area,greenhouseId,greenhouse) {
+      this.greenhouseDevise = greenhouseId;
+      this.equipmentList(area,greenhouseId,greenhouse);
+      this.controlNode(greenhouseId,this.equipment);
+      this.visible1 = false;
+    },
   }
 };
 </script>
@@ -554,6 +650,8 @@ export default {
   position: absolute;
   right: 50rpx;
   top: 71rpx;
+  width: 68rpx;
+  height: 40rpx;
 }
 .switchBtnBox{
   position: absolute;

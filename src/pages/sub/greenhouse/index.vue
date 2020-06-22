@@ -268,9 +268,9 @@ export default {
   },
   mounted(){
     this.projectId = wx.getStorageSync('projectId')
-    setTimeout(()=>{
+    // setTimeout(()=>{
       this.homePage();
-    },200);
+    // },200);
     // let pages = getCurrentPages();
     // let currentPage = pages[pages.length-1]
     // console.log("currentPage",currentPage)
