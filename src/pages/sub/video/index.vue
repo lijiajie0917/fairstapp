@@ -38,12 +38,16 @@ export default {
   methods: {
     // 获取视频监控地址
     getVideoUrl(){
-      // this.$httpWX.post({
-      //   url: '/miniProgram/getVideoUrl/'
-      // }).then(res => {
-      //   var data = res.data;
-      // })
-      this.videoUrl = "http://hls01open.ys7.com/openlive/92185fae71934fca881ea590d40134e3.m3u8"
+      this.$httpWX.get({
+        url: '/ys/live/video',
+        data: {
+          deviceSerial: this.num,
+        }
+      }).then(res => {
+        var data = res.data;
+        console.log(data);
+        // this.videoUrl = "http://hls01open.ys7.com/openlive/92185fae71934fca881ea590d40134e3.m3u8"
+      })
     }
   }
 };

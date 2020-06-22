@@ -4,7 +4,7 @@
     <ul class="equipmentInfor" :style="{'margin-top':(navH + 15)+'px'}">
       <li @click='showModal'>
         <span class="liTitle">设备名称：</span>
-        <span>{{videoName}}</span>
+        <span class="devicename">{{videoName}}</span>
       </li>
       <li>
         <span class="liTitle">序列号：</span>
@@ -12,7 +12,7 @@
       </li>
       <li>
         <span class="liTitle">当前版本：</span>
-        <span>V5.5.5 15485</span>
+        <span>{{videoVersion}}</span>
       </li>
     </ul>
     <button class="unbind" @click="unbind()" type="button" name="button">解绑摄像机</button>
@@ -37,7 +37,8 @@ export default {
       title:'设备信息',
       navH:this.$store.state.navH,
       deviceModal:true,
-      input:''
+      input:'',
+      videoVersion:''
     }
   },
   mounted(){
@@ -45,6 +46,8 @@ export default {
     this.num = this.$root.$mp.query.num
     // 获取视频列表设备名称
     this.videoName = this.$root.$mp.query.videoName
+    // 获取视频版本号
+    this.videoVersion = this.$root.$mp.query.Version
   },
   created(){
 
@@ -59,14 +62,37 @@ export default {
     },
     // 点击设备名称弹框显示
     showModal(){
+      this.input = '';
       this.deviceModal = false;
     },
     // 确认修改回调
     modelconfirm(e) {
       this.deviceModal = true;
-      this.$httpWX.showSuccessToast('修改成功')
-      // this.videoName = this.input;
+      this.$httpWX.put({
+        url: '/ys/device/info',
+        data: {
+          deviceSerial: this.num,
+          deviceName:this.input
+        }
+      }).then(res => {
+        var data = res;
+        this.$httpWX.showSuccessToast('修改成功')
+        this.videoName = this.input;
+        // this.deviceInfo()
+      })
     },
+    // 获取摄像头详情
+    // deviceInfo(){
+    //   this.$httpWX.get({
+    //     url: '/ys/device/info',
+    //     data: {
+    //       deviceSerial: this.num
+    //     }
+    //   }).then(res => {
+    //     var data = res;
+    //     console.log(data);
+    //   })
+    // },
     // 取消修改回调
     modelcancel(e) {
       this.deviceModal = true;
@@ -119,5 +145,11 @@ export default {
   position: fixed;
   width:100%;
   height: 100%;
+}
+.devicename{
+  width: 216px;
+  overflow: auto;
+  white-space: nowrap;
+  text-align: right;
 }
 </style>

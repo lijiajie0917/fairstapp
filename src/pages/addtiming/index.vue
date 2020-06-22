@@ -13,23 +13,33 @@
           </div>
           <ul class="taskUi">
             <li class="taskTilte">名称：</li>
-            <li> <input class="startTime" type="text" name="" value="手动输入任务名称"> </li>
+            <li>
+              <input class="startTime" placeholder='手动输入任务名称' v-model="input"/>
+            </li>
             <li class="taskTilte">开始时间:</li>
-            <picker mode="multiSelector" @change="startTimefun" :value="startIndex" :range="newMultiArray">
+            <picker mode="multiSelector" @change="startTimefun" :value="startIndexTime" :range="newMultiArray">
               <span>{{startTime}}</span>
               <img class="userDown" src="../../../static/images/down.png" alt="">
             </picker>
             <li class="taskTilte">执行类型:</li>
             <li class="perBox">
-              <span class="perType">单次执行</span>
+              <span class="perType" @click="oneExecute">单次执行</span>
               <picker @change="bindPickerChange" :value="pickerindex" :range="array">
                 <span class="perType">{{perName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
               </picker>
             </li>
             <li class="taskTilte">动作:</li>
             <li class="perBox">
-              <span class="perType moveType">水阀——001<img class="repDown" src="../../../static/images/down.png" alt=""></span>
-              <span class="perType moveType">开启<img class="repDown" src="../../../static/images/down.png" alt=""></span>
+              <picker class="equipmentFlot"
+                @change="equipmentAction"
+                :value="equipmentIndex"
+                :range-key="'name'"
+                :range="equipmentarray">
+                <span class="perType moveType">{{equipmentName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
+              </picker>
+              <picker @change="startAction" :value="startIndex" :range="startarray">
+                <span class="perType">{{startperName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
+              </picker>
             </li>
           </ul>
         </div>
@@ -39,18 +49,20 @@
           </div>
           <ul class="taskUi">
             <li class="taskTilte">结束时间:</li>
-            <picker mode="multiSelector" @change="overTimefun" :value="overIndex" :range="newMultiArray">
+            <picker mode="multiSelector" @change="overTimefun" :value="overIndexTime" :range="newMultiArray">
               <span>{{overTime}}</span>
               <img class="userDown" src="../../../static/images/down.png" alt="">
             </picker>
             <li class="taskTilte">动作:</li>
             <li class="perBox">
-              <span class="perType moveType">水阀——001</span>
-              <span class="perType moveType">开启<img class="repDown" src="../../../static/images/down.png" alt=""></span>
+              <span class="perType moveType">{{equipmentName}}</span>
+              <picker @change="overAction" :value="overIndex" :range="overarray">
+                <span class="perType moveType">{{overperName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
+              </picker>
             </li>
           </ul>
         </div>
-        <div class="addTiming">
+        <div class="addTiming" @click="savePage()">
           保存
         </div>
       </div>
@@ -80,16 +92,30 @@ export default {
       startTime: "请选择开始时间",
       overTime:'请选择结束时间',
       multiArray: [], //时间初始化
-      startIndex: [0, 0, 0, 0, 0], //开始时间
-      overIndex:[0, 0, 0, 0], //结束时间
+      startIndexTime: [0, 0, 0, 0, 0], //开始时间
+      formattingstartTime:'',
+      overIndexTime:[0, 0, 0, 0], //结束时间
+      formattingoverTime:'',
       year:'',
       month:'',
       day:'',
       hour:'',
       minute:'',
       perName:'重复执行', //动作初始化
+      startperName:'关闭',
+      overperName:'关闭',
       pickerindex:0, //动作下标初始化
+      startIndex:0,
+      overIndex:0,
+      equipmentIndex:0,
       array: ['永不', '每天', '每两天', '每三天','每周'], //动作数组
+      startarray:['关闭','开启'],
+      overarray:['关闭','开启'],
+      equipmentarray:[],
+      input:'',
+      localId:'',
+      equipmentName:'',
+      isRepeat:true, //是否重复 默认否
     }
   },
   computed: {
@@ -143,17 +169,19 @@ export default {
         this.screenHeight = res.screenHeight;
       }
     });
+    this.dateOne = this.$httpWX.formatTime();
   },
   watch: {
-    '$store.state.equipment': function () {
-      this.equipment = this.$store.state.equipment;
+    '$store.state.localId': function (newVal) {
+      this.localId = newVal;
     },
-    '$store.state.gatewayId': function () {
-      this.gatewayId = this.$store.state.gatewayId;
+    '$store.state.equipmentName': function (newVal) {
+      this.equipmentName = newVal;
     }
   },
   mounted(){
     this.projectId = this.$store.state.projectId;
+    this.equipmentarray = wx.getStorageSync('deviceList')
   },
   methods:{
     initTime(index){
@@ -165,22 +193,102 @@ export default {
     },
     startTimefun(e) {
       // 开始时间
-      this.startIndex = e.target.value;
-      const index = this.startIndex;
-      this.initTime(index)
+      this.startIndexTime = e.target.value;
+      const index = this.startIndexTime;
+      this.initTime(index);
+      this.formattingstartTime = this.year + "-" + this.month + "-" + this.day + " " + this.hour + ":" + this.minute + ":00"
       this.startTime = this.year + " 年 " + this.month + " 月 " + this.day + " 日  " + this.hour + ":" + this.minute;
     },
     overTimefun(e){
       // 结束时间
-      this.overIndex = e.target.value;
-      const index = this.overIndex;
+      this.overIndexTime = e.target.value;
+      const index = this.overIndexTime;
       this.initTime(index)
+      this.formattingoverTime = this.year + "-" + this.month + "-" + this.day + " " + this.hour + ":" + this.minute + ":00"
       this.overTime = this.year + " 年 " + this.month + " 月 " + this.day + " 日  " + this.hour + ":" + this.minute;
     },
-    // 选择动作
+    // 选择是否重复执行
     bindPickerChange(e) {
       this.pickerindex = e.target.value
       this.perName = this.array[this.pickerindex];
+    },
+    // 选择开始动作
+    startAction(e){
+      this.startIndex = e.target.value
+      this.startperName = this.startarray[this.startIndex];
+    },
+    // 选择结束动作
+    overAction(e){
+      this.overIndex = e.target.value
+      this.overperName = this.overarray[this.overIndex];
+    },
+    // 添加定时设备选择
+    equipmentAction(e){
+      this.equipmentIndex = e.target.value
+      this.localId = this.equipmentarray[this.equipmentIndex].localId;
+      this.equipmentName = this.equipmentarray[this.equipmentIndex].name;
+    },
+    oneExecute(){
+      this.isRepeat = false;
+    },
+    // 保存
+    savePage(){
+
+      let startPage;
+      let overPage;
+      let perPage;
+
+      if (this.startperName == "关闭" && this.overperName == "关闭") {
+        this.$httpWX.showErrorToast('动作重复')
+      } else if (this.startperName == "开启" && this.overperName == "开启") {
+        this.$httpWX.showErrorToast('动作重复')
+      } else {
+        switch(this.perName){
+          case "永不":
+              perPage = "0";
+              this.isRepeat = false;
+              break;
+          case "每天":
+              perPage = "1";
+              break;
+          case "每两天":
+              perPage = "2";
+              break;
+          case "每三天":
+              perPage = "3";
+              break;
+          default:
+              perPage = "5";
+              break;
+        }
+        startPage = this.startperName == "开启"? "OPEN" : "CLOSE" ;
+        overPage = this.overperName == "关闭"? "CLOSE" : "OPEN" ;
+        this.$httpWX.post({
+          url: '/miniProgram/scheduleControl',
+          data: {
+            localId : this.localId, //唯一ID
+            name : this.input, //定时任务名称
+            startTime : this.formattingstartTime, //开始时间
+            endTime : this.formattingoverTime, //结束时间
+            action : startPage, //开启动作
+            endAction : overPage, //结束动作
+            period : perPage, //周期
+            isRepeat : this.isRepeat, //是否重复
+          }
+        }).then(res => {
+          let data = res.data;
+          console.log(res)
+          if (res.status == "001001") {
+            this.$httpWX.showErrorToast(res.msg);
+          } else {
+            this.$store.commit('setlocalId',this.localId);
+            this.$store.commit('setaddTimingFlag',this.input);
+            wx.navigateBack({
+              delta: 1
+            })
+          }
+        })
+      }
     },
   }
 }
@@ -289,5 +397,8 @@ picker{
 }
 .perType:last-child{
   float: right;
+}
+.equipmentFlot{
+  float: left;
 }
 </style>

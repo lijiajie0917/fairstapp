@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <div class="title_text">{{ navTitle }}</div> -->
     <img class="navBackground" src="../../../static/images/background.png" alt />
     <div class="areaGreenhouseBox" :style="{'top':(navH+20)+'px'}">
       <div class="A_hook">
@@ -43,12 +42,13 @@
           class="areaGreenhouse"
           @change="handleOpen2"
           :value="equipmentIndex"
-          :range-key="'nodeId'"
-          :range="equipmentItems2"
+          :range-key="navTitle != '定时任务'?'nodeId':'name'"
+          :range="navTitle != '定时任务'? equipmentItems2 : controlNodeArray"
         >
           <view class="picker">
             <img class="areaDown" src="../../../static/images/shebei.png" alt />
-            {{equipment+'号设备'}}
+            <span v-if="navTitle != '定时任务'">{{equipment+'号设备'}}</span>
+            <span v-else>{{equipmentName}}</span>
             <img
               class="down"
               src="../../../static/images/down.png"
@@ -63,7 +63,7 @@
 <script>
 export default {
     name: "selectOption",  //下拉选项组件
-    props: [],
+    props: ["navTitle"],
     data() {
     	return {
         navH: this.$store.state.navH, //导航栏高度
@@ -72,19 +72,22 @@ export default {
         maskItems: [], //片区列表内容初始化
         downImage: true, //下拉样式初始化
         visible1: false, //片区弹窗初始化
+        equipmentItems:[],
+        equipmentIndex:'',
         equipmentItems2: [], //设备列表初始化
+        controlNodeArray:[], //控制设备列表初始化
         equipment: "-", //默认设备名字
         projectId:'',
+        equipmentName:'', //控制设备名字
+        localId:'', //控制设备唯一ID
       };
     },
     created:function(){
       wx.hideShareMenu(); //禁止出现转发按钮
     },
     mounted() {
-      setTimeout(()=>{
-        this.homePage(); //请求下拉框数据
-      },200);
       this.projectId = this.$store.state.projectId;
+      this.homePage(); //请求下拉框数据
       if (this.visible1 != false) {
         this.visible1 = false;
       }
@@ -102,26 +105,25 @@ export default {
       },
       // 片区请求
       homePage() {
-        this.$httpWX
-          .post({
+        this.$httpWX.post({
             url: "/miniProgram/groupInfo/" + this.projectId,
             data: {
               county: "修文县"
             }
-          })
-          .then(res => {
+          }).then(res => {
             var data = res.data;
             if (data.level == "area") {
               this.areaText = data.value[0].area; //默认区域
               this.greenhouse = data.value[0].greenhouse[0].greenhouse; //默认大鹏名字
               this.greenhouseId = data.value[0].greenhouse[0].greenhouseId; //默认大棚id
               this.maskItems = data.value; //片区和大棚下拉框
-              // 获取默认设备列表
-              this.equipmentList(
-                this.areaText,
-                this.greenhouseId,
-                this.greenhouse
-              );
+              if (this.navTitle == '定时任务') {
+                // 获取控制设备列表
+                this.controlNode(this.greenhouseId)
+              } else {
+                // 获取默认设备列表
+                this.equipmentList(this.areaText,this.greenhouseId,this.greenhouse);
+              }
             }
           });
       },
@@ -148,12 +150,10 @@ export default {
                   mask: true
                 });
               } else {
-                this.areaText = area; //默认区域
-                this.greenhouse = greenhouse; //默认大鹏名字
                 this.equipment = data.value[0].nodeId; //默认设备名字
                 this.gatewayId = data.value[0].gatewayId; //默认设备id
-                this.equipmentItems = data.value; //设备下拉框
                 this.equipmentItems2 = [];
+                this.equipmentItems = data.value;
                 for (var i = 0; i < data.value.length; i++) {
                   this.equipmentItems2.push({
                     nodeId: data.value[i].nodeId + "号设备"
@@ -166,24 +166,61 @@ export default {
             }
           });
       },
+      // 获取控制设备信息
+      controlNode(greenhouseId){
+        this.$httpWX.get({
+            url: "/miniProgram/controlNode",
+            data: {
+              greenhouseId: greenhouseId
+            }
+        }).then(res => {
+          var data = res.data;
+          if (data.length == 0) {
+            wx.showToast({
+              title: "暂无数据",
+              icon: "none",
+              duration: 1000,
+              mask: true
+            });
+          } else {
+            this.equipmentName = data[0].name; //默认控制设备名字
+            this.localId = data[0].localId; //默认设备唯一localid
+            this.controlNodeArray = data;
+            this.$httpWX.setStorage("deviceList",data);
+            // 设置全局默认控制设备唯一ID和名称
+            this.$store.commit('setlocalId',this.localId);
+            this.$store.commit('setequipmentName',this.equipmentName);
+          }
+        })
+      },
       // 选择大棚
       areaClick(area,greenhouseId,greenhouse) {
-        this.equipmentList(area,greenhouseId,greenhouse);
+        if (this.navTitle == '定时任务') {
+          this.controlNode(greenhouseId)
+        } else {
+          this.equipmentList(area,greenhouseId,greenhouse);
+        }
         this.visible1 = false;
       },
       // 获取选择设备列表
       handleOpen2(e) {
         this.equipmentIndex = e.target.value;
-        this.equipment = this.equipmentItems[e.target.value].nodeId;
-        this.gatewayId = this.equipmentItems[e.target.value].gatewayId;
-        // 改变全局设备名称和ID
-        // this.$store.commit('setequipment',this.equipment);
-        // this.$store.commit('setgatewayId',this.gatewayId);
-        this.$store.commit('setequipment','1111');
-        this.$store.commit('setgatewayId','2222');
+        if (this.navTitle == '定时任务') {
+          this.equipmentName = this.controlNodeArray[e.target.value].name;
+          this.localId = this.controlNodeArray[e.target.value].localId;
+          // 改变全局默认控制设备唯一ID和名称
+          this.$store.commit('setlocalId',this.localId);
+          this.$store.commit('setequipmentName',this.equipmentName);
+        } else {
+          this.equipment = this.equipmentItems[e.target.value].nodeId;
+          this.gatewayId = this.equipmentItems[e.target.value].gatewayId;
+          // 改变全局设备名称和ID
+          this.$store.commit('setequipment',this.equipment);
+          this.$store.commit('setgatewayId',this.gatewayId);
+        }
       },
     }
-};
+  }
 </script>
 <style scoped>
 /* 内容区 */

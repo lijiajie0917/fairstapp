@@ -84,6 +84,11 @@ function post (obj) {
   return request(obj.url, 'POST', obj.data)
 }
 
+// PUT请求
+function put (obj) {
+  return request(obj.url, 'PUT', obj.data)
+}
+
 // 存
 function setStorage (key,value) {
   wx.setStorageSync(key, value);
@@ -123,6 +128,7 @@ function showErrorToast(msg) {
   wx.showToast({
     title: msg,
     mask: true,
+    icon: "none" //图标，支持"success"、"loading"
     // image: '/static/images/icon_error.png' //自定义失败图标
   })
 }
@@ -148,6 +154,7 @@ export default {
   request,
   get,
   post,
+  put,
   host,
   formatTime,
   setStorage,
