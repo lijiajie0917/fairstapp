@@ -42,7 +42,7 @@
           class="areaGreenhouse"
           @change="handleOpen2"
           :value="equipmentIndex"
-          :range-key="navTitle != '定时任务'?'nodeId':'name'"
+          :range-key="navTitle != '定时任务'?'nodeId':'typeName'"
           :range="navTitle != '定时任务'? equipmentItems2 : controlNodeArray"
         >
           <view class="picker">
@@ -183,7 +183,7 @@ export default {
               mask: true
             });
           } else {
-            this.equipmentName = data[0].name; //默认控制设备名字
+            this.equipmentName = data[0].typeName; //默认控制设备名字
             this.localId = data[0].localId; //默认设备唯一localid
             this.controlNodeArray = data;
             this.$httpWX.setStorage("deviceList",data);
@@ -206,7 +206,7 @@ export default {
       handleOpen2(e) {
         this.equipmentIndex = e.target.value;
         if (this.navTitle == '定时任务') {
-          this.equipmentName = this.controlNodeArray[e.target.value].name;
+          this.equipmentName = this.controlNodeArray[e.target.value].typeName;
           this.localId = this.controlNodeArray[e.target.value].localId;
           // 改变全局默认控制设备唯一ID和名称
           this.$store.commit('setlocalId',this.localId);

@@ -25,21 +25,31 @@ export default {
       title:'视频监控',
       navH:this.$store.state.navH,
       videoList:[],
+      // accessToken : 'at.93gghid54pin6lks4ys8qbyo93ym2lcl-9kefudgdxj-0u1p81i-ios0cyvbv',
+      // deviceSerial : 'E46925593',
+      // channelNo : '1',
     }
   },
   created(){
     wx.hideShareMenu();//禁止出现转发按钮
   },
+  watch: {
+    '$store.state.deviceName': function (newVal) {
+      this.getvideoList();
+    }
+  },
   mounted(){
-    this.$httpWX.get({
-      url: '/ys/device/list'
-    }).then(res => {
-      var data = res.data;
-      this.videoList = data;
-      console.log(data);
-    })
+    this.getvideoList();
   },
   methods:{
+    getvideoList(){
+      this.$httpWX.get({
+        url: '/ys/device/list'
+      }).then(res => {
+        var data = res.data;
+        this.videoList = data;
+      })
+    },
     // 跳转视频监控页面
     video(videoName,num){
       wx.navigateTo({

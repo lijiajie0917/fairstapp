@@ -12,7 +12,8 @@ const store =  new Vuex.Store({
     gatewayId:'', //全局设备ID
     localId:'', //全局设备控制唯一ID
     equipmentName:'', //设备唯一名称
-    addTimingFlag:'' //添加定时任务刷新列表
+    addTimingFlag:'', //添加定时任务刷新列表
+    deviceName : '', //修改监控设备名称
   },
   mutations : {
     // 改变项目ID
@@ -42,6 +43,10 @@ const store =  new Vuex.Store({
     // 添加定时任务刷新列表
     setaddTimingFlag(state,value) {
       state.addTimingFlag = value
+    },
+    // 改变修改监控设备名称
+    setdeviceName(state,value) {
+      state.deviceName = value
     },
   }
 });

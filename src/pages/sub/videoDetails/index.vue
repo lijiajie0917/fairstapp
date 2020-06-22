@@ -78,7 +78,7 @@ export default {
         var data = res;
         this.$httpWX.showSuccessToast('修改成功')
         this.videoName = this.input;
-        // this.deviceInfo()
+        this.$store.commit('setdeviceName',this.input + "!@#$%^&");
       })
     },
     // 获取摄像头详情

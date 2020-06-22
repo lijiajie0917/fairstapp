@@ -33,7 +33,7 @@
               <picker class="equipmentFlot"
                 @change="equipmentAction"
                 :value="equipmentIndex"
-                :range-key="'name'"
+                :range-key="'typeName'"
                 :range="equipmentarray">
                 <span class="perType moveType">{{equipmentName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
               </picker>
@@ -226,7 +226,7 @@ export default {
     equipmentAction(e){
       this.equipmentIndex = e.target.value
       this.localId = this.equipmentarray[this.equipmentIndex].localId;
-      this.equipmentName = this.equipmentarray[this.equipmentIndex].name;
+      this.equipmentName = this.equipmentarray[this.equipmentIndex].typeName;
     },
     oneExecute(){
       this.isRepeat = false;
