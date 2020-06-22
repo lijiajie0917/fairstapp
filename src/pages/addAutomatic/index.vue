@@ -57,8 +57,7 @@
                   <img class="choice" src="../../../static/images/down.png" alt />
                 </div>
               </picker>
-            </form>
-            数值
+            </form>数值
             <div class="maticNum">
               <input type="digit" v-model="maticNum" />
             </div>
@@ -110,59 +109,72 @@
 export default {
   data() {
     return {
-      projectId: '',
+      projectId: "",
       Tourist: "0", //默认非游客模式
       navH: 0, //导航栏高度
       screenHeight: null, //屏幕总高
       maticName: "", //任务名称
       maticNum: "", //限额数值
-      spanT1:'空气湿度',//七要素默认值
-      spanN1:0,//七要素index
-      spanTxt1:[
-        {"localId":"空气湿度",
-          "name":"airHumidity"
+      spanT1: "空气湿度", //七要素默认值
+      spanN1: 0, //七要素index
+      spanTxt1: [
+        {
+          localId: "空气湿度",
+          name: "airHumidity",
+          company: "%RH"
         },
-        {"localId":"空气温度",
-          "name":"airTemperature"
+        {
+          localId: "空气温度",
+          name: "airTemperature",
+          company: "℃"
         },
-        {"localId":"光照强度",
-          "name":"lux"
+        {
+          localId: "光照强度",
+          name: "lux",
+          company: "lux"
         },
-        {"localId":"二氧化碳",
-          "name":"CO2"
+        {
+          localId: "二氧化碳",
+          name: "CO2",
+          company: "ppm"
         },
-        {"localId":"土壤温度",
-          "name":"soilTemperature"
+        {
+          localId: "土壤温度",
+          name: "soilTemperature",
+          company: "℃"
         },
-        {"localId":"土壤湿度",
-          "name":"soilHumidity"
+        {
+          localId: "土壤湿度",
+          name: "soilHumidity",
+          company: "%RH"
         },
-        {"localId":"土壤ph值",
-          "name":"ph"
+        {
+          localId: "土壤ph值",
+          name: "ph",
+          company: "W/cm²"
         }
-      ],//七要素
-      spanT2:'大于',//大于或小于默认值
-      spanN2:0,//大于或小于index
-      spanTxt2:[
-        {"localId":"大于"},
-        {"localId":"小于"}
-      ],//大于或小于
-      spanT3:'',//设备列表默认值
-      spanN3:0,//设备列表index
-      spanTxt3:[],//设备列表
-      spanT4:'关闭',//关闭或开启默认值
-      spanN4:0,//关闭或开启index
-      spanTxt4:[
-        {"localId":"关闭",
-          "state":"CLOSE"
+      ], //七要素
+      spanT2: "大于", //大于或小于默认值
+      spanN2: 0, //大于或小于index
+      spanTxt2: [{ localId: "大于" }, { localId: "小于" }], //大于或小于
+      spanT3: "", //设备列表默认值
+      spanN3: 0, //设备列表index
+      spanTxt3: [], //设备列表
+      spanT4: "关闭", //关闭或开启默认值
+      spanN4: 0, //关闭或开启index
+      spanTxt4: [
+        {
+          localId: "关闭",
+          state: "CLOSE"
         },
-        {"localId":"开启",
-          "state":"OPEN"
+        {
+          localId: "开启",
+          state: "OPEN"
         }
-      ],//关闭或开启
-      gatewayId:'',//温室宝gatewayId
-      nodeId:'',//温室宝nodeId
-      localId:'',//温室宝localId
+      ], //关闭或开启
+      gatewayId: "", //温室宝gatewayId
+      nodeId: "", //温室宝nodeId
+      localId: "" //温室宝localId
     };
   },
   created: function() {
@@ -170,13 +182,13 @@ export default {
     this.getHeight();
   },
   mounted() {
-    this.projectId = wx.getStorageSync('projectId')
+    this.projectId = wx.getStorageSync("projectId");
     this.getList();
   },
-  onLoad (option) {
-    this.gatewayId = option.gatewayId
-    this.nodeId = option.nodeId
-    this.localId = option.localId
+  onLoad(option) {
+    this.gatewayId = option.gatewayId;
+    this.nodeId = option.nodeId;
+    this.localId = option.localId;
   },
   methods: {
     /**标题栏返回按钮 */
@@ -196,73 +208,75 @@ export default {
         }
       });
     },
-    getList() {//获取设备列表
+    getList() {
+      //获取设备列表
       this.$httpWX
         .get({
           url: "/miniProgram/controlNode",
-          data:{
-            greenhouseId:123
+          data: {
+            greenhouseId: 123
           }
         })
         .then(res => {
           console.log("自动控制设备列表", res);
           let data = res.data;
           this.spanTxt3 = data;
-          this.spanT3 = data[0].name
+          this.spanT3 = data[0].name;
         });
     },
-    submit(){//提交任务内容
-      if(this.maticName == ''|| this.maticName.length<=0){
+    submit() {
+      //提交任务内容
+      if (this.maticName == "" || this.maticName.length <= 0) {
         wx.showToast({
-          title: '任务名不能为空',
-          icon: 'none',
+          title: "任务名不能为空",
+          icon: "none",
           duration: 2000
-        })
+        });
         return;
       }
-      if(this.maticNum == ''|| this.maticNum.length<=0){
+      if (this.maticNum == "" || this.maticNum.length <= 0) {
         wx.showToast({
-          title: '数值不能为空',
-          icon: 'none',
+          title: "数值不能为空",
+          icon: "none",
           duration: 2000
-        })
+        });
         return;
       }
-      let submitData = {}
-      if(this.spanT2 == '大于'){
+      let submitData = {};
+      if (this.spanT2 == "大于") {
         submitData = {
-          "localId": this.spanTxt3[this.spanN3].localId,
-          "name": this.spanTxt3[this.spanN3].name,
-          'rule':{
-            gatewayId:this.gatewayId,
-            nodeId:this.nodeId,
-            localId:this.localId,
-            field:this.spanTxt1[this.spanN1].name,
-            'lowWater':{
-              'name':this.maticName,
-              'limit':this.maticNum,
-              'action':this.spanTxt4[this.spanN4].state,
-              'isOpen':true
+          localId: this.spanTxt3[this.spanN3].localId,
+          name: this.spanTxt3[this.spanN3].name,
+          rule: {
+            gatewayId: this.gatewayId,
+            nodeId: this.nodeId,
+            localId: this.localId,
+            field: this.spanTxt1[this.spanN1].name,
+            lowWater: {
+              name: this.maticName,
+              limit: this.maticNum,
+              action: this.spanTxt4[this.spanN4].state,
+              isOpen: true
             }
           }
-        }
-      }else{
+        };
+      } else {
         submitData = {
-          "localId": this.spanTxt3[this.spanN3].localId,
-          "name": this.spanTxt3[this.spanN3].name,
-          'rule':{
-            gatewayId:this.gatewayId,
-            nodeId:this.nodeId,
-            localId:this.localId,
-            field:this.spanTxt1[this.spanN1].name,
-            'highWater':{
-              'name':this.maticName,
-              'limit':this.maticNum,
-              'action':this.spanTxt4[this.spanN4].state,
-              'isOpen':true
+          localId: this.spanTxt3[this.spanN3].localId,
+          name: this.spanTxt3[this.spanN3].name,
+          rule: {
+            gatewayId: this.gatewayId,
+            nodeId: this.nodeId,
+            localId: this.localId,
+            field: this.spanTxt1[this.spanN1].name,
+            highWater: {
+              name: this.maticName,
+              limit: this.maticNum,
+              action: this.spanTxt4[this.spanN4].state,
+              isOpen: true
             }
           }
-        }
+        };
       }
       this.$httpWX
         .post({
@@ -273,26 +287,30 @@ export default {
           console.log("保存", res);
         });
     },
-    spanChange1 (e) {//七要素切换
+    spanChange1(e) {
+      //七要素切换
       // console.log(e)
-      this.spanN1 = e.target.value
+      this.spanN1 = e.target.value;
       this.spanT1 = this.spanTxt1[e.target.value].localId;
     },
-    spanChange2 (e) {//大于或小于切换
+    spanChange2(e) {
+      //大于或小于切换
       // console.log(e)
-      this.spanN2 = e.target.value
+      this.spanN2 = e.target.value;
       this.spanT2 = this.spanTxt2[e.target.value].localId;
     },
-    spanChange3 (e) {//设备切换
+    spanChange3(e) {
+      //设备切换
       // console.log(e)
-      this.spanN3 = e.target.value
+      this.spanN3 = e.target.value;
       this.spanT3 = this.spanTxt3[e.target.value].name;
     },
-    spanChange4 (e) {//关闭或开启切换
+    spanChange4(e) {
+      //关闭或开启切换
       // console.log(e)
-      this.spanN4 = e.target.value
+      this.spanN4 = e.target.value;
       this.spanT4 = this.spanTxt4[e.target.value].localId;
-    },
+    }
   }
 };
 </script>
@@ -490,21 +508,21 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
-.addAutoBtn{
-  width:390rpx;
-  height:78rpx;
-  background:rgba(51,112,255,1);
-  box-shadow:0px 10rpx 30rpx 0px rgba(167,197,242,0.3);
-  border-radius:12rpx;
+.addAutoBtn {
+  width: 390rpx;
+  height: 78rpx;
+  background: rgba(51, 112, 255, 1);
+  box-shadow: 0px 10rpx 30rpx 0px rgba(167, 197, 242, 0.3);
+  border-radius: 12rpx;
   line-height: 76rpx;
   margin: 0 auto;
   text-align: center;
   position: absolute;
   left: 180rpx;
   bottom: 200px;
-  font-size:34rpx;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(255,255,255,1);
+  font-size: 34rpx;
+  font-family: PingFang SC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
 }
 </style>

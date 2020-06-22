@@ -33,7 +33,7 @@ function request (url, method, data, header = {}) {
         header: {
           'content-type': 'application/json', // 默认值
           'Authorization': wx.getStorageSync('JSESSIONID'),
-          'projectId':wx.getStorageSync('prosItem')[0].id
+          'projectId':wx.getStorageSync('projectId')
         },
         success: function (res) {
           wx.hideLoading()
@@ -103,11 +103,11 @@ function getStorage (key) {
 function formatTime (){
   var timestamp = Date.parse(new Date());
   var date = new Date(timestamp);
-  //获取年份  
+  //获取年份
   var Y =date.getFullYear();
-  //获取月份  
+  //获取月份
   var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1);
-  //获取当日日期 
+  //获取当日日期
   var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
   var timeDate = Y + '-' + M + '-' + D
   return timeDate;

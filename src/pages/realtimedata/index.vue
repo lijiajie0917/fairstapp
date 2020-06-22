@@ -170,10 +170,10 @@ export default {
   },
   mounted() {
     this.projectId = wx.getStorageSync('projectId')
-    setTimeout(()=>{
+    // setTimeout(()=>{
       this.homePage();
-    },200);
-    this.projectId = this.$store.state.projectId;
+    // },200);
+    // this.projectId = this.$store.state.projectId;
     if (this.visible1 != false) {
       this.visible1 = false;
     }
@@ -225,6 +225,7 @@ export default {
       }
     },
     homePage() {
+      console.log("this.projectId",this.projectId)
       this.$httpWX
         .post({
           url: "/miniProgram/groupInfo/" + this.projectId,

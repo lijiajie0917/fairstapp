@@ -157,7 +157,7 @@ export default {
             // 存入用户token
             this.$httpWX.setStorage('JSESSIONID',res.msg);
             // 改变默认请求头projectId
-            this.$store.commit('setprojectId',res.data.pros[0].id);
+            this.$httpWX.setStorage('projectId',res.data.pros[0].id);
             // 跳转
             wx.navigateTo({
               url: '/pages/option/main',
