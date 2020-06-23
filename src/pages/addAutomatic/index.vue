@@ -285,6 +285,18 @@ export default {
         })
         .then(res => {
           console.log("保存", res);
+          if(res.status == '200'){
+            wx.navigateBack({
+              delta: 1
+            });
+          }else{
+            wx.showToast({
+              title: res.msg,
+              icon: "none",
+              duration: 2000
+            });
+            return;
+          }
         });
     },
     spanChange1(e) {

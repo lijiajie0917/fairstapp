@@ -60,11 +60,7 @@
           <view class="picker">
             <img class="areaDown" src="../../../static/images/wsb.png" alt />
             {{wsbId+'号温室宝'}}
-            <img
-              class="down"
-              src="../../../static/images/down.png"
-              alt
-            />
+            <img class="down" src="../../../static/images/down.png" alt />
           </view>
         </picker>
       </form>
@@ -74,23 +70,39 @@
       <p>当前无自动控制任务！</p>
       <div class="addTaskOne" @click="addmatic()">添加自动控制</div>
     </div>
-    <img class="addBtn" v-if="kong == false" @click="addmatic()" src="../../../static/images/add.png" alt />
+    <img
+      class="addBtn"
+      v-if="kong == false"
+      @click="addmatic()"
+      src="../../../static/images/add.png"
+      alt
+    />
 
-    <div class="automaticBox">
-      <ul class="automaticUl" v-if="kong == false">
+    <div v-if="kong == false"
+      class="automaticBox"
+      :style="{
+        'top':isIphoneX||isIphoneX11?'260px':'',
+        'height':isIphoneX||isIphoneX11?(screenHeight-350)+'px':(screenHeight-220)+'px'
+      }"
+    >
+      <ul class="automaticUl">
         <li class="automaticli" v-for="(item,index) in deciveItems" :key="index">
           <div class="automaticName">
             <i-switch
               class="switchBtn"
               :value="item.WisOpen"
               slot="footer"
-              @change="onChange(index,item.WlocalId,item.WisOpen)"
+              @change="onChange(index,item.localId,item.WisOpen,item.isHight)"
             >
               <view slot="open">开</view>
               <view slot="close">关</view>
             </i-switch>
             <div>{{item.Wname}}</div>
-            <img @click="delBtn(item.isHight,item.WlocalId)" src="../../../static/images/off.png" alt />
+            <img
+              @click="delBtn(item.isHight,item.localId)"
+              src="../../../static/images/off.png"
+              alt
+            />
           </div>
           <div class="automaticTxt">
             <div class="automaticItem">
@@ -106,6 +118,12 @@
           </div>
         </li>
       </ul>
+    </div>
+    <div class="Tourist" v-if="Tourist == '1'" @click="Touristips()">
+      <div class="tipsBox" v-if="tipsBox">
+        <img src="../../../static/images/tips.png" alt />
+        <span>体验账号无设备控制权限</span>
+      </div>
     </div>
     <div class="delTips" v-if="delTips">
       <div class="deleteTips">
@@ -125,27 +143,30 @@ export default {
     return {
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11: this.globalData.isIphoneX11, //适配iphonex11
-      projectId: wx.getStorageSync('projectId'),
+      projectId: wx.getStorageSync("projectId"),
       areaText: "", //默认区域
       greenhouse: "", //默认大鹏名字
-      maskItems:[],//大棚下拉框数据
+      maskItems: [], //大棚下拉框数据
       greenhouseId: "",
-      wsbId:"",//默认温室宝localId
-      wsbIndex:0,
+      wsbId: "", //默认温室宝localId
+      wsbIndex: 0,
       equipmentItems: [], //设备下拉框数据列表
-      wsbList:[],//温室宝下拉框数据列表
-      equipmentItems2: [],//温室宝下拉框名称列表
+      wsbList: [], //温室宝下拉框数据列表
+      equipmentItems2: [], //温室宝下拉框名称列表
       Tourist: "0", //默认非游客模式
+      tipsBox:false,//是否显示体验者提示框
+      count: '',// 倒计时
       navH: 0, //导航栏高度
       screenHeight: null, //屏幕总高
       switch1: false,
       deciveItems: [], //自动控制任务列表
-      kong:false,//任务列表为空
+      kong: false, //任务列表为空
       downImage: true,
       visible1: false,
-      delTips:false,//删除弹框是否显示
-      delId:'',//删除设备的localId
-      isHight:false,//删除设备是否高水位
+      delTips: false, //删除弹框是否显示
+      delId: "", //删除设备的localId
+      isHight: false, //删除设备是否高水位
+      isGetItem:false,//是否执行onShow周期中的函数
     };
   },
   created: function() {
@@ -153,52 +174,85 @@ export default {
     this.getHeight();
   },
   mounted() {
-    this.projectId = wx.getStorageSync('projectId')
+    this.projectId = wx.getStorageSync("projectId");//获取项目id
+    this.Tourist = wx.getStorageSync('Tourist')//获取是否为体验者模式
     this.homePage();
   },
+  onShow: function() {
+    if(this.isGetItem == true){
+      this.deciveItems = [];
+      this.getList(this.wsbId);
+    }
+  },
   methods: {
+    //2秒后提示框消失
+    goChoicePeople() {
+      const TIME_COUNT = 2
+      if (!this.timer) {
+        this.count = TIME_COUNT
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--
+          } else {
+            clearInterval(this.timer)
+            this.timer = null
+            this.tipsBox = false;
+          }
+        }, 1000)
+      }
+    },
+    Touristips(){//体验模式提示
+      this.tipsBox = true;
+      this.goChoicePeople()
+    },
     //显示删除弹框
-    delBtn(isHight,id){
-      console.log(isHight,id)
+    delBtn(isHight, id) {
+      // console.log(isHight, id);
       this.isHight = isHight;
       this.delId = id;
       this.delTips = true;
     },
     // 取消删除
-    cencelDel(){
+    cencelDel() {
       this.isHight = false;
-      this.delId = '';
+      this.delId = "";
       this.delTips = false;
     },
     //确定删除
-    trueDel(){
-      let acTxt = 'lowerWater';
-      if(this.isHight == true){
-        acTxt = 'highWater';
+    trueDel() {
+      let acTxt = "lowerWater";
+      if (this.isHight == true) {
+        acTxt = "highWater";
       }
-      console.log(acTxt)
+      // console.log(acTxt);
       this.$httpWX
         .post({
-          url: "/miniProgram/del/autoControl/"+this.wsbId,
+          url: "/miniProgram/del/autoControl",
           data: {
-            localId:this.delId,
-            action:acTxt
+            localId: this.delId,
+            action: acTxt
           }
         })
         .then(res => {
-          console.log("删除", res);
-          for(let i in this.deciveItems){
-            if(this.deciveItems[i].WlocalId = this.delId){
-              this.deciveItems[i].remove()
-            }
+          // console.log("删除", res);
+          if(res.status == '200'){
+            this.delTips = false;
+            this.deciveItems[i].remove();
+            this.isHight = false;
+            this.delId = "";
+          }else{
+            wx.showToast({
+              title: res.msg,
+              icon: "none",
+              duration: 2000
+            });
+            return;
           }
-          this.isHight = false;
-          this.delId = '';
-          this.delTips = false;
         });
     },
     /**标题栏返回按钮 */
     navBack() {
+      this.isGetItem = false;
       wx.navigateBack({
         delta: 1
       });
@@ -214,26 +268,30 @@ export default {
         }
       });
     },
-    onChange(i,WlocalId,WisOpen) {
-      console.log(i,WlocalId,WisOpen);
-      // this.deciveItems[i].WisOpen = !WisOpen;
-      // var cmd = switch1;
-      // if (cmd == false) {
-      //   cmd = 1;
-      // } else {
-      //   cmd = 0;
-      // }
-      // this.$httpWX
-      //   .post({
-      //     url: "/sensor/" + gatewayId + "/" + nodeId + "/" + cmd,
-      //     data: {}
-      //   })
-      //   .then(res => {
-      //     // console.log(res)
-      //     if (res.status == "200") {
-      //     }
-      //   });
+    //关闭或开启该条任务
+    onChange(i, localId, isOpen,isHight) {
+      // console.log(i, localId, isOpen);
+      let acTxt = "lowerWater";
+      if (this.isHight == true) {
+        acTxt = "highWater";
+      }
+      this.$httpWX
+        .post({
+          url: '/miniProgram/autoControl/ifOpen',
+          data: {
+            localId:localId,
+            isOpen:!isOpen,
+            config:acTxt
+          }
+        })
+        .then(res => {
+          // console.log(res)
+          if (res.status == "200") {
+            this.deciveItems[i].WisOpen = !isOpen;
+          }
+        });
     },
+    //获取大棚信息
     homePage() {
       this.$httpWX
         .post({
@@ -243,7 +301,7 @@ export default {
           }
         })
         .then(res => {
-          console.log("/*/*/*/", res);
+          // console.log("/*/*/*/", res);
           var data = res.data;
           if (data.level == "area") {
             this.areaText = data.value[0].area; //默认区域
@@ -260,37 +318,29 @@ export default {
         });
     },
     // 温室宝数据
-    realTimeData(id,txt,gid) {
-      console.log(id)
+    realTimeData(id, txt, gid) {
+      // console.log(id);
       this.$httpWX
         .post({
           url: "/miniProgram/group/sensorInfo",
           data: {
-            greenhouseId:gid,
-            nodeType:"9"
+            greenhouseId: gid,
+            nodeType: "9"
           }
         })
         .then(res => {
-          // let data = []
-          // for(let i in res.data.rows){
-          //   if(res.data.rows[i].typeName == "温室宝"){
-          //     data = data.concat(res.data.rows[i])
-          //   }
-          // }
           let data = res.data.rows;
-          console.log("温室宝数据", data);
+          // console.log("温室宝数据", data);
           this.wsbList = data;
           this.wsbId = data[0].localId;
           this.equipmentItems2 = [];
           for (let j = 0; j < data.length; j++) {
             this.equipmentItems2.push({
-              localId: data[j].localId + '号温室宝'
+              localId: data[j].localId + "号温室宝"
             });
           }
           // 获取自动任务列表
-          this.getList(
-            data[0].localId,
-          );
+          this.getList(data[0].localId);
         });
     },
     //获取自动任务列表
@@ -300,55 +350,66 @@ export default {
           url: "/miniProgram/autoControl/" + id
         })
         .then(res => {
-          console.log("自动控制任务列表", res.data);
+          // console.log("自动控制任务列表", res.data);
           let data = res.data;
-          if(data.length>0){
+          if (data.length > 0) {
             this.kong = false;
             let spanTxt1 = [
-              {"localId":"空气湿度",
-                "name":"airHumidity",
-                "company":"%RH"
+              {
+                localId: "空气湿度",
+                name: "airHumidity",
+                company: "%RH"
               },
-              {"localId":"空气温度",
-                "name":"airTemperature",
-                "company":"℃"
+              {
+                localId: "空气温度",
+                name: "airTemperature",
+                company: "℃"
               },
-              {"localId":"光照强度",
-                "name":"lux",
-                "company":"lux"
+              {
+                localId: "光照强度",
+                name: "lux",
+                company: "lux"
               },
-              {"localId":"二氧化碳",
-                "name":"CO2",
-                "company":"ppm"
+              {
+                localId: "二氧化碳",
+                name: "CO2",
+                company: "ppm"
               },
-              {"localId":"土壤温度",
-                "name":"soilTemperature",
-                "company":"℃"
+              {
+                localId: "土壤温度",
+                name: "soilTemperature",
+                company: "℃"
               },
-              {"localId":"土壤湿度",
-                "name":"soilHumidity",
-                "company":"%RH"
+              {
+                localId: "土壤湿度",
+                name: "soilHumidity",
+                company: "%RH"
               },
-              {"localId":"土壤ph值",
-                "name":"ph",
-                "company":"W/cm²"
+              {
+                localId: "土壤ph值",
+                name: "ph",
+                company: "W/cm²"
               }
-            ]
-            for(let i in data){
-              if(data[i].rule.lowWater.action == 'OPEN'){
-                data[i].rule.lowWater.action = '开启'
-              }else{
-                data[i].rule.lowWater.action = '关闭'
+            ];
+            for (let i in data) {
+              if (data[i].rule.lowWater.action == "OPEN") {
+                data[i].rule.lowWater.action = "开启";
+              } else {
+                data[i].rule.lowWater.action = "关闭";
               }
-              for(let j in spanTxt1){
-                if(spanTxt1[j].name == data[i].rule.field){
-                  data[i].rule.field = spanTxt1[j].localId
-                  data[i].rule.lowWater.limit = data[i].rule.lowWater.limit+spanTxt1[j].company
+              for (let j in spanTxt1) {
+                if (spanTxt1[j].name == data[i].rule.field) {
+                  data[i].rule.field = spanTxt1[j].localId;
+                  data[i].rule.lowWater.limit =
+                    data[i].rule.lowWater.limit + spanTxt1[j].company;
                 }
               }
-              if(data[i].rule.highWater == null||data[i].rule.highWater == "null"){
+              if (
+                data[i].rule.highWater == null ||
+                data[i].rule.highWater == "null"
+              ) {
                 data[i] = {
-                  isHight:false,
+                  isHight: false,
                   frequency: data[i].frequency,
                   localId: data[i].localId,
                   modifyTime: data[i].modifyTime,
@@ -364,11 +425,11 @@ export default {
                   nullRule: data[i].rule.nullRule,
                   ruleJson: data[i].ruleJson,
                   serialId: data[i].serialId,
-                  version: data[i].version,
-                }
-              }else{
+                  version: data[i].version
+                };
+              } else {
                 data[i] = {
-                  isHight:true,
+                  isHight: true,
                   frequency: data[i].frequency,
                   localId: data[i].localId,
                   modifyTime: data[i].modifyTime,
@@ -384,40 +445,49 @@ export default {
                   nullRule: data[i].rule.nullRule,
                   ruleJson: data[i].ruleJson,
                   serialId: data[i].serialId,
-                  version: data[i].version,
-                }
+                  version: data[i].version
+                };
               }
-              this.deciveItems = this.deciveItems.concat(data[i])
-              console.log("数据处理后",this.deciveItems)
+              this.deciveItems = this.deciveItems.concat(data[i]);
+              // console.log("数据处理后", this.deciveItems);
             }
-          }else{
+          } else {
             this.kong = true;
-            this.deciveItems = []
+            this.deciveItems = [];
           }
         });
     },
     /**跳转添加自动任务页 */
-    addmatic(){
+    addmatic() {
+      // console.log(11111)
+      this.isGetItem = true;
       wx.navigateTo({
-        url: `/pages/addAutomatic/main`+
-        `?gatewayId=`+this.wsbList[this.wsbIndex].gatewayId+
-        `&nodeId=`+this.wsbList[this.wsbIndex].nodeId+
-        `&localId=`+this.wsbList[this.wsbIndex].localId
-      })
+        url:
+          `/pages/addAutomatic/main` +
+          `?gatewayId=` +
+          this.wsbList[this.wsbIndex].gatewayId +
+          `&nodeId=` +
+          this.wsbList[this.wsbIndex].nodeId +
+          `&localId=` +
+          this.wsbList[this.wsbIndex].localId
+      });
     },
-    handleOpen1() {//大鹏下拉
+    handleOpen1() {
+      //大鹏下拉
       this.visible1 = true;
       this.downImage = false;
     },
-    handleOpen2 (e) {//温室宝下拉
-      this.wsbIndex = e.target.value
+    handleOpen2(e) {
+      //温室宝下拉
+      this.deciveItems = [];
+      this.wsbIndex = e.target.value;
       this.wsbId = this.wsbList[e.target.value].localId;
-      this.getList(this.wsbList[e.target.value].localId)
+      this.getList(this.wsbList[e.target.value].localId);
     },
     closeMask() {
       this.visible1 = false;
       this.downImage = true;
-    },
+    }
   }
 };
 </script>
@@ -492,7 +562,40 @@ export default {
   border-left: 1px solid #eaeaea;
   margin-top: 6px;
 }
-
+/* 体验模式 */
+.Tourist {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.tipsBox {
+  width: 260px;
+  height: 53px;
+  background: rgba(119, 119, 119, 1);
+  border-radius: 4px;
+  text-align: center;
+  padding-top: 18px;
+}
+.tipsBox img {
+  width: 17px;
+  height: 17px;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+.tipsBox span {
+  font-size: 17px;
+  font-family: PingFang SC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  vertical-align: middle;
+}
 /* 内容区 */
 .areaGreenhouseBox {
   z-index: 5;
@@ -545,66 +648,66 @@ export default {
   margin-top: 17px;
   margin-right: 15px;
 }
-.mask{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  background:rgba(0,0,0,.7);
-  z-index:900;
-  transition:all .2s ease-in-out;
-  opacity:1;
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 900;
+  transition: all 0.2s ease-in-out;
+  opacity: 1;
 }
-.mask .asShow{
-  position:fixed;
-  width:100%;
-  box-sizing:border-box;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#f7f7f7;
-  transform:translate3d(0,0,0);
-  transform-origin:center;
-  transition:all .2s ease-in-out;
-  z-index:900;
+.mask .asShow {
+  position: fixed;
+  width: 100%;
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f7f7f7;
+  transform: translate3d(0, 0, 0);
+  transform-origin: center;
+  transition: all 0.2s ease-in-out;
+  z-index: 900;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   height: 537px;
-  background: #F9FAFC;
+  background: #f9fafc;
   padding: 30px 15px 0 15px;
 }
-.mask .asShow>img{
+.mask .asShow > img {
   width: 19px;
   height: 19px;
   position: absolute;
   top: 15px;
   right: 15px;
 }
-.maskLi{
+.maskLi {
   margin-bottom: 16px;
   position: relative;
 }
-.maskLi .homeLogo{
+.maskLi .homeLogo {
   width: 32.5px;
   height: 32.5px;
   margin-right: 15.5px;
   float: left;
 }
-.maskLi .gray{
+.maskLi .gray {
   width: 1px;
   height: 56.5px;
   position: absolute;
-  left:16.5px;
-  top:50px;
+  left: 16.5px;
+  top: 50px;
 }
-.maskLi .maskArea{
+.maskLi .maskArea {
   font-size: 15px;
-  color: #0F3DA8;
+  color: #0f3da8;
   font-weight: bold;
   margin-bottom: 10px;
 }
-.maskLi .maskList{
+.maskLi .maskList {
   width: 282px;
   height: 67.5px;
   border-radius: 10px;
@@ -616,7 +719,7 @@ export default {
   padding-top: 10px;
   padding-left: 15px;
 }
-.maskLi .maskList span{
+.maskLi .maskList span {
   float: left;
   width: 79px;
   height: 24px;
@@ -660,12 +763,12 @@ export default {
   text-align: center;
   margin: 0 auto;
 }
-.automaticBox{
+.automaticBox {
   width: 690rpx;
   padding: 0 30rpx;
   position: absolute;
   left: 0;
-  top: 410rpx;
+  top: 420rpx;
   height: 100%;
   overflow-y: auto;
 }
@@ -765,7 +868,7 @@ export default {
   margin-left: 100rpx;
   text-align: center;
 }
-.delTips{
+.delTips {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -773,47 +876,47 @@ export default {
   top: 0;
   left: 0;
   z-index: 20;
-  background:rgba(51,51,61,.5);
+  background: rgba(51, 51, 61, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.deleteTips{
-  width:690rpx;
-  height:300rpx;
-  background:rgba(255,255,255,1);
-  box-shadow:0px 10rpx 30rpx 0px rgba(167,197,242,0.3);
-  border-radius:20rpx;
-  font-size:34rpx;
-  font-family:PingFang SC;
-  font-weight:bold;
-  color:rgba(33,33,33,1);
+.deleteTips {
+  width: 690rpx;
+  height: 300rpx;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 10rpx 30rpx 0px rgba(167, 197, 242, 0.3);
+  border-radius: 20rpx;
+  font-size: 34rpx;
+  font-family: PingFang SC;
+  font-weight: bold;
+  color: rgba(33, 33, 33, 1);
   text-align: center;
 }
-.deleteTips p{
+.deleteTips p {
   margin: 60rpx 0;
 }
-.delTipsBtn{
+.delTipsBtn {
   display: flex;
   justify-content: space-around;
   align-self: center;
-  font-size:34rpx;
-  font-family:PingFang SC;
-  font-weight:500;
+  font-size: 34rpx;
+  font-family: PingFang SC;
+  font-weight: 500;
   line-height: 86rpx;
 }
-.delTipsBtnL{
-  width:290rpx;
-  height:88rpx;
-  border:1rpx solid rgba(209,209,209,1);
-  border-radius:12rpx;
-  color:rgba(51,51,51,1);
+.delTipsBtnL {
+  width: 290rpx;
+  height: 88rpx;
+  border: 1rpx solid rgba(209, 209, 209, 1);
+  border-radius: 12rpx;
+  color: rgba(51, 51, 51, 1);
 }
-.delTipsBtnR{
-  width:290rpx;
-  height:88rpx;
-  background:rgba(51,111,255,1);
-  border-radius:12rpx;
-  color:rgba(255,255,255,1);
+.delTipsBtnR {
+  width: 290rpx;
+  height: 88rpx;
+  background: rgba(51, 111, 255, 1);
+  border-radius: 12rpx;
+  color: rgba(255, 255, 255, 1);
 }
 </style>

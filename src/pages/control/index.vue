@@ -78,7 +78,7 @@
       :class="{'isIphoneX-class': isIphoneX,'isIphoneX11-class': isIphoneX11}"
     >
       <div class="tabUl"></div>
-      <ul class="tabUl2" v-if="Tourist == '0'">
+      <ul class="tabUl2">
         <li class="equipmentList" v-for="(item,index) in deciveItems" :key="index">
           <img class="equipmentImg" :src="'https://krjrobot.cn/krjrobot/img/mini/' + item.url" alt />
           <p class="equipmentTitle" @click="changeBtn(item.localId,index)">{{item.name}}</p>
@@ -132,9 +132,11 @@
           </div>
         </li> -->
       </ul>
-      <div class="Tourist" v-if="Tourist == '1'">
-        <img src="../../../static/images/tips.png" alt />
-        <span>体验账号无设备控制权限</span>
+      <div class="Tourist" v-if="Tourist == '1'" @click="Touristips()">
+        <div class="tipsBox" v-if="tipsBox">
+          <img src="../../../static/images/tips.png" alt />
+          <span>体验账号无设备控制权限</span>
+        </div>
       </div>
     </div>
 
@@ -176,6 +178,8 @@ export default {
       localId:'',//设备修改名字localId
       controlIndex:'',//设备修改index
       greenhouseDevise:'',
+      tipsBox:false,//是否显示体验者提示框
+      count: '',// 倒计时
     };
   },
   created: function() {
@@ -184,13 +188,33 @@ export default {
   },
   mounted() {
     this.projectId = wx.getStorageSync('projectId')
-    this.homePage();
     this.Tourist = wx.getStorageSync('Tourist')
+    this.homePage();
     if (this.visible1 != false) {
       this.visible1 = false;
     }
   },
   methods: {
+    //2秒后提示框消失
+    goChoicePeople() {
+      const TIME_COUNT = 2
+      if (!this.timer) {
+        this.count = TIME_COUNT
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--
+          } else {
+            clearInterval(this.timer)
+            this.timer = null
+            this.tipsBox = false;
+          }
+        }, 1000)
+      }
+    },
+    Touristips(){//体验模式提示
+      this.tipsBox = true;
+      this.goChoicePeople()
+    },
     //显示改名弹框
     changeBtn(localId,index){
       this.localId = localId;
@@ -678,8 +702,20 @@ export default {
   width: 38rpx;
   height: 50rpx;
 }
+/* 体验模式 */
 .Tourist {
-  margin: 70px 0 0 42.5px;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.tipsBox {
   width: 260px;
   height: 53px;
   background: rgba(119, 119, 119, 1);
@@ -687,19 +723,21 @@ export default {
   text-align: center;
   padding-top: 18px;
 }
-.Tourist img {
+.tipsBox img {
   width: 17px;
   height: 17px;
   margin-right: 15px;
   vertical-align: middle;
 }
-.Tourist span {
+.tipsBox span {
   font-size: 17px;
   font-family: PingFang SC;
   font-weight: 500;
   color: rgba(255, 255, 255, 1);
   vertical-align: middle;
 }
+
+
 .mask {
   position: fixed;
   top: 0;
