@@ -19,11 +19,14 @@
             <li class="taskTilte">开始时间:</li>
             <picker mode="multiSelector" @change="startTimefun" :value="startIndexTime" :range="newMultiArray">
               <span>{{startTime}}</span>
-              <img class="userDown" src="../../../static/images/down.png" alt="">
+              <img class="userDown" src="../../../static/images/rightIcon.png" alt="">
             </picker>
             <li class="taskTilte">执行类型:</li>
             <li class="perBox">
-              <span class="perType" @click="oneExecute">单次执行</span>
+              <span class="perType" :class="{'active':isActive}" @click="oneExecute">
+                单次执行
+                <img v-show="isActive" class="checkIcon" src="../../../static/images/checkIcon.png" alt="">
+              </span>
               <picker @change="bindPickerChange" :value="pickerindex" :range="array">
                 <span class="perType">{{perName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
               </picker>
@@ -38,7 +41,7 @@
                 <span class="perType moveType">{{equipmentName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
               </picker>
               <picker @change="startAction" :value="startIndex" :range="startarray">
-                <span class="perType">{{startperName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
+                <span class="perType moveType">{{startperName}}<img class="repDown" src="../../../static/images/down.png" alt=""></span>
               </picker>
             </li>
           </ul>
@@ -51,7 +54,7 @@
             <li class="taskTilte">结束时间:</li>
             <picker mode="multiSelector" @change="overTimefun" :value="overIndexTime" :range="newMultiArray">
               <span>{{overTime}}</span>
-              <img class="userDown" src="../../../static/images/down.png" alt="">
+              <img class="userDown" src="../../../static/images/rightIcon.png" alt="">
             </picker>
             <li class="taskTilte">动作:</li>
             <li class="perBox">
@@ -101,7 +104,7 @@ export default {
       day:'',
       hour:'',
       minute:'',
-      perName:'重复执行', //动作初始化
+      perName:'永不', //动作初始化
       startperName:'关闭',
       overperName:'关闭',
       pickerindex:0, //动作下标初始化
@@ -115,7 +118,8 @@ export default {
       input:'',
       localId:'',
       equipmentName:'',
-      isRepeat:true, //是否重复 默认否
+      isActive:true,
+      isRepeat:false, //是否重复 默认否
     }
   },
   computed: {
@@ -169,7 +173,6 @@ export default {
         this.screenHeight = res.screenHeight;
       }
     });
-    this.dateOne = this.$httpWX.formatTime();
   },
   watch: {
     '$store.state.localId': function (newVal) {
@@ -211,6 +214,14 @@ export default {
     bindPickerChange(e) {
       this.pickerindex = e.target.value
       this.perName = this.array[this.pickerindex];
+      switch(this.perName){
+        case "永不":
+            this.isActive = true;
+            break;
+        default:
+            this.isActive = false;
+            break;
+      }
     },
     // 选择开始动作
     startAction(e){
@@ -228,9 +239,9 @@ export default {
       this.localId = this.equipmentarray[this.equipmentIndex].localId;
       this.equipmentName = this.equipmentarray[this.equipmentIndex].typeName;
     },
-    oneExecute(){
-      this.isRepeat = false;
-    },
+    // oneExecute(){
+    //   this.isRepeat = false;
+    // },
     // 保存
     savePage(){
 
@@ -238,56 +249,66 @@ export default {
       let overPage;
       let perPage;
 
-      if (this.startperName == "关闭" && this.overperName == "关闭") {
-        this.$httpWX.showErrorToast('动作重复')
-      } else if (this.startperName == "开启" && this.overperName == "开启") {
-        this.$httpWX.showErrorToast('动作重复')
+      if (this.input == '') {
+        this.$httpWX.showErrorToast('请填写任务名称');
+      } else if (this.formattingstartTime == '') {
+        this.$httpWX.showErrorToast('请选择开始时间');
+      } else if (this.formattingoverTime == '') {
+        this.$httpWX.showErrorToast('请选择结束时间');
       } else {
-        switch(this.perName){
-          case "永不":
-              perPage = "0";
-              this.isRepeat = false;
-              break;
-          case "每天":
-              perPage = "1";
-              break;
-          case "每两天":
-              perPage = "2";
-              break;
-          case "每三天":
-              perPage = "3";
-              break;
-          default:
-              perPage = "5";
-              break;
+        if (this.startperName == "关闭" && this.overperName == "关闭") {
+          this.$httpWX.showErrorToast('动作重复')
+        } else if (this.startperName == "开启" && this.overperName == "开启") {
+          this.$httpWX.showErrorToast('动作重复')
+        } else {
+          switch(this.perName){
+            case "永不":
+                perPage = "0";
+                this.isRepeat = false;
+                break;
+            case "每天":
+                perPage = "1";
+                break;
+            case "每两天":
+                perPage = "2";
+                break;
+            case "每三天":
+                perPage = "3";
+                break;
+            default:
+                perPage = "5";
+                break;
+          }
+          startPage = this.startperName == "开启"? "OPEN" : "CLOSE" ;
+          overPage = this.overperName == "关闭"? "CLOSE" : "OPEN" ;
+          this.$httpWX.post({
+            url: '/miniProgram/scheduleControl',
+            data: {
+              localId : this.localId, //唯一ID
+              name : this.input, //定时任务名称
+              startTime : this.formattingstartTime, //开始时间
+              endTime : this.formattingoverTime, //结束时间
+              action : startPage, //开启动作
+              endAction : overPage, //结束动作
+              period : perPage, //周期
+              isRepeat : this.isRepeat, //是否重复
+            }
+          }).then(res => {
+            let data = res.data;
+            console.log(res)
+            if (res.status == "001001") {
+              this.$httpWX.showErrorToast(res.msg);
+            } else {
+              this.$store.commit('setlocalId',this.localId);
+              console.log(this.dateOne);
+              let dateOne = Date.parse(new Date());
+              this.$store.commit('setaddTimingFlag',dateOne);
+              wx.navigateBack({
+                delta: 1
+              })
+            }
+          })
         }
-        startPage = this.startperName == "开启"? "OPEN" : "CLOSE" ;
-        overPage = this.overperName == "关闭"? "CLOSE" : "OPEN" ;
-        this.$httpWX.post({
-          url: '/miniProgram/scheduleControl',
-          data: {
-            localId : this.localId, //唯一ID
-            name : this.input, //定时任务名称
-            startTime : this.formattingstartTime, //开始时间
-            endTime : this.formattingoverTime, //结束时间
-            action : startPage, //开启动作
-            endAction : overPage, //结束动作
-            period : perPage, //周期
-            isRepeat : this.isRepeat, //是否重复
-          }
-        }).then(res => {
-          let data = res.data;
-          console.log(res)
-          if (res.status == "001001") {
-            this.$httpWX.showErrorToast(res.msg);
-          } else {
-            this.$store.commit('setlocalId',this.localId);
-            this.$store.commit('setaddTimingFlag',this.input);
-            wx.navigateBack({
-              delta: 1
-            })
-          }
-        })
       }
     },
   }
@@ -363,10 +384,10 @@ picker{
   margin-bottom: 15px;
 }
 .userDown{
-  width: 12px;
-  height: 6.5px;
+  width: 6.55px;
+  height: 11.7px;
   float: right;
-  margin: 7.5px 0;
+  margin: 5px 0;
 }
 .perBox{
   overflow: hidden;
@@ -391,6 +412,9 @@ picker{
   border-radius:4px;
   position: relative;
 }
+.perBox .active{
+  border:1px solid #3370FF;
+}
 .perBox .moveType{
   text-align: left;
   text-indent: 5px;
@@ -400,5 +424,12 @@ picker{
 }
 .equipmentFlot{
   float: left;
+}
+.checkIcon{
+  width: 15px;
+  height: 15.5px;
+  position: absolute;
+  right: 0;
+  bottom: 0
 }
 </style>

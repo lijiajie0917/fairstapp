@@ -5,6 +5,7 @@
       <li @click='showModal'>
         <span class="liTitle">设备名称：</span>
         <span class="devicename">{{videoName}}</span>
+        <img class="rightIcon" src="../../../../static/images/rightIcon.png" alt="">
       </li>
       <li>
         <span class="liTitle">序列号：</span>
@@ -81,18 +82,6 @@ export default {
         this.$store.commit('setdeviceName',this.input + "!@#$%^&");
       })
     },
-    // 获取摄像头详情
-    // deviceInfo(){
-    //   this.$httpWX.get({
-    //     url: '/ys/device/info',
-    //     data: {
-    //       deviceSerial: this.num
-    //     }
-    //   }).then(res => {
-    //     var data = res;
-    //     console.log(data);
-    //   })
-    // },
     // 取消修改回调
     modelcancel(e) {
       this.deviceModal = true;
@@ -116,6 +105,7 @@ export default {
   height: 55px;
   line-height: 55px;
   font-size: 16px;
+  position: relative;
 }
 .equipmentInfor li:last-child{
   border: none;
@@ -147,9 +137,17 @@ export default {
   height: 100%;
 }
 .devicename{
-  width: 216px;
+  width: 192px;
   overflow: auto;
   white-space: nowrap;
   text-align: right;
+  margin-right: 24px;
+}
+.rightIcon{
+  width: 8px;
+  height: 14.5px;
+  position: absolute;
+  right: 0;
+  top: 21px;
 }
 </style>

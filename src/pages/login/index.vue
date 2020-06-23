@@ -215,13 +215,13 @@ export default {
   height: 46.5px;
   line-height: 46.5px;
   border: none;
-  background: #0057FF;
+  background: #D0D0D0;
   border-radius: 50px;
   color: #fff;
   margin-bottom: 28px;
 }
 .formBox .active{
-  color: #fff;
+  background: #0057FF;
 }
 footer{
   color: #999999;

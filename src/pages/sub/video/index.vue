@@ -11,16 +11,16 @@
     >
     </video>
     <div class="controlBtn">
-      <div class="quartercircle divLeft" @longpress="Change(2)" @touchend="stopMove(2)">
+      <div class="quartercircle divLeft" @longpress="Change(2)" @touchend="stopMove(2)" @click="clickChange(2)">
         <img src="../../../../static/images/controlUp.png" alt="">
       </div>
-      <div class="quartercircle divTop" @longpress="Change(0)" @touchend="stopMove(0)">
+      <div class="quartercircle divTop" @longpress="Change(0)" @touchend="stopMove(0)" @click="clickChange(0)">
         <img class="styleAge" src="../../../../static/images/controlRight.png" alt="">
       </div>
-      <div class="quartercircle divRight" @longpress="Change(3)" @touchend="stopMove(3)">
+      <div class="quartercircle divRight" @longpress="Change(3)" @touchend="stopMove(3)" @click="clickChange(3)">
         <img src="../../../../static/images/controlDown.png" alt="">
       </div>
-      <div class="quartercircle divBottom" @longpress="Change(1)" @touchend="stopMove(1)">
+      <div class="quartercircle divBottom" @longpress="Change(1)" @touchend="stopMove(1)" @click="clickChange(1)">
         <img class="styleAge" src="../../../../static/images/controlLeft.png" alt="">
       </div>
     </div>
@@ -62,38 +62,43 @@ export default {
         var data = res.data;
         console.log(data);
         this.channelNo = data.channelNo;
-        this.videoUrl = data.liveAddress;
+        this.videoUrl = data.hdAddress;
       })
     },
     // 控制摄像头转动
-    // Change(direction){
-    //   console.log("开始动作！" + direction);
-    //   this.$httpWX.post({
-    //     url: '/ys/ptz/start',
-    //     data: {
-    //       deviceSerial : this.num,
-    //       channelNo : ,
-    //       direction : direction,
-    //       // speed : ,
-    //     }
-    //   }).then(res => {
-    //     var data = res.data;
-    //     console.log(res);
-    //   })
-    // },
-    // stopMove(direction){
-    //   console.log("动作结束！" + direction);
-    //   this.$httpWX.post({
-    //     url: '/ys/ptz/stop',
-    //     data: {
-    //       deviceSerial : this.num,
-    //       channelNo : ,
-    //     }
-    //   }).then(res => {
-    //     var data = res.data;
-    //     console.log(res);
-    //   })
-    // },
+    Change(direction){
+      console.log("开始动作！" + direction);
+      this.startChange(direction);
+    },
+    startChange(direction){
+      this.$httpWX.post({
+        url: '/ys/ptz/start',
+        data: {
+          deviceSerial : this.num,
+          channelNo : this.channelNo,
+          direction : direction,
+          // speed : ,
+        }
+      }).then(res => {
+        var data = res.data;
+      })
+    },
+    stopMove(direction){
+      console.log("动作结束！" + direction);
+      this.$httpWX.post({
+        url: '/ys/ptz/stop',
+        data: {
+          deviceSerial : this.num,
+          channelNo : this.channelNo,
+        }
+      }).then(res => {
+        var data = res.data;
+      })
+    },
+    // 单次点击
+    clickChange(direction){
+      this.startChange(direction)
+    },
   }
 };
 </script>
