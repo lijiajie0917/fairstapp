@@ -179,9 +179,13 @@ export default {
     this.homePage();
   },
   onShow: function() {
+    console.log("onShow",this.isGetItem)
     if(this.isGetItem == true){
+      // console.log("11",this.isGetItem)
       this.deciveItems = [];
       this.getList(this.wsbId);
+    }else{
+      this.deciveItems = [];
     }
   },
   methods: {
@@ -207,7 +211,6 @@ export default {
     },
     //显示删除弹框
     delBtn(isHight, id) {
-      // console.log(isHight, id);
       this.isHight = isHight;
       this.delId = id;
       this.delTips = true;
@@ -514,10 +517,10 @@ export default {
   width: 100%;
   overflow: hidden;
   position: fixed;
+  z-index: 999;
   background: rgba(0, 0, 0, 0);
   top: 0;
   left: 0;
-  z-index: 10;
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.2);
   display: flex;
   justify-content: center;
@@ -570,7 +573,7 @@ export default {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 999;
+  z-index: 900;
   display: flex;
   justify-content: center;
   align-items: center;

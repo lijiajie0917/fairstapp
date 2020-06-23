@@ -479,7 +479,7 @@ export default {
   background: rgba(0, 0, 0, 0);
   top: 0;
   left: 0;
-  z-index: 10;
+  z-index: 999;
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.2);
   display: flex;
   justify-content: center;
@@ -710,7 +710,7 @@ export default {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 999;
+  z-index: 900;
   display: flex;
   justify-content: center;
   align-items: center;
