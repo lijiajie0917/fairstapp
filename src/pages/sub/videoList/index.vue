@@ -7,6 +7,7 @@
         <p class="videoName">{{item.deviceName}}</p>
         <p class="number">{{item.deviceSerial}}</p>
         <span class="details" @click="videoDetails(item.deviceName,item.deviceSerial,item.deviceVersion)">详情</span>
+        <img class="rightIcon" src="../../../../static/images/rightIcon.png" alt="">
       </div>
     </div>
   </div>
@@ -25,32 +26,53 @@ export default {
       title:'视频监控',
       navH:this.$store.state.navH,
       videoList:[],
+      Tourist:'',
     }
   },
   created(){
     wx.hideShareMenu();//禁止出现转发按钮
   },
+  watch: {
+    '$store.state.deviceName': function (newVal) {
+      this.getvideoList();
+    }
+  },
   mounted(){
-    this.$httpWX.get({
-      url: '/ys/device/list'
-    }).then(res => {
-      var data = res.data;
-      this.videoList = data;
-      console.log(data);
-    })
+    this.getvideoList();
+    this.Tourist = wx.getStorageSync('Tourist')
   },
   methods:{
+    // 体验账号
+    TouristAlert(){
+      this.$httpWX.showErrorToast('体验账号无控制权限')
+    },
+    getvideoList(){
+      this.$httpWX.get({
+        url: '/ys/device/list'
+      }).then(res => {
+        var data = res.data;
+        this.videoList = data;
+      })
+    },
     // 跳转视频监控页面
     video(videoName,num){
-      wx.navigateTo({
-        url: '/pages/sub/video/main?num='+num+'&videoName='+videoName,
-      })
+      if (this.Tourist == "1") {
+        this.TouristAlert();
+      } else {
+        wx.navigateTo({
+          url: '/pages/sub/video/main?num='+num+'&videoName='+videoName,
+        })
+      }
     },
     // 跳转设备信息详情
     videoDetails(videoName,num,Version){
-      wx.navigateTo({
-        url: '/pages/sub/videoDetails/main?num='+num+'&videoName='+videoName+'&Version='+Version,
-      })
+      if (this.Tourist == "1") {
+        this.TouristAlert();
+      } else {
+        wx.navigateTo({
+          url: '/pages/sub/videoDetails/main?num='+num+'&videoName='+videoName+'&Version='+Version,
+        })
+      }
     }
   }
 };
@@ -97,5 +119,12 @@ export default {
   position: fixed;
   width:100%;
   height: 100%;
+}
+.rightIcon{
+  width: 8px;
+  height: 14.5px;
+  position: absolute;
+  right: 20px;
+  top: 36px;
 }
 </style>

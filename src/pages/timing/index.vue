@@ -20,8 +20,8 @@
                 timedTaskList.actions[0].startTime,
                 timedTaskList.isRepeat,
                 timedTaskList.actions[0].action,
-                timedTaskList.actions[1].endTime,
-                timedTaskList.actions[1].endAction,
+                timedTaskList.actions[1].startTime,
+                timedTaskList.actions[1].action,
                 )"
               slot="footer"
             >
@@ -33,8 +33,14 @@
           <ul class="taskUi" v-for="(item2,index2) in timedTaskList.actions" :key="index2">
             <li class="taskTilte">{{item2.action == "OPEN"? "任务开启":"任务结束"}}</li>
             <li>{{item2.action == "OPEN"? "开始":"结束"}}时间 <span>{{item2.startTime}}</span> </li>
-            <li v-show="item2.action == 'OPEN'? true:false ">执行类型 <span>{{timedTaskList.period}}</span> </li>
-            <li v-show="item2.action == 'OPEN'? true:false ">是否重复 <span>{{timedTaskList.isRepeat}}</span> </li>
+            <li v-show="item2.action == 'OPEN'? true:false ">执行类型
+              <span>{{
+                  timedTaskList.period == '0'? '永不':timedTaskList.period == '1'? '每天':
+                  timedTaskList.period == '2'? '每两天':timedTaskList.period == '3'? '每三天' :
+                  '每周'
+                }}</span>
+            </li>
+            <li v-show="item2.action == 'OPEN'? true:false ">是否重复 <span>{{timedTaskList.isRepeat == true? '是' : '否'}}</span> </li>
             <li>动作 <span>{{item2.action == "OPEN"? "开启":"关闭"}}——{{equipmentName}}</span> </li>
           </ul>
         </li>
@@ -72,6 +78,7 @@ export default {
       localId:'',
       equipmentName:'',
       timedTaskShow:false,
+      Tourist:'',
     }
   },
   created:function(){
@@ -96,11 +103,17 @@ export default {
   },
   mounted(){
     this.projectId = this.$store.state.projectId;
+    this.localId = this.$store.state.localId;
+    this.Tourist = wx.getStorageSync('Tourist')
     setTimeout(()=>{
-      this.scheduleControl(this.$store.state.localId);
+      this.scheduleControl(this.localId);
     },500);
   },
   methods:{
+    // 体验账号
+    TouristAlert(){
+      this.$httpWX.showErrorToast('体验账号无控制权限')
+    },
     // 获取定时任务列表
     scheduleControl(localId){
       this.$httpWX.get({
@@ -110,7 +123,6 @@ export default {
         }
       }).then(res => {
         let data = res.data;
-        console.log(res)
         if (data.actions.length == 0) {
           this.timedTaskShow = false;
         } else {
@@ -121,54 +133,66 @@ export default {
     },
     // 定时任务开关操作
     onChange(switch1,localId,name,startTime,isRepeat,action,endTime,endAction){
-      // console.log(switch1);
-      var switchflg = !switch1;
-      var cmd = switch1;
-      if (cmd == false) {
-        cmd = 1;
+      if (this.Tourist == "1") {
+        this.TouristAlert();
       } else {
-        cmd = 0;
-      }
-      this.$httpWX.put({
-        url: '/miniProgram/scheduleControl',
-        data: {
-          localId : localId,
-          name : name,
-          startTime : startTime,
-          isRepeat : isRepeat,
-          action : action,
-          endTime : endTime,
-          endAction : endAction,
-          isOpen : cmd,
+        var switchflg = !switch1;
+        var cmd = switch1;
+        if (cmd == false) {
+          cmd = 1;
+        } else {
+          cmd = 0;
         }
-      }).then(res => {
-        console.log(res)
-        // this.switch1 = switchflg;
-      })
-    },
-    // 删除定时任务
-    delTask(localId,name){
-      let confirm = ()=>{
-        this.$httpWX.post({
-          url: '/miniProgram/del/scheduleControl',
+        this.$httpWX.put({
+          url: '/miniProgram/scheduleControl',
           data: {
             localId : localId,
+            name : name,
+            startTime : startTime,
+            isRepeat : isRepeat,
+            action : action,
+            endTime : endTime,
+            endAction : endAction,
+            isOpen : cmd,
           }
         }).then(res => {
-          let data = res.data;
-          console.log(res)
           if (res.status == "200") {
-            this.$httpWX.showSuccessToast('删除成功')
-            this.scheduleControl(this.localId);
+            this.scheduleControl(localId);
           }
         })
       }
-      this.$httpWX.alert('提示','确定删除"' + name + '"吗？',confirm,true);
+    },
+    // 删除定时任务
+    delTask(localId,name){
+      if (this.Tourist == "1") {
+        this.TouristAlert();
+      } else {
+        let confirm = ()=>{
+          this.$httpWX.post({
+            url: '/miniProgram/del/scheduleControl',
+            data: {
+              localId : localId,
+            }
+          }).then(res => {
+            let data = res.data;
+            if (res.status == "200") {
+              this.$httpWX.showSuccessToast('删除成功')
+              this.scheduleControl(this.localId);
+            }
+          })
+        }
+        this.$httpWX.alert('提示','确定删除"' + name + '"吗？',confirm,true);
+      }
     },
     goaddTiming(){
-      wx.navigateTo({
-        url: '/pages/addtiming/main',
-      })
+
+      if (this.Tourist == "1") {
+        this.TouristAlert();
+      } else {
+        wx.navigateTo({
+          url: '/pages/addtiming/main',
+        })
+      }
     }
   }
 }
