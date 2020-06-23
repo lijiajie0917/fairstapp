@@ -80,18 +80,15 @@ export default {
         projectId:'',
         equipmentName:'', //控制设备名字
         localId:'', //控制设备唯一ID
-        Tourist:'',
       };
     },
     created:function(){
       wx.hideShareMenu(); //禁止出现转发按钮
-      this.Tourist = wx.getStorageSync('Tourist')
       this.projectId = wx.getStorageSync('projectId')
       this.homePage(); //请求下拉框数据
     },
     mounted() {
       // this.projectId = this.$store.state.projectId;
-
       if (this.visible1 != false) {
         this.visible1 = false;
       }
@@ -203,7 +200,7 @@ export default {
       },
       // 选择大棚
       areaClick(area,greenhouseId,greenhouse) {
-        if (this.Tourist == "1") {
+        if (wx.getStorageSync('Tourist') == "1") {
           this.TouristAlert();
         } else {
           if (this.navTitle == '定时任务') {
@@ -216,7 +213,7 @@ export default {
       },
       // 获取选择设备列表
       handleOpen2(e) {
-        if (this.Tourist == "1") {
+        if (wx.getStorageSync('Tourist') == "1") {
           this.TouristAlert();
         } else {
           this.equipmentIndex = e.target.value;
