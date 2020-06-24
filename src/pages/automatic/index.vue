@@ -278,9 +278,9 @@ export default {
     },
     //关闭或开启该条任务
     onChange(i, localId, isOpen,isHight) {
-      // console.log(i, localId, isOpen);
+      console.log(i, localId, isOpen);
       let acTxt = "lowerWater";
-      if (this.isHight == true) {
+      if (isHight == true) {
         acTxt = "highWater";
       }
       this.$httpWX
@@ -288,7 +288,7 @@ export default {
           url: '/miniProgram/autoControl/ifOpen',
           data: {
             localId:localId,
-            isOpen:!isOpen,
+            open:!isOpen,
             config:acTxt
           }
         })
