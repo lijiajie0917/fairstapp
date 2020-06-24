@@ -174,7 +174,8 @@ export default {
       ], //关闭或开启
       gatewayId: "", //温室宝gatewayId
       nodeId: "", //温室宝nodeId
-      localId: "" //温室宝localId
+      localId: "", //温室宝localId
+      greenhouseId:"",//大鹏id
     };
   },
   created: function() {
@@ -183,16 +184,28 @@ export default {
   },
   mounted() {
     this.projectId = wx.getStorageSync("projectId");
-    this.getList();
   },
   onLoad(option) {
+    console.log("----",option)
+    this.greenhouseId = option.greenhouseId;
     this.gatewayId = option.gatewayId;
     this.nodeId = option.nodeId;
     this.localId = option.localId;
+    this.getList();
   },
   methods: {
     /**标题栏返回按钮 */
     navBack() {
+      this.maticName = "" //任务名称
+      this.maticNum = "" //限额数值
+      this.spanT1 =  "空气湿度" //七要素默认值
+      this.spanN1 = 0 //七要素index
+      this.spanT2 = "大于" //大于或小于默认值
+      this.spanN2 = 0 //大于或小于index
+      this.spanT3 = "" //设备列表默认值
+      this.spanN3 = 0 //设备列表index
+      this.spanT4 = "关闭" //关闭或开启默认值
+      this.spanN4 = 0 //关闭或开启index
       wx.navigateBack({
         delta: 1
       });
@@ -212,9 +225,10 @@ export default {
       //获取设备列表
       this.$httpWX
         .get({
-          url: "/miniProgram/controlNode",
+          url: "/miniProgram/autoControl/controlNode",
           data: {
-            greenhouseId: 123
+            greenhouseId: this.greenhouseId,
+            localId: this.localId
           }
         })
         .then(res => {
@@ -283,12 +297,17 @@ export default {
           url: "/miniProgram/autoControl",
           data: submitData
         })
+        // .get({
+        //   url:"/miniProgram/autoControl/controlNode",
+        //   data:{
+        //     localId: this.localId,
+        //     greenhouseId:this.gatewayId,
+        //   }
+        // })
         .then(res => {
           console.log("保存", res);
           if(res.status == '200'){
-            wx.navigateBack({
-              delta: 1
-            });
+            this.navBack()//创建任务成功后返回上一页
           }else{
             wx.showToast({
               title: res.msg,
