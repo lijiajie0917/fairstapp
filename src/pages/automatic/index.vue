@@ -177,6 +177,7 @@ export default {
   mounted() {
     this.projectId = wx.getStorageSync("projectId");//获取项目id
     this.Tourist = wx.getStorageSync('Tourist')//获取是否为体验者模式
+    this.deciveItems = [];
     this.homePage();
   },
   onShow: function() {
