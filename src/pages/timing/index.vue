@@ -221,7 +221,7 @@ export default {
 }
 .timedTaskList{
   width: 305px;
-  height: 340px;
+  height: 360px;
   background: #fff;
   border-radius: 10px;
   margin: 0 0 15px 15px;
