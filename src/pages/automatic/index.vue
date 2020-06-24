@@ -175,21 +175,18 @@ export default {
     this.getHeight();
   },
   mounted() {
+    console.log("mounted",this.isGetItem)
     this.projectId = wx.getStorageSync("projectId");//获取项目id
     this.Tourist = wx.getStorageSync('Tourist')//获取是否为体验者模式
-    this.deciveItems = [];
-    this.homePage();
+    if(this.isGetItem == false){
+      this.homePage();
+    }
   },
   onShow: function() {
     console.log("onShow",this.isGetItem)
-    if(this.isGetItem == true){
-      // console.log("11",this.isGetItem)
-      this.deciveItems = [];
+    this.deciveItems = [];
       this.getList(this.wsbId);
-    }else{
-      this.deciveItems = [];
-    }
-  },
+    },
   methods: {
     //2秒后提示框消失
     goChoicePeople() {
