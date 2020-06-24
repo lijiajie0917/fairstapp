@@ -5,6 +5,7 @@ let dev = __wxConfig.envVersion; // 运行环境
 switch (dev)
 {
   case 'develop':
+    // host = 'http://enu65c.natappfree.cc/krjrobot'; // 测试环境
     host = 'https://dev.krjrobot.cn/krjrobot'; // 测试环境
     break;
   case 'trial':

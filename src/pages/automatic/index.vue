@@ -107,7 +107,7 @@
           <div class="automaticTxt">
             <div class="automaticItem">
               当
-              <div class="spanTxt1">{{item.Wfield}}</div>大于
+              <div class="spanTxt1">{{item.Wfield}}</div>{{item.isHight?'小于':'大于'}}
               <div class="spanTxt2">{{item.Wlimit}}</div>
             </div>
             <div class="automaticItem">
@@ -167,6 +167,7 @@ export default {
       delId: "", //删除设备的localId
       isHight: false, //删除设备是否高水位
       isGetItem:false,//是否执行onShow周期中的函数
+      changewsbId:'',//切换温室宝添加任务成功后跳回显示当前选择的温室宝
     };
   },
   created: function() {
@@ -225,7 +226,7 @@ export default {
     trueDel() {
       let acTxt = "lowerWater";
       if (this.isHight == true) {
-        acTxt = "highWater";
+        acTxt = "highWather";
       }
       // console.log(acTxt);
       this.$httpWX
@@ -240,9 +241,10 @@ export default {
           // console.log("删除", res);
           if(res.status == '200'){
             this.delTips = false;
-            this.deciveItems[i].remove();
             this.isHight = false;
             this.delId = "";
+            this.deciveItems = [];
+            this.getList(this.wsbId);
           }else{
             wx.showToast({
               title: res.msg,
@@ -255,6 +257,8 @@ export default {
     },
     /**标题栏返回按钮 */
     navBack() {
+      this.changewsbId = '';
+      this.wsbIndex = ''
       this.isGetItem = false;
       wx.navigateBack({
         delta: 1
@@ -395,22 +399,22 @@ export default {
               }
             ];
             for (let i in data) {
-              if (data[i].rule.lowWater.action == "OPEN") {
-                data[i].rule.lowWater.action = "开启";
-              } else {
-                data[i].rule.lowWater.action = "关闭";
-              }
-              for (let j in spanTxt1) {
-                if (spanTxt1[j].name == data[i].rule.field) {
-                  data[i].rule.field = spanTxt1[j].localId;
-                  data[i].rule.lowWater.limit =
-                    data[i].rule.lowWater.limit + spanTxt1[j].company;
-                }
-              }
               if (
                 data[i].rule.highWater == null ||
                 data[i].rule.highWater == "null"
               ) {
+                if (data[i].rule.lowWater.action == "OPEN") {
+                  data[i].rule.lowWater.action = "开启";
+                } else {
+                  data[i].rule.lowWater.action = "关闭";
+                }
+                for (let j in spanTxt1) {
+                  if (spanTxt1[j].name == data[i].rule.field) {
+                    data[i].rule.field = spanTxt1[j].localId;
+                    data[i].rule.lowWater.limit =
+                      data[i].rule.lowWater.limit + spanTxt1[j].company;
+                  }
+                }
                 data[i] = {
                   isHight: false,
                   frequency: data[i].frequency,
@@ -431,6 +435,18 @@ export default {
                   version: data[i].version
                 };
               } else {
+                if (data[i].rule.highWater.action == "OPEN") {
+                  data[i].rule.highWater.action = "开启";
+                } else {
+                  data[i].rule.highWater.action = "关闭";
+                }
+                for (let j in spanTxt1) {
+                  if (spanTxt1[j].name == data[i].rule.field) {
+                    data[i].rule.field = spanTxt1[j].localId;
+                    data[i].rule.highWater.limit =
+                      data[i].rule.highWater.limit + spanTxt1[j].company;
+                  }
+                }
                 data[i] = {
                   isHight: true,
                   frequency: data[i].frequency,
@@ -462,13 +478,16 @@ export default {
     },
     /**跳转添加自动任务页 */
     addmatic() {
-      // console.log(11111)
+      console.log(this.wsbIndex)
+      this.changewsbId = this.wsbIndex;
       this.isGetItem = true;
       wx.navigateTo({
         url:
           `/pages/addAutomatic/main` +
           `?gatewayId=` +
           this.wsbList[this.wsbIndex].gatewayId +
+          `&greenhouseId=` +
+          this.greenhouseId +
           `&nodeId=` +
           this.wsbList[this.wsbIndex].nodeId +
           `&localId=` +
@@ -490,7 +509,15 @@ export default {
     closeMask() {
       this.visible1 = false;
       this.downImage = true;
-    }
+    },
+    areaClick(area,greenhouseId,greenhouse) {
+      console.log(area,greenhouseId,greenhouse)
+      this.deciveItems = [];
+      this.greenhouseDevise = greenhouseId;
+      this.realTimeData(this.projectId, area,greenhouseId)
+      // this.controlNode(greenhouseId,this.equipment);
+      this.visible1 = false;
+    },
   }
 };
 </script>
