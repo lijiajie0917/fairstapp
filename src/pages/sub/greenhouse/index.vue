@@ -87,7 +87,7 @@
                 <img class="userDown" src="../../../../static/images/down.png" alt="">
               </view>
             </picker>
-            <div class="echarts-wrap" :style="{height: (screenHeight/2.7 + 'px')}">
+            <div v-show="echartsShow" class="echarts-wrap" :style="{height: (screenHeight/2.7 + 'px')}">
               <mpvue-echarts :echarts="echarts" :onInit="dataEcharts" canvasId="demo-canvas" />
             </div>
         </li>
@@ -128,6 +128,7 @@ export default {
       equipmentItems2: [], //设备列表初始化
       equipment: "-", //默认设备名字
       informShow:true,
+      echartsShow:true,
 
       echarts,
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
@@ -270,7 +271,9 @@ export default {
         var data = res.data.data;
         if (data.length == 0) {
           this.$httpWX.showErrorToast('暂无数据')
+          this.echartsShow = false;
         } else {
+          this.echartsShow = true;
           var frequency = (60/res.data.frequency)-1;
           this.timeAge = [];
           this.dataAge = [];
