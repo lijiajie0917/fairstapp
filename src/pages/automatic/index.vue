@@ -185,8 +185,9 @@ export default {
   onShow: function() {
     console.log("onShow",this.isGetItem)
     this.deciveItems = [];
-      this.getList(this.wsbId);
-    },
+    // this.realTimeData(this.projectId,this.areaText,this.greenhouseId);
+    this.getList(this.wsbId);
+  },
   methods: {
     //2秒后提示框消失
     goChoicePeople() {
@@ -359,6 +360,7 @@ export default {
           let data = res.data;
           if (data.length > 0) {
             this.kong = false;
+            this.deciveItems = [];
             let spanTxt1 = [
               {
                 localId: "空气湿度",
