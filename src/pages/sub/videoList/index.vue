@@ -9,6 +9,12 @@
         <span class="details" @click="videoDetails(item.deviceName,item.deviceSerial,item.deviceVersion)">详情</span>
         <img class="rightIcon" src="../../../../static/images/rightIcon.png" alt="">
       </div>
+      <div class="Tourist" v-if="Tourist == '1'" @click="Touristips()">
+        <div class="tipsBox" v-if="tipsBox">
+          <img src="../../../../static/images/tips.png" alt />
+          <span>体验账号无设备控制权限</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -27,6 +33,8 @@ export default {
       navH:this.$store.state.navH,
       videoList:[],
       Tourist:'',
+      tipsBox:false,//是否显示体验者提示框
+      count: '',// 倒计时
     }
   },
   created(){
@@ -42,9 +50,25 @@ export default {
     this.Tourist = wx.getStorageSync('Tourist')
   },
   methods:{
-    // 体验账号
-    TouristAlert(){
-      this.$httpWX.showErrorToast('体验账号无控制权限')
+    //2秒后提示框消失
+    goChoicePeople() {
+      const TIME_COUNT = 2
+      if (!this.timer) {
+        this.count = TIME_COUNT
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--
+          } else {
+            clearInterval(this.timer)
+            this.timer = null
+            this.tipsBox = false;
+          }
+        }, 1000)
+      }
+    },
+    Touristips(){//体验模式提示
+      this.tipsBox = true;
+      this.goChoicePeople()
     },
     getvideoList(){
       this.$httpWX.get({
@@ -56,23 +80,15 @@ export default {
     },
     // 跳转视频监控页面
     video(videoName,num){
-      if (this.Tourist == "1") {
-        this.TouristAlert();
-      } else {
         wx.navigateTo({
           url: '/pages/sub/video/main?num='+num+'&videoName='+videoName,
         })
-      }
     },
     // 跳转设备信息详情
     videoDetails(videoName,num,Version){
-      if (this.Tourist == "1") {
-        this.TouristAlert();
-      } else {
         wx.navigateTo({
           url: '/pages/sub/videoDetails/main?num='+num+'&videoName='+videoName+'&Version='+Version,
         })
-      }
     }
   }
 };
@@ -126,5 +142,39 @@ export default {
   position: absolute;
   right: 20px;
   top: 36px;
+}
+/* 体验模式 */
+.Tourist {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.tipsBox {
+  width: 260px;
+  height: 53px;
+  background: rgba(119, 119, 119, 1);
+  border-radius: 4px;
+  text-align: center;
+  padding-top: 18px;
+}
+.tipsBox img {
+  width: 17px;
+  height: 17px;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+.tipsBox span {
+  font-size: 17px;
+  font-family: PingFang SC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  vertical-align: middle;
 }
 </style>
