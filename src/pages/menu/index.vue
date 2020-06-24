@@ -149,6 +149,8 @@ export default {
 .menu{
   padding: 20rpx 50rpx 0;
   background: #F3F5F8;
+  height: 100vh;
+  overflow: hidden;
 }
 .menuTitle{
   padding-top: 64rpx;
@@ -167,7 +169,7 @@ export default {
 .menuUl{
   padding-top: 60rpx;
   width: 650rpx;
-  height: 100%;
+  height: 1078rpx;
   display: flex;
   justify-content: space-between;
   flex-wrap:wrap;
