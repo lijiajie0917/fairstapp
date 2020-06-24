@@ -73,7 +73,7 @@ export default {
         downImage: true, //下拉样式初始化
         visible1: false, //片区弹窗初始化
         equipmentItems:[],
-        equipmentIndex:'',
+        equipmentIndex:0,
         equipmentItems2: [], //设备列表初始化
         controlNodeArray:[], //控制设备列表初始化
         equipment: "-", //默认设备名字
@@ -85,19 +85,15 @@ export default {
     created:function(){
       wx.hideShareMenu(); //禁止出现转发按钮
       this.projectId = wx.getStorageSync('projectId')
-      this.homePage(); //请求下拉框数据
     },
     mounted() {
       // this.projectId = this.$store.state.projectId;
+      this.homePage(); //请求下拉框数据
       if (this.visible1 != false) {
         this.visible1 = false;
       }
     },
     methods:{
-      // 体验账号
-      TouristAlert(){
-        this.$httpWX.showErrorToast('体验账号无控制权限')
-      },
       // 显示选择片区弹框
       handleOpen1() {
         this.visible1 = true;
@@ -200,36 +196,29 @@ export default {
       },
       // 选择大棚
       areaClick(area,greenhouseId,greenhouse) {
-        if (wx.getStorageSync('Tourist') == "1") {
-          this.TouristAlert();
+        if (this.navTitle == '定时任务') {
+          this.controlNode(greenhouseId)
         } else {
-          if (this.navTitle == '定时任务') {
-            this.controlNode(greenhouseId)
-          } else {
-            this.equipmentList(area,greenhouseId,greenhouse);
-          }
-          this.visible1 = false;
+          this.equipmentIndex = 0;
+          this.equipmentList(area,greenhouseId,greenhouse);
         }
+        this.visible1 = false;
       },
       // 获取选择设备列表
       handleOpen2(e) {
-        if (wx.getStorageSync('Tourist') == "1") {
-          this.TouristAlert();
+        this.equipmentIndex = e.target.value;
+        if (this.navTitle == '定时任务') {
+          this.equipmentName = this.controlNodeArray[e.target.value].typeName;
+          this.localId = this.controlNodeArray[e.target.value].localId;
+          // 改变全局默认控制设备唯一ID和名称
+          this.$store.commit('setlocalId',this.localId);
+          this.$store.commit('setequipmentName',this.equipmentName);
         } else {
-          this.equipmentIndex = e.target.value;
-          if (this.navTitle == '定时任务') {
-            this.equipmentName = this.controlNodeArray[e.target.value].typeName;
-            this.localId = this.controlNodeArray[e.target.value].localId;
-            // 改变全局默认控制设备唯一ID和名称
-            this.$store.commit('setlocalId',this.localId);
-            this.$store.commit('setequipmentName',this.equipmentName);
-          } else {
-            this.equipment = this.equipmentItems[e.target.value].nodeId;
-            this.gatewayId = this.equipmentItems[e.target.value].gatewayId;
-            // 改变全局设备名称和ID
-            this.$store.commit('setequipment',this.equipment);
-            this.$store.commit('setgatewayId',this.gatewayId);
-          }
+          this.equipment = this.equipmentItems[e.target.value].nodeId;
+          this.gatewayId = this.equipmentItems[e.target.value].gatewayId;
+          // 改变全局设备名称和ID
+          this.$store.commit('setequipment',this.equipment);
+          this.$store.commit('setgatewayId',this.gatewayId);
         }
       },
     }

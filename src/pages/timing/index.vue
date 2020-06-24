@@ -3,7 +3,6 @@
     <div class="timing" :style="{'margin-top':(navH)+'px'}">
       <TitleBar :navTitle="title"></TitleBar>
       <SelectOption :navTitle="title"></SelectOption>
-      <!-- <h1>{{localId}}</h1> -->
       <ul class="timedTask" :style="{
         'top':(navH+175)+'px',
         'height':isIphoneX||isIphoneX11?(screenHeight-350)+'px':(screenHeight-240)+'px'}"
@@ -49,6 +48,12 @@
         </div>
         <img class="AddBtn" @click="goaddTiming()" src="../../../static/images/addBtn.png" alt="">
       </ul>
+      <div class="Tourist" v-if="Tourist == '1'" @click="Touristips()">
+        <div class="tipsBox" v-if="tipsBox">
+          <img src="../../../static/images/tips.png" alt />
+          <span>体验账号无设备控制权限</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -79,6 +84,8 @@ export default {
       equipmentName:'',
       timedTaskShow:false,
       Tourist:'',
+      tipsBox:false,//是否显示体验者提示框
+      count: '',// 倒计时
     }
   },
   created:function(){
@@ -110,9 +117,25 @@ export default {
     },500);
   },
   methods:{
-    // 体验账号
-    TouristAlert(){
-      this.$httpWX.showErrorToast('体验账号无控制权限')
+    //2秒后提示框消失
+    goChoicePeople() {
+      const TIME_COUNT = 2
+      if (!this.timer) {
+        this.count = TIME_COUNT
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--
+          } else {
+            clearInterval(this.timer)
+            this.timer = null
+            this.tipsBox = false;
+          }
+        }, 1000)
+      }
+    },
+    Touristips(){//体验模式提示
+      this.tipsBox = true;
+      this.goChoicePeople()
     },
     // 获取定时任务列表
     scheduleControl(localId){
@@ -133,66 +156,53 @@ export default {
     },
     // 定时任务开关操作
     onChange(switch1,localId,name,startTime,isRepeat,action,endTime,endAction){
-      if (this.Tourist == "1") {
-        this.TouristAlert();
+      var switchflg = !switch1;
+      var cmd = switch1;
+      if (cmd == false) {
+        cmd = 1;
       } else {
-        var switchflg = !switch1;
-        var cmd = switch1;
-        if (cmd == false) {
-          cmd = 1;
-        } else {
-          cmd = 0;
-        }
-        this.$httpWX.put({
-          url: '/miniProgram/scheduleControl',
-          data: {
-            localId : localId,
-            name : name,
-            startTime : startTime,
-            isRepeat : isRepeat,
-            action : action,
-            endTime : endTime,
-            endAction : endAction,
-            isOpen : cmd,
-          }
-        }).then(res => {
-          if (res.status == "200") {
-            this.scheduleControl(localId);
-          }
-        })
+        cmd = 0;
       }
+      this.$httpWX.put({
+        url: '/miniProgram/scheduleControl',
+        data: {
+          localId : localId,
+          name : name,
+          startTime : startTime,
+          isRepeat : isRepeat,
+          action : action,
+          endTime : endTime,
+          endAction : endAction,
+          isOpen : cmd,
+        }
+      }).then(res => {
+        if (res.status == "200") {
+          this.scheduleControl(localId);
+        }
+      })
     },
     // 删除定时任务
     delTask(localId,name){
-      if (this.Tourist == "1") {
-        this.TouristAlert();
-      } else {
-        let confirm = ()=>{
-          this.$httpWX.post({
-            url: '/miniProgram/del/scheduleControl',
-            data: {
-              localId : localId,
-            }
-          }).then(res => {
-            let data = res.data;
-            if (res.status == "200") {
-              this.$httpWX.showSuccessToast('删除成功')
-              this.scheduleControl(this.localId);
-            }
-          })
-        }
-        this.$httpWX.alert('提示','确定删除"' + name + '"吗？',confirm,true);
+      let confirm = ()=>{
+        this.$httpWX.post({
+          url: '/miniProgram/del/scheduleControl',
+          data: {
+            localId : localId,
+          }
+        }).then(res => {
+          let data = res.data;
+          if (res.status == "200") {
+            this.$httpWX.showSuccessToast('删除成功')
+            this.scheduleControl(this.localId);
+          }
+        })
       }
+      this.$httpWX.alert('提示','确定删除"' + name + '"吗？',confirm,true);
     },
     goaddTiming(){
-
-      if (this.Tourist == "1") {
-        this.TouristAlert();
-      } else {
-        wx.navigateTo({
-          url: '/pages/addtiming/main',
-        })
-      }
+      wx.navigateTo({
+        url: '/pages/addtiming/main',
+      })
     }
   }
 }
@@ -276,5 +286,39 @@ export default {
   font-size: 16px;
   color: #333333;
   font-weight: bold;
+}
+/* 体验模式 */
+.Tourist {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.tipsBox {
+  width: 260px;
+  height: 53px;
+  background: rgba(119, 119, 119, 1);
+  border-radius: 4px;
+  text-align: center;
+  padding-top: 18px;
+}
+.tipsBox img {
+  width: 17px;
+  height: 17px;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+.tipsBox span {
+  font-size: 17px;
+  font-family: PingFang SC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  vertical-align: middle;
 }
 </style>

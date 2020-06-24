@@ -7,36 +7,32 @@
       'height':isIphoneX||isIphoneX11?(screenHeight-350)+'px':(screenHeight-240)+'px'}"
       >
         <li class="dataEcharts" :style="{height: (screenHeight/2.3 + 'px')}">
-            <p class="echartsTitle">空气温度</p>
+          <picker class="user"
+              @change="handlePickerChange"
+              :value="selectedIndex"
+              :range-key="'name'"
+              :range="myAnnual"
+            >
+              <view class="picker">
+                {{myAnnual[selectedIndex].name}}
+                <img class="userDown" src="../../../../static/images/down.png" alt="">
+              </view>
+            </picker>
             <picker class="user"
               mode="date"
-              :value="dateOne"
+              :value="date"
               start="2015-01-01"
               end="2030-09-01"
               @change="bindDateChangeOne"
             >
               <view class="picker">
-                {{timeOne}}
+                {{time}}
                 <img class="userDown" src="../../../../static/images/down.png" alt="">
               </view>
             </picker>
-          <mpvue-echarts :echarts="echarts" :onInit="dataEchartsOne" canvasId="demo-canvasOne" />
-        </li>
-        <li class="dataEcharts" :style="{height: (screenHeight/2.3 + 'px')}">
-          <p class="echartsTitle">空气湿度</p>
-          <picker class="user"
-            mode="date"
-            :value="dateTwo"
-            start="2015-01-01"
-            end="2030-09-01"
-            @change="bindDateChangeTwo"
-          >
-            <view class="picker">
-              {{timeTwo}}
-              <img class="userDown" src="../../../../static/images/down.png" alt="">
-            </view>
-          </picker>
-          <mpvue-echarts :echarts="echarts" :onInit="dataEchartsTwo" canvasId="demo-canvasTwo" />
+            <div class="echarts-wrap" :style="{height: (screenHeight/2.7 + 'px')}">
+              <mpvue-echarts :echarts="echarts" :onInit="dataEcharts" canvasId="demo-canvas" />
+            </div>
         </li>
     </ul>
   </div>
@@ -50,7 +46,7 @@ import SelectOption from "@/components/selectOption/index";
 import echarts from 'echarts'
 import mpvueEcharts from 'mpvue-echarts'
 
-let chart,chart1
+let chart
 
 export default {
   components: {
@@ -62,32 +58,33 @@ export default {
     return {
       title:'数据分析',
       navH:this.$store.state.navH,
-      equipmenta:'', //设备名称
-      gatewayIda:'', //设备ID
+      equipment:'', //设备名称
+      gatewayId:'', //设备ID
       projectId:'', //项目ID
 
       echarts,
       isIphoneX: this.globalData.isIphoneX, //适配iphonex
       isIphoneX11:this.globalData.isIphoneX11, //适配iphonex11
       time:'',
-      dateOne:'',
-      dateTwo:'',
-      timeOne:'',
-      timeTwo:'',
+      date:'',
       timeAge:[],
       dataAge:[],
       startLength:'',
-      myAnnual:[
-        {name:"空气温度",unit:"℃"},
-        {name:"空气湿度",unit:""},
-        {name:"光照度",unit:"lux"},
-        {name:"co2浓度",unit:"ppm"},
-        {name:"土壤温度",unit:"℃"},
-        {name:"土壤湿度",unit:""},
-        {name:"酸碱度",unit:"ph"},
+      myAnnual: [
+        {name : "空气温度" , key : "air_temperature",unit : "℃"},
+        {name : "空气湿度" , key : "air_humidity"},
+        {name : "光照度" , key : "lux",unit : "lux"},
+        {name : "co2浓度" , key : "CO2",unit : "ppm"},
+        {name : "土壤温度" , key : "soil_temperature",unit : "℃"},
+        {name : "土壤湿度" , key : "soil_humidity"},
+        {name : "酸碱度" , key : "ph"},
       ],
+      columnKey:'air_temperature',
+      columnName:'空气温度',
+      unitName:'℃',
       screenWidth:'',
       screenHeight:'',
+      selectedIndex: 0,
     }
   },
   created:function(){
@@ -98,68 +95,65 @@ export default {
         this.screenWidth = res.screenWidth;
       }
     });
-    this.dateOne = this.$httpWX.formatTime();
-    this.timeOne = this.$httpWX.formatTime();
-    this.dateTwo = this.$httpWX.formatTime();
-    this.timeTwo = this.$httpWX.formatTime();
   },
   watch: {
     '$store.state.equipment': function (newVal) {
-      this.equipmenta = newVal;
+      this.equipment = newVal;
+      this.date = this.$httpWX.formatTime();
+      this.time = this.$httpWX.formatTime();
+      this.selectedIndex = 0;
+      this.columnKey = "air_temperature";
+      this.columnName = '空气温度';
+      this.unitName = '℃';
+      this.echartsAjax(this.$store.state.gatewayId,this.equipment);
     },
     '$store.state.gatewayId': function (newVal) {
-      this.gatewayIda = newVal;
+      this.gatewayId = newVal;
     }
   },
   mounted(){
-    this.projectId = wx.getStorageSync('projectId')
+    setTimeout(()=>{
+      this.echartsAjax(this.$store.state.gatewayId,this.$store.state.equipment);
+    },200);
   },
   methods: {
-    dataEchartsOne(canvas){ //空气温度
+    dataEcharts(canvas,width,height){
       chart = echarts.init(canvas, null, {
         width: this.screenWidth - 50,
         height: this.screenHeight/2.8,
       });
       canvas.setChart(chart);
-      setTimeout(()=>{
-        this.echartsAjax(this.equipmenta,this.gatewayIda,0);
-      },300);
+
       return chart
     },
-    dataEchartsTwo(canvas){ //空气湿度
-      chart1 = echarts.init(canvas, null, {
-        width: this.screenWidth - 50,
-        height: this.screenHeight/2.8,
-      });
-      canvas.setChart(chart1);
-      setTimeout(()=>{
-        this.echartsAjax(this.equipmenta,this.gatewayIda,1);
-      },400);
-      return chart1
-    },
-    echartsAjax(nodeId,gatewayId,num){
+    echartsAjax(gatewayId,nodeId){
       this.$httpWX.post({
-        // this.gatewayId 改为 this.pId 查看已有数据
         url: '/miniProgram/history',
         data: {
           gatewayId:gatewayId,
           nodeId:nodeId,
           time:this.time,
+          field:this.columnKey,
         }
       }).then(res => {
-        var data = res.data;
-        // console.log(data);
-        var frequency = (60/data.frequency)-1;
-        this.timeAge = data.gatherTimes;
-        // this.dataAge = data.dataNodes[num].data;
-        if (num == 0) {
-          chart.setOption(this.getBarOption(this.timeAge,data.dataNodes[num].data,frequency,num),true)
-        } else if (num == 1) {
-          chart1.setOption(this.getBarOption(this.timeAge,data.dataNodes[num].data,frequency,num),true)
+        var data = res.data.data;
+        var frequency = (60/res.data.frequency)-1;
+        this.timeAge = [];
+        this.dataAge = [];
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].gatherTime == "") {
+            this.timeAge.push("");
+            this.dataAge.push(data[i].field);
+          } else {
+            this.dataAge.push(data[i].field);
+            this.timeAge.push(data[i].gatherTime);
+          }
         }
+        // 设置图表样式及数据
+        chart.setOption(this.getBarOption(this.timeAge,this.dataAge,frequency))
       })
     },
-    getBarOption(timeAge,dataAge,frequency,num){
+    getBarOption(timeAge,dataAge,frequency){
 
       if (dataAge.length > 40) {
         if (frequency <= "5") {
@@ -172,7 +166,7 @@ export default {
       }
       return {
         title: {
-                text: this.myAnnual[num].unit,
+                text: this.unitName,
                 textStyle:{
                   fonnSize :'11'
                 }
@@ -206,9 +200,9 @@ export default {
             //   formatter: "采集时间：{b}\n{a0}：{c0}",
             //   backgroundColor: 'rgba(0,0,0,0.3)', // 背景
             // },
-            // legend: {
-            //     data:[this.columnName]
-            // },
+            legend: {
+                data:[this.columnName]
+            },
             dataZoom : [
               {
                    type: 'slider',//图表下方的伸缩条
@@ -280,7 +274,7 @@ export default {
             },
             series: [
                 {
-                    name:this.myAnnual[num].name,
+                    name:this.columnName,
                     // symbol: "none",
                     type:'line',
                     // stack: '总量',
@@ -310,20 +304,17 @@ export default {
     },
     // 选择时间
     bindDateChangeOne: function(e) {
-      this.dateOne = e.target.value;
-      this.timeOne = this.dateOne;
-      this.time = this.dateOne;
-      setTimeout(()=>{
-        this.echartsAjax(this.equipmenta,this.gatewayIda,0);
-      },300);
+      this.date = e.target.value;
+      this.time = this.date;
+      this.echartsAjax(this.gatewayId,this.equipment);
     },
-    bindDateChangeTwo:function(e) {
-      this.dateTwo = e.target.value;
-      this.timeTwo = this.dateTwo;
-      this.time = this.dateTwo;
-      setTimeout(()=>{
-        this.echartsAjax(this.equipmenta,this.gatewayIda,1);
-      },300);
+    // 选择七要素
+    handlePickerChange (e) {
+      this.selectedIndex = e.target.value
+      this.columnKey = this.myAnnual[e.target.value].key
+      this.columnName = this.myAnnual[e.target.value].name;
+      this.unitName = this.myAnnual[e.target.value].unit;
+      this.echartsAjax(this.gatewayId,this.equipment);
     },
   }
 }
@@ -354,13 +345,8 @@ export default {
   background: #fff;
   border-radius: 10px;
   padding: 15px 0 0 15px;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
   position: relative;
-}
-.timedTask .dataEcharts picker{
-  position: absolute;
-  right: -6px;
-  top: 14px;
 }
 .timedTask .dataEcharts .echartsTitle{
   font-size: 18px;
@@ -402,8 +388,5 @@ export default {
 .echarts-wrap {
   width: 100%;
   margin-top: 45px;
-}
-.ChartsStyle{
-  position: absolute;
 }
 </style>

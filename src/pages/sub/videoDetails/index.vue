@@ -55,12 +55,12 @@ export default {
   },
   methods: {
     // 解绑摄像机
-    unbind(){
-      let confirm = ()=>{
-      	this.$httpWX.showSuccessToast('解绑成功')
-      }
-      this.$httpWX.alert('提示','确定解除设备绑定吗？',confirm,true);
-    },
+    // unbind(){
+    //   let confirm = ()=>{
+    //   	this.$httpWX.showSuccessToast('解绑成功')
+    //   }
+    //   this.$httpWX.alert('提示','确定解除设备绑定吗？',confirm,true);
+    // },
     // 点击设备名称弹框显示
     showModal(){
       this.input = '';

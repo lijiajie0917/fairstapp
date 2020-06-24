@@ -38,7 +38,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 10;
+  z-index: 999;
   border-bottom: 0.5px solid rgba(255,255,255,.2);
   display: flex;
   justify-content: center;
