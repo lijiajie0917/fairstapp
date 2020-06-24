@@ -7,7 +7,7 @@
         'top':(navH+175)+'px',
         'height':isIphoneX||isIphoneX11?(screenHeight-350)+'px':(screenHeight-240)+'px'}"
         >
-        <li class="timedTaskList" v-show="timedTaskShow">
+        <li class="timedTaskList" v-if="timedTaskShow">
           <div class="timedHeader">
             <p class="timedName">{{timedTaskList.name}}</p>
             <i-switch class="switchBtn"
@@ -43,10 +43,14 @@
             <li>动作 <span>{{item2.action == "OPEN"? "开启":"关闭"}}——{{equipmentName}}</span> </li>
           </ul>
         </li>
+        <div v-else class="noneTimming">
+          <img src="../../../static/images/automaticjpg.png" alt="">
+          <p>当前无定时任务!</p>
+        </div>
         <div class="addTiming" @click="goaddTiming()">
           添加定时任务
         </div>
-        <img class="AddBtn" @click="goaddTiming()" src="../../../static/images/addBtn.png" alt="">
+        <img v-show="addFlag" class="AddBtn" @click="goaddTiming()" src="../../../static/images/addBtn.png" alt="">
       </ul>
       <div class="Tourist" v-if="Tourist == '1'" @click="Touristips()">
         <div class="tipsBox" v-if="tipsBox">
@@ -82,7 +86,8 @@ export default {
       switch1:false,
       localId:'',
       equipmentName:'',
-      timedTaskShow:false,
+      timedTaskShow:true,
+      addFlag:true,
       Tourist:'',
       tipsBox:false,//是否显示体验者提示框
       count: '',// 倒计时
@@ -112,9 +117,9 @@ export default {
     this.projectId = this.$store.state.projectId;
     this.localId = this.$store.state.localId;
     this.Tourist = wx.getStorageSync('Tourist')
-    setTimeout(()=>{
-      this.scheduleControl(this.localId);
-    },500);
+    // setTimeout(()=>{
+    //   this.scheduleControl(this.localId);
+    // },500);
   },
   methods:{
     //2秒后提示框消失
@@ -148,8 +153,10 @@ export default {
         let data = res.data;
         if (data.actions.length == 0) {
           this.timedTaskShow = false;
+          this.addFlag = false;
         } else {
           this.timedTaskShow = true;
+          this.addFlag = true;
           this.timedTaskList = data;
         }
       })
@@ -320,5 +327,17 @@ export default {
   font-weight: 500;
   color: rgba(255, 255, 255, 1);
   vertical-align: middle;
+}
+.noneTimming{
+  color: #666666;
+  font-size: 15px;
+}
+.noneTimming img{
+  width: 218px;
+  height: 136px;
+  margin: 15px 0 34.5px 83.5px;
+}
+.noneTimming p{
+  margin-left: 135px;
 }
 </style>
