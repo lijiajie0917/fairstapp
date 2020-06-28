@@ -36,7 +36,7 @@ export default {
       num:'',
       videoName:'',
       title:'设备信息',
-      navH:this.$store.state.navH,
+      navH:'',
       deviceModal:true,
       input:'',
       videoVersion:''
@@ -51,7 +51,7 @@ export default {
     this.videoVersion = this.$root.$mp.query.Version
   },
   created(){
-
+    this.navH = wx.getStorageSync('navH');
   },
   methods: {
     // 解绑摄像机

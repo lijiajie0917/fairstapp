@@ -1,7 +1,7 @@
 <template>
   <div class="greenhouseWrap">
     <TitleBar :navTitle="title"></TitleBar>
-      <img class="navBackground" src="../../../../static/images/background.png" alt />
+      <img class="navBackground" :style="{'top':(navH)+'px'}" src="../../../../static/images/background.png" alt />
       <div class="areaGreenhouseBox" :style="{'top':(navH+20)+'px'}">
         <div class="A_hook">
           <div class="hook"></div>
@@ -113,7 +113,7 @@ export default {
   data () {
     return {
       title:'数据分析',
-      navH:this.$store.state.navH,
+      navH:'',
       equipment:'', //设备名称
       gatewayId:'', //设备ID
       projectId:'', //项目ID
@@ -156,6 +156,7 @@ export default {
     }
   },
   created:function(){
+    this.navH = wx.getStorageSync('navH');
     wx.hideShareMenu();//禁止出现转发按钮
     this.projectId = wx.getStorageSync('projectId')
     wx.getSystemInfo({
@@ -545,7 +546,6 @@ export default {
   width: 100vw;
   height: 125px;
   position: relative;
-  top: 0;
   left: 0;
 }
 /* 内容区 */

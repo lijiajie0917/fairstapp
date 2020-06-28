@@ -39,7 +39,7 @@ export default {
     return {
       num:'',
       videoUrl:'',
-      navH:this.$store.state.navH,
+      navH:'',
       channelNo:'',
     }
   },
@@ -48,7 +48,7 @@ export default {
     this.getVideoUrl();
   },
   created(){
-
+    this.navH = wx.getStorageSync('navH');
   },
   methods: {
     // 获取视频监控地址

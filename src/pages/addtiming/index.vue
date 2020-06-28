@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <div class="timing" :style="{'margin-top':(navH)+'px'}">
+    <div class="timing">
       <TitleBar :navTitle="title"></TitleBar>
       <!-- <SelectOption></SelectOption> -->
       <div class="timedTask" :style="{
-        'top':(navH+15)+'px',
+        'top':(navH + 20)+'px',
         'height':isIphoneX||isIphoneX11?(screenHeight-190)+'px':(screenHeight-80)+'px'}"
         >
         <div class="timedTaskList">
@@ -84,7 +84,7 @@ export default {
   data () {
     return {
       title:'添加定时任务',
-      navH:this.$store.state.navH,
+      navH:'',
       equipment:'', //设备名称
       gatewayId:'', //设备ID
       projectId:'', //项目ID
@@ -167,6 +167,7 @@ export default {
     }
   },
   created:function(){
+    this.navH = wx.getStorageSync('navH');
     wx.hideShareMenu();//禁止出现转发按钮
     wx.getSystemInfo({
       success: res => {
@@ -217,9 +218,11 @@ export default {
       switch(this.perName){
         case "永不":
             this.isActive = true;
+            this.isRepeat = false;
             break;
         default:
             this.isActive = false;
+            this.isRepeat = true;
             break;
       }
     },

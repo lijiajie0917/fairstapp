@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="timing" :style="{'margin-top':(navH)+'px'}">
+    <div class="timing">
       <TitleBar :navTitle="title"></TitleBar>
       <SelectOption :navTitle="title"></SelectOption>
       <ul class="timedTask" :style="{
@@ -34,7 +34,7 @@
             <li>{{item2.action == "OPEN"? "开始":"结束"}}时间 <span>{{item2.startTime}}</span> </li>
             <li v-show="item2.action == 'OPEN'? true:false ">执行类型
               <span>{{
-                  timedTaskList.period == '0'? '永不':timedTaskList.period == '1'? '每天':
+                  timedTaskList.period == '1'? timedTaskList.isRepeat == false? '永不' : '每天':
                   timedTaskList.period == '2'? '每两天':timedTaskList.period == '3'? '每三天' :
                   '每周'
                 }}</span>
@@ -75,7 +75,7 @@ export default {
   data () {
     return {
       title:'定时任务',
-      navH:this.$store.state.navH,
+      navH:'',
       equipment:'', //设备名称
       gatewayId:'', //设备ID
       projectId:'', //项目ID
@@ -94,6 +94,7 @@ export default {
     }
   },
   created:function(){
+    this.navH = wx.getStorageSync('navH');
     wx.hideShareMenu();//禁止出现转发按钮
     wx.getSystemInfo({
       success: res => {
@@ -171,7 +172,7 @@ export default {
         cmd = 0;
       }
       this.$httpWX.put({
-        url: '/miniProgram/scheduleControl',
+        url: '/miniProgram/scheduleControl/ifOpen',
         data: {
           localId : localId,
           name : name,
@@ -302,7 +303,7 @@ export default {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 900;
+  z-index: 100;
   display: flex;
   justify-content: center;
   align-items: center;
