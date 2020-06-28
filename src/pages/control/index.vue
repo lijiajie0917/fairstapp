@@ -607,7 +607,7 @@ export default {
 .equipmentImg {
   width: 50px;
   height: 50px;
-  margin: 0 31px 0 25px;
+  margin: 0 20px 0 15px;
   float: left;
 }
 .equipmentTitle {
@@ -672,10 +672,10 @@ export default {
 }
 .switchBtn {
   position: absolute;
-  right: 50rpx;
+  right: 40rpx;
   top: 71rpx;
-  width: 68rpx;
-  height: 40rpx;
+  width: 50px;
+  height: 40px;
 }
 .switchBtnBox{
   position: absolute;
