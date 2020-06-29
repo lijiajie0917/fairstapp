@@ -225,7 +225,7 @@ export default {
     trueDel() {
       let acTxt = "lowerWater";
       if (this.isHight == true) {
-        acTxt = "highWather";
+        acTxt = "highWater";
       }
       // console.log(acTxt);
       this.$httpWX
