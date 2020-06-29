@@ -107,7 +107,7 @@
           <div class="automaticTxt">
             <div class="automaticItem">
               当
-              <div class="spanTxt1">{{item.Wfield}}</div>{{item.isHight?'小于':'大于'}}
+              <div class="spanTxt1">{{item.Wfield}}</div>{{item.isHight?'大于':'小于'}}
               <div class="spanTxt2">{{item.Wlimit}}</div>
             </div>
             <div class="automaticItem">

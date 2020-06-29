@@ -266,7 +266,7 @@ export default {
             nodeId: this.nodeId,
             localId: this.localId,
             field: this.spanTxt1[this.spanN1].name,
-            lowWater: {
+            highWater: {
               name: this.maticName,
               limit: this.maticNum,
               action: this.spanTxt4[this.spanN4].state,
@@ -283,7 +283,7 @@ export default {
             nodeId: this.nodeId,
             localId: this.localId,
             field: this.spanTxt1[this.spanN1].name,
-            highWater: {
+            lowWater: {
               name: this.maticName,
               limit: this.maticNum,
               action: this.spanTxt4[this.spanN4].state,
