@@ -85,19 +85,19 @@
           <div class="equipmentStatus" v-if="item.typeName != '卷膜机'&&item.typeName != '卷帘机'">
             <div class="statusTitle">
               状态：
-              <div :class="item.STATUS == '0' ? 'spottz' : (item.STATUS == '1'? 'spotkq' : 'spotdj')"></div>
+              <div :class="item.isDamage != '0' ? 'spottz' : (item.STATUS == '1'? 'spotkq' : 'spotdj')"></div>
               <div
-                :class="item.STATUS == '0' ? 'spantz' : 'spankq'"
-              >{{item.STATUS == '0'? '停止' :(item.STATUS == '1'? '开启' : '待机')}}</div>
+                :class="item.isDamage != '0' ? 'spantz' : (item.STATUS == '1'? 'spankq' : 'spandj')"
+              >{{item.isDamage != '0'? '故障' :(item.STATUS == '1'? '开启' : '关闭')}}</div>
             </div>
           </div>
           <div class="equipmentStatus" v-if="item.typeName == '卷膜机'||item.typeName == '卷帘机'">
             <div class="statusTitle">
               状态：
-              <div :class="item.STATUS == '3' ? 'spottz' : (item.STATUS == '1'? 'spotkq' : 'spotdj')"></div>
+              <div :class="item.isDamage != '0' ? 'spottz' : (item.STATUS == '3'? 'spotdj' : 'spotkq')"></div>
               <div
-                :class="item.STATUS == '3' ? 'spantz' : 'spankq'"
-              >{{item.STATUS == '3'? '停止' : '开启'}}</div>
+                :class="item.isDamage != '0' ? 'spantz' : (item.STATUS == '3' ? 'spandj' : 'spankq')"
+              >{{item.isDamage != '0' ? '故障' : (item.STATUS == '3'? '停止' : '开启')}}</div>
             </div>
           </div>
           <div class="switchBtnBox" v-if="item.typeName == '卷膜机'||item.typeName == '卷帘机'">
