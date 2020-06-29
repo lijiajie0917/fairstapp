@@ -129,7 +129,7 @@ function showErrorToast(msg) {
   wx.showToast({
     title: msg,
     mask: true,
-    duration:3000,//显示时长
+    duration:2000,//显示时长
     icon: "none" //图标，支持"success"、"loading"
     // image: '/static/images/icon_error.png' //自定义失败图标
   })

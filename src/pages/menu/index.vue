@@ -137,7 +137,8 @@ export default {
       wx.getSystemInfo({
         success: function(res) {
           that.navH = res.statusBarHeight + 46;
-          that.$store.commit('setnavH',that.navH);
+          that.$httpWX.setStorage("navH",that.navH);
+          // that.$store.commit('setnavH',that.navH);
         }
       })
     },

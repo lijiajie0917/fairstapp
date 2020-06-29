@@ -30,7 +30,7 @@ export default {
   data () {
     return {
       title:'视频监控',
-      navH:this.$store.state.navH,
+      navH:'',
       videoList:[],
       Tourist:'',
       tipsBox:false,//是否显示体验者提示框
@@ -39,6 +39,7 @@ export default {
   },
   created(){
     wx.hideShareMenu();//禁止出现转发按钮
+    this.navH = wx.getStorageSync('navH');
   },
   watch: {
     '$store.state.deviceName': function (newVal) {

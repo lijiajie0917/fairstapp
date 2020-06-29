@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img class="navBackground" src="../../../static/images/background.png" alt />
+    <img class="navBackground" :style="{'top':(navH)+'px'}" src="../../../static/images/background.png" alt />
     <div class="areaGreenhouseBox" :style="{'top':(navH+20)+'px'}">
       <div class="A_hook">
         <div class="hook"></div>
@@ -66,7 +66,7 @@ export default {
     props: ["navTitle"],
     data() {
     	return {
-        navH: this.$store.state.navH, //导航栏高度
+        navH: '', //导航栏高度
         areaText: "", //默认片区
         greenhouse: "", //默认大棚名称
         maskItems: [], //片区列表内容初始化
@@ -84,6 +84,7 @@ export default {
     },
     created:function(){
       wx.hideShareMenu(); //禁止出现转发按钮
+      this.navH = wx.getStorageSync('navH');
       this.projectId = wx.getStorageSync('projectId')
     },
     mounted() {
@@ -370,7 +371,6 @@ export default {
   width: 100vw;
   height: 125px;
   position: relative;
-  top: 0;
   left: 0;
 }
 </style>

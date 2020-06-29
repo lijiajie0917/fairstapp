@@ -1,6 +1,6 @@
 <template>
-  <div class='nav' :style="{height:(navH)+'px',}">
-    <img class="navBackground" src="../../../static/images/titlebg.jpg" alt />
+  <div class='nav' :style="{height:(navH)+'px'}">
+    <img class="navBackgroundTitle" :style="{height:(navH)+'px'}" src="../../../static/images/titlebg.jpg" alt />
     <div class='title_icon'>
       <img class="back" src="../../../static/images/backIcon.png" @click='navBack' alt="" mode='aspectFit'>
     </div>
@@ -13,11 +13,11 @@ export default {
     props: ["navTitle"],
     data() {
     	return {
-          navH: this.$store.state.navH, //导航栏高度
+          navH: '', //导航栏高度
       };
     },
     created:function(){
-
+      this.navH = wx.getStorageSync('navH');
     },
     methods:{
       /**标题栏返回按钮 */
@@ -85,11 +85,9 @@ export default {
   border-left: 1px solid #eaeaea;
   margin-top: 6px;
 }
-.navBackground {
+.navBackgroundTitle {
   width: 100vw;
-  height: 64px;
   position: relative;
-  top: 0;
   left: 0;
 }
 </style>
