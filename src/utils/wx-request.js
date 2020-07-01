@@ -37,8 +37,17 @@ function request (url, method, data, header = {}) {
           'projectId':wx.getStorageSync('projectId')
         },
         success: function (res) {
-          wx.hideLoading()
-          resolve(res.data)
+          if (res.data.status == "002002" || res.data.status == "002001") {
+            let confirm = ()=>{
+              wx.navigateTo({
+                url: '/pages/login/main',
+              })
+            }
+            alert('提示','您的帐号已在其他地方登录，请重新登录',confirm);
+          } else {
+            wx.hideLoading()
+            resolve(res.data)
+          }
         },
         fail: function (res) {
           wx.hideLoading()

@@ -129,7 +129,7 @@ export default {
   position: absolute;
   right: 36px;
   top: 32.5px;
-  z-index: 1000;
+  z-index: 500;
 }
 .container {
   background-color: #f3f5f8;
